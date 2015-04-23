@@ -1,7 +1,7 @@
 # ################################################################ #
 # DEFINITION OF MY FUNCTION TO KNOW IF A YEAR IS BISSEXTILE OR NOT #
 #                                                                  #  
-def is_bis(annee)
+def is_bis(annee):
 	try:
 		year = int(annee)
 	except:
