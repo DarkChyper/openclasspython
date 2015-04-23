@@ -1,7 +1,8 @@
-# ################################################################ #
-# DEFINITION OF MY FUNCTION TO KNOW IF A YEAR IS BISSEXTILE OR NOT #
-#                                                                  #  
 def is_bis(annee):
+	"""
+		return True if the "annee" argument is bissextile
+		return False if not or if "annee" is not a int
+	"""
 	try:
 		year = int(annee)
 	except:
