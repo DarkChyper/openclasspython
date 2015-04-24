@@ -1,4 +1,3 @@
-#!/usr/bin/python3.4
 def is_bis(annee):
 	"""
 		return True if the "annee" argument is bissextile
