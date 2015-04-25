@@ -39,5 +39,57 @@ while choixFait == None:
 		choixFait = True
 infoBank = dict()
 infoBank = difficulte(choixDifficulte)
-print infoBank
+
+"""
+Boucle qui fait continuer la partie après x mise(s) tant que : 
+	_ le joueur ou la banque n'est pas à < 0
+	_ le joueur ne décide pas de terminer la partie
+"""
+nouveauParis = True
+while nouveauParis:
+	#on initialise le lancé
+	table = dict() #contiendra les mises sur les différentes cases
+	infoBank['lancer'] = infoBank[User] # le joueur ne peut miser que ce qu'il possède
+	while 1:
+		tableauMises()#affichage des mises et de l'argent que l'user peut encore miser
+		print "Laisser vide si vous voulez lancer la bille !"
+		case = raw_input("Sur quelle case misez-vous ?")
+		if case == "":
+			break
+		try:
+			case = int(case)
+			assert case >= 0 or case <= 49
+		except ValueError:
+			print "Merci de choisir une case entre 0 et 49."
+		except AssertionError:
+			print "Merci de choisir une case entre 0 et 49."
+		else:
+			while 1:
+				mise = raw_input("Combien misez-vous ?")
+				try:
+					mise = int(mise)
+					assert mise <= bankInfo[lancer] or mise >= 0
+				except AssertionError:
+					print "Vous ne pouvez pas miser plus de "bankInfo[lancer]"$ ou une mise négative !"
+				except ValueError:
+					print "Mise incorrecte."
+				else:
+					
+		
+	
+	choix = False
+	while choix == False:
+		try:		
+			again = raw_input("Une nouvelle mise ? O/n ")
+			assert again == "o" or again =="n"
+		except AssertionError:
+			print "Merci de choisir o pour oui ou n pour non."
+		else:
+			if again == "n":
+				choix = True
+				nouveauParis = False
+
+		
+
+
 
