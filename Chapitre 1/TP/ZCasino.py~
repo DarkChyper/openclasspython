@@ -4,6 +4,7 @@
 """ Premier TP OpenClassRoom
 ZCasino
 """
+import os
 from ZCasino import *
 
 """
@@ -24,10 +25,10 @@ userName = raw_input("Comment vous appellez-vous ? ")
 
 # on demande au joueur le niveau de difficulte
 print "Merci de choisir votre niveau de difficulté, ",userName
-print "1 Facile : Bank 100$ ",userName," 200$"
-print "2 Normal : Bank 200$ ",userName," 200$"
-print "3 Difficil : Bank 500$ ",userName," 100$"
-print "4 Ninja : Bank 1000$ ",userName," 50$"
+print "1 Facile : Bank 100$ ",userName,"200$"
+print "2 Normal : Bank 200$ ",userName,"200$"
+print "3 Difficil : Bank 500$ ",userName,"100$"
+print "4 Ninja : Bank 1000$ ",userName,"50$"
 choixFait = None
 while choixFait == None:
 	choix = raw_input("1,2,3 ou 4 ? ")
@@ -122,7 +123,7 @@ while nouveauParis:
 			print "Merci de choisir o pour oui ou n pour non."
 		else:
 			if again == "n":
-				print "Vous êtes sages ",userName"."
+				print "Vous êtes sages ",userName,"."
 				print "Vous repartez avec ",infoBank[User],"$ !"
 				choix = True
 				nouveauParis = False #on ne refera pas de pari donc on sort de la boucle 1

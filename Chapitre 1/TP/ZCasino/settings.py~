@@ -67,14 +67,14 @@ def resolution(infoBank, bille, tableDeJeu, userName):
 			# si le joueur a la bonne parité
 			if ( i % 2 == 0 and bille % 2 == 0) or (i % 2 == 1 and bille % 2 == 1):
 				# les gains sont de 150% de la mise
-				infoBank[lancer] = infoBank[lancer] + ceil(infoBank[i] * 1.5)
+				infoBank[lancer] = infoBank[lancer] + ceil(tableDeJeu[i] * 1.5)
 				# la banque perd la moitié de la mise
-				infoBank[Bank] = infoBank[Bank] - ceeil(infoBank[i] * 0.5)
+				infoBank[Bank] = infoBank[Bank] - ceeil(tableDeJeu[i] * 0.5)
 
 			# sinon il perd sa mise qui va à la banque
 			else:
-				infoBank[Bank] = infoBank[Bank] + infoBank[i]
-				perte = perte + infoBank[i]
+				infoBank[Bank] = infoBank[Bank] + tableDeJeu[i]
+				perte = perte + tableDeJeu[i]
 	# on met à jour les infos du joueur
 	infoBank[User] = infobank[lancer]
 

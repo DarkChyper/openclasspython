@@ -39,7 +39,7 @@ def afficheBank(infoBank,userName, tableDeJeu):
 	#affichage des mises si il y en a
 	for i in range(50):
 		if tableDeJeu[i] > 0:
-			print "case ",i" : ",tableDeJeu[i]"$"
+			print "case ",i," : ",tableDeJeu[i],"$"
 	
 	if infoBank[user] > infoBank[lancer]:
 		print "Reste ",	infoBank[lancer],"$"
