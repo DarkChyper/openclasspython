@@ -5,7 +5,7 @@
 ZCasino
 """
 import os
-from ZCasino.settings import *
+from ZCasino import *
 
 """Main"""
 print "==========================="
