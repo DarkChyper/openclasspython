@@ -1,0 +1,2 @@
+/Foo
+    settings.py
