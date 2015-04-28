@@ -5,7 +5,7 @@
 ZCasino
 """
 import os
-from ZCasino import settings
+from settings import *
 
 """
 Initilisation des variables
@@ -24,14 +24,14 @@ print "Le but est de faire sauter la banque au jeu de la roulette"
 userName = raw_input("Comment vous appellez-vous ? ")
 
 # on demande au joueur le niveau de difficulte
-print "Merci de choisir votre niveau de difficulté, ",userName
+print "\n\nMerci de choisir votre niveau de difficulté, ",userName
 print "1 Facile : Bank 100$ ",userName,"200$"
 print "2 Normal : Bank 200$ ",userName,"200$"
 print "3 Difficil : Bank 500$ ",userName,"100$"
 print "4 Ninja : Bank 1000$ ",userName,"50$"
 choixFait = None
 while choixFait == None:
-	choix = raw_input("1,2,3 ou 4 ? ")
+	choix = raw_input("\n1,2,3 ou 4 ? ")
 	try:
 		choixDifficulte = int(choix)
 		assert choixDifficulte >= 1 and choixDifficulte <= 4
@@ -45,7 +45,7 @@ while choixFait == None:
 		choixFait = True
 
 infoBank = difficulte(choixDifficulte)
-
+#print infoBank
 """
 Boucle qui fait continuer la partie après x mise(s) tant que : 
 	_ le joueur ou la banque n'est pas à < 0
@@ -55,13 +55,19 @@ nouveauParis = True
 while nouveauParis:
 	#on initialise le lancé
 	tableDeJeu = initTable()
-	infoBank['lancer'] = infoBank[User] # le joueur ne peut miser que ce qu'il possède
+	#print tableDeJeu
+	infoBank['Lancer'] = infoBank['User'] # le joueur ne peut miser que ce qu'il possède
 
 	#le joueur pose ses mises
 	while 1:
-		afficheBank(infoBank, userName)#affichage des mises et de l'argent que l'user peut encore miser
-		print "Laisser vide si vous voulez lancer la bille !"
-		case = raw_input("Sur quelle case misez-vous ?")
+		afficheBank(infoBank, userName, tableDeJeu)#affichage des mises et de l'argent que l'user peut encore miser
+
+		# on affiche la condition d'arret des mises si une mise a été faite
+		if infoBank['Lancer'] < infoBank['User']:		
+			print "Laisser vide si vous voulez lancer la bille !"
+		
+		#recuperation du numero de la case
+		case = raw_input("Sur quelle case misez-vous ? ")
 		if case == "":
 			break # on sort du while 1
 		try:
@@ -74,18 +80,19 @@ while nouveauParis:
 		else:
 			#le joueur a choisi une case valide on attend sa mise
 			while 2:
-				mise = raw_input("Combien misez-vous ?")
+				mise = raw_input("Combien misez-vous ? ")
 				try:
 					mise = int(mise)
-					assert mise <= infoBank[lancer] or mise >= 0
+					assert mise <= infoBank['Lancer'] or mise >= 0
 				except AssertionError:
-					print "Vous ne pouvez pas miser plus de ",infoBank[lancer],"$ ou une mise négative !"
+					print "Vous ne pouvez pas miser plus de ",infoBank['Lancer'],"$ ou une mise négative !"
 				except ValueError:
 					print "Mise incorrecte."
 				else:
 					#le joueur a fait une mise autorisée
 					#on la rajoute au tableau des mises
 					tableDeJeu[case] = tableDeJeu.get(case,0) + mise
+					infoBank['Lancer'] = infoBank['Lancer'] - mise
 					break #on sort du while 2
 
 	print "On lance la roulette !"
@@ -102,20 +109,19 @@ while nouveauParis:
 	#resolution des pertes et gains
 	infoBank = resolution(infoBank, bille, tableDeJeu, userName)
 
-	if infoBank[User] == 0:
+	if infoBank['User'] == 0:
 		print "Vous n'avez plus d'argent, vous avez perdu."
 		print "Aurevoir ",userName
 		nouveauParis = False #on ne refera pas de pari donc on sort de la boucle 1
 		continue
 		
-	elif infoBank[Bank] <= 0:
+	elif infoBank['Bank'] <= 0:
 		print "Vous avez fait sauter la Banque ",userName," !!!"
 		print "Vous avez gagner la partie !"
-		print "Vous repartez avec ",infoBank[User],"$ !"
+		print "Vous repartez avec ",infoBank['User'],"$ !"
 		nouveauparis = False #on ne refera pas de pari donc on sort de la boucle 1
 	
-	choix = False
-	while choix == False:
+	while 3:
 		try:		
 			again = raw_input("Une nouvelle mise ? O/n ")
 			assert again == "o" or again =="n"
@@ -124,9 +130,10 @@ while nouveauParis:
 		else:
 			if again == "n":
 				print "Vous êtes sages ",userName,"."
-				print "Vous repartez avec ",infoBank[User],"$ !"
-				choix = True
+				print "Vous repartez avec ",infoBank['User'],"$ !"
+				
 				nouveauParis = False #on ne refera pas de pari donc on sort de la boucle 1
+				break
 
 # quand on arrive ici, c'est que la partie est terminée
 print "A bientôt au Dark ZCasino !"
