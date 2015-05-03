@@ -72,7 +72,7 @@ while nouveauParis:
 			break # on sort du while 1
 		try:
 			case = int(case)
-			assert case >= 0 or case <= 49
+			assert case >= 0 and case <= 49
 		except ValueError:
 			print "Merci de choisir une case entre 0 et 49."
 		except AssertionError:
@@ -83,7 +83,7 @@ while nouveauParis:
 				mise = raw_input("Combien misez-vous ? ")
 				try:
 					mise = int(mise)
-					assert mise <= infoBank['Lancer'] or mise >= 0
+					assert mise <= infoBank['Lancer'] and mise >= 0
 				except AssertionError:
 					print "Vous ne pouvez pas miser plus de ",infoBank['Lancer'],"$ ou une mise négative !"
 				except ValueError:
@@ -93,7 +93,7 @@ while nouveauParis:
 					#on la rajoute au tableau des mises
 					tableDeJeu[case] = tableDeJeu.get(case,0) + mise
 					infoBank['Lancer'] = infoBank['Lancer'] - mise
-					break #on sort du while 2
+				break #on sort du while 2
 
 	print "On lance la roulette !"
 
