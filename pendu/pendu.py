@@ -25,3 +25,4 @@ pseudo = askName()
 # Vérification de la présence du fichier des scores 
 # et de la présence du joueur ou non
 scores = initScores(pseudo)
+affPlayerScores(scores, pseudo)
