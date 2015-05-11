@@ -1,7 +1,7 @@
 #!/usr/python3.4
 # -*-coding:utf_8 -*
 
-import * from donnees
+from donnee import *
 import pickle
 """
 	Définition des fonctions utilisées dans le jeu de pendu pendu.py
@@ -30,7 +30,7 @@ def initScores(pseudo):
 	scores = dict()
 	#tentative d'ouverture du fichier des scores
 	try:
-		with open(donnees.defNameScores(), 'rb') as fichier :
+		with open(defNameScores(), 'rb') as fichier :
 			lesScoresBrut = pickle.Unpickler(fichier)
 			scores = pickle.load(lesScoresBrut)
 	
@@ -40,3 +40,9 @@ def initScores(pseudo):
 	scores[pseudo] = scores.get(pseudo,0) 
 
 	return scores
+
+"""
+	affiche le nombre de point du joueur
+"""
+def affPlayerScores(scores, pseudo):
+	print ("{} vous avez actuellement {} point(s) ! ".format(pseudo, scores[pseudo]))
