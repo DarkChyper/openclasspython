@@ -26,3 +26,10 @@ pseudo = askName()
 # et de la présence du joueur ou non
 scores = initScores(pseudo)
 affPlayerScores(scores, pseudo)
+
+#boucle de sortie du jeu
+while 1:
+	dico = initWord()
+	while 2: # tant que l'on ne sort pas de cette boucle
+			 # on cherche le mot
+	break
