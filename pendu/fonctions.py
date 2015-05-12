@@ -63,10 +63,10 @@ def initWord():
 	mot = selectMot() # on prend un mot au hasard
 	secret = chiffreMot(mot) # on cacche le mot pour le joueur
 	dico = {
-	hidden:mot,
-	founded:secret,
-	tentativ:""
-	essai:8
+	'hidden':mot,
+	'founded':secret,
+	'tantativ':"",
+	'essai':"8"
 	}
 	return dico
 
@@ -78,7 +78,7 @@ def initWord():
 def chiffreMot(mot):
 	hidden = ""
 	for i in range(len(mot)):
-		hidden += hiden + "_"
+		hidden += hidden + "_"
 	return hidden
 
 """
@@ -90,71 +90,71 @@ def chiffreMot(mot):
 		_ le nombre d'essai restants (essai)
 """
 def affEtatPendu(**dico):
-	if dico[essai] == 0:
+	if int(dico['essai']) == 0:
 		print"    _______"
 		print"   //   |"
-		print"  ||    0     {}".format(dico[lettres])
-		print"  ||   /|\    Il reste {} essai(s)".format(dico[essai])
+		print"  ||    0     {}".format(dico['tantativ'])
+		print"  ||   /|\    Il reste {} essai(s)".format(dico['essai'])
 		print"  ||   / \ "
 		print"_/||__"
-	elif dico[essai] == 1:
+	elif int(dico['essai']) == 1:
 		print"    _______"
 		print"   //   |"
-		print"  ||    0     {}".format(dico[lettres])
-		print"  ||   /|\    Il reste {} essai(s)".format(dico[essai])
+		print"  ||    0     {}".format(dico['tantativ'])
+		print"  ||   /|\    Il reste {} essai(s)".format(dico['essai'])
 		print"  ||   /  "
 		print"_/||__"
-	elif dico[essai] == 2:
+	elif int(dico['essai']) == 2:
 		print"    _______"
 		print"   //   |"
-		print"  ||    0     {}".format(dico[lettres])
-		print"  ||   /|\    Il reste {} essai(s)".format(dico[essai])
+		print"  ||    0     {}".format(dico['tantativ'])
+		print"  ||   /|\    Il reste {} essai(s)".format(dico['essai'])
 		print"  ||     "
 		print"_/||__"
-	elif dico[essai] == 3:
+	elif int(dico['essai']) == 3:
 		print"    _______"
 		print"   //   |"
-		print"  ||    0     {}".format(dico[lettres])
-		print"  ||   /|     Il reste {} essai(s)".format(dico[essai])
+		print"  ||    0     {}".format(dico['tantativ'])
+		print"  ||   /|     Il reste {} essai(s)".format(dico['essai'])
 		print"  ||     "
 		print"_/||__"
-	elif dico[essai] == 4:
+	elif int(dico['essai']) == 4:
 		print"    _______"
 		print"   //   |"
-		print"  ||    0     {}".format(dico[lettres])
-		print"  ||    |     Il reste {} essai(s)".format(dico[essai])
+		print"  ||    0     {}".format(dico['tantativ'])
+		print"  ||    |     Il reste {} essai(s)".format(dico['essai'])
 		print"  ||     "
 		print"_/||__"
-	elif dico[essai] == 5:
+	elif int(dico['essai']) == 5:
 		print"    _______"
 		print"   //   |"
-		print"  ||    0     {}".format(dico[lettres])
-		print"  ||          Il reste {} essai(s)".format(dico[essai])
+		print"  ||    0     {}".format(dico['tantativ'])
+		print"  ||          Il reste {} essai(s)".format(dico['essai'])
 		print"  ||     "
 		print"_/||__"
-	elif dico[essai] == 6:
+	elif int(dico['essai']) == 6:
 		print"    _______"
 		print"   //   |"
-		print"  ||    0     {}".format(dico[lettres])
-		print"  ||          Il reste {} essai(s)".format(dico[essai])
+		print"  ||    0     {}".format(dico['tantativ'])
+		print"  ||          Il reste {} essai(s)".format(dico['essai'])
 		print"  ||     "
 		print"_/||__"
-	elif dico[essai] == 7:
+	elif int(dico['essai']) == 7:
 		print"    _______"
 		print"   //   |"
-		print"  ||          {}".format(dico[lettres])
-		print"  ||          Il reste {} essai(s)".format(dico[essai])
+		print"  ||          {}".format(dico['tantativ'])
+		print"  ||          Il reste {} essai(s)".format(dico['essai'])
 		print"  ||     "
 		print"_/||__"
-	elif dico[essai] == 8:
+	elif int(dico['essai']) == 8:
 		print"    _______"
 		print"   //   "
-		print"  ||          {}".format(dico[lettres])
-		print"  ||          Il reste {} essai(s)".format(dico[essai])
+		print"  ||          {}".format(dico['tantativ'])
+		print"  ||          Il reste {} essai(s)".format(dico['essai'])
 		print"  ||     "
 		print"_/||__"
 
-	print affHiddenWord(dico[founded])
+	print affHiddenWord(dico['founded'])
 
 
 """
@@ -186,12 +186,12 @@ def askLettre():
 """
 def verifLettre(lettre, **dico):
 	#on ajoute la lettre aux lettres proposées
-	dico[tantative] = dico[tantative] + lettre
+	dico['tantative'] = dico['tantative'] + lettre
 
 	#on verifie la presence de la lettre dans le mot
 	verif = False
 	mot = ""
-	for i in len(dico[hidden]):
+	for i in len(dico['hidden']):
 		if dico[hidden[i]] == lettre:
 			mot += lettre
 			verif = True
@@ -201,7 +201,7 @@ def verifLettre(lettre, **dico):
 		print ("La lettre \"{}\" fait bien partie du mot mystère !".format(lettre))
 	else: 
 		print ("{} ne fait pas partie du mot mystère, vous perdez un point.".format(lettre))
-		dico[essai] = dico[essai] - 1
+		dico['essai'] = str(int(dico['essai']) - 1)
 
 	return dico
 
