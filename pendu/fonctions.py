@@ -164,3 +164,50 @@ def affEtatPendu(**dico):
 """
 def affHiddenWord(mot):
 	print mot
+
+"""
+	Demande une lettre au joueur et la retourne
+"""
+def askLettre():
+	while 1:
+		lettre = raw_input("Quelle lettre voulez-vous tenter ? ")
+		if len(lettre) > 1 or len(lettre) == 0:
+			print("Merci de ne saisir qu'une seule lettre")
+		elif lettre.lower() not in ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]:
+			print("Merci de ne pas saisir autre chose qu'une lettre, sans accent.")
+		else:
+			return lettre.lower()
+
+"""
+	Prend en entrée la lettre choisi et le dictionnaire du jeu.
+	Vérifie la présence de la lettre dans le mot à trouver.
+	Mets à jour le mot à trouver, les lettres proposées et le nombres de tentatives restantes
+	Renvoi un dico
+"""
+def verifLettre(lettre, **dico):
+	#on ajoute la lettre aux lettres proposées
+	dico[tantative] = dico[tantative] + lettre
+
+	#on verifie la presence de la lettre dans le mot
+	verif = False
+	mot = ""
+	for i in len(dico[hidden]):
+		if dico[hidden[i]] == lettre:
+			mot += lettre
+			verif = True
+		else: mot += "_"
+
+	if verif == True:
+		print ("La lettre \"{}\" fait bien partie du mot mystère !".format(lettre))
+	else: 
+		print ("{} ne fait pas partie du mot mystère, vous perdez un point.".format(lettre))
+		dico[essai] = dico[essai] - 1
+
+	return dico
+
+"""
+"""
+def svgScores(**scores):
+	with open(defNameScores(), 'wb') as fichier :
+		mon_pickler = pickle.Pickler(fichier)
+		mon_pickler.dump(scores)
