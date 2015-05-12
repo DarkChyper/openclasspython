@@ -154,7 +154,7 @@ def affEtatPendu(**dico):
 		print"  ||     "
 		print"_/||__"
 
-	print affHiddenWord(dico['founded'])
+	affHiddenWord(dico['founded'])
 
 
 """
