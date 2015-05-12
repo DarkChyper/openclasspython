@@ -32,35 +32,49 @@ scores = initScores(pseudo)
 #boucle de sortie du jeu
 nouveauMot = True
 while nouveauMot:
-	print("===DEBUG=== Affichage des scores")
+	
 	affPlayerScores(scores, pseudo)
-	print("===DEBUG=== Initialisation du mot")
+	
 	dico = initWord()
 	while 2: # tant que l'on ne sort pas de cette boucle
 			 # on cherche le mot
-		print("===DEBUG=== Affichage de l'etat du pendu")
+		
 		affEtatPendu(**dico) #affiche l'etat du pendu
-		print("===DEBUG=== Demande de la lettre")
+		
 		lettre = askLettre()
 		dico = verifLettre(lettre,**dico)
+
+		print("\n\n\n\n")
+
 		# on vérifie les conditions de sortie
-		if dico[essai] == 0: # le joueur a utilisé ses 8 tentatives
+		if int(dico['essai']) == 0: # le joueur a utilisé ses 8 tentatives
+
 			affEtatPendu(**dico)
+
 			print("Vous avez perdu ! ")
 			print("Le mot était \"{}\".".format(dico['hidden']))
+
 			break # on sort du mot mais le joueur peut recommencer
-		elif dico[hidden] == dico[founded]: # le joueur a trouvé le mot en moins de 8 tentatives
+
+		elif dico['hidden'] == dico['founded']: # le joueur a trouvé le mot en moins de 8 tentatives
+
 			print("Bravo {}, vous avez trouvé le mot \"{}\"".format(pseudo,dico['founded']))
 			print("Vous gagnez {} points.".format(dico['essai']))
-			print("Vous avez {} au total".format(dico['essai'] + scores['pseudo']))
-			dico['essai'] = dico['essai'] + scores['pseudo'] # on prépare la sauvegarde du nouveau score
+
+			calcul = int(dico['essai']) + int(scores[pseudo])
+
+			print("Vous avez {} au total".format(str(calcul)))
+			dico['essai'] = str(calcul) # on prépare la sauvegarde du nouveau score
+
 			break
+
 	# on sort du mot
 	# on enregistre le score même si c'est 0 point
 	# on écrase l'ancien score
-	scores['pseudo'] = dico['essai']
+	scores[pseudo] = dico['essai']
 	print("Sauvegarde de votre score.")
 	svgScores(**scores)
+
 	while 3:
 		try:		
 			again = raw_input("Un nouveau mot ? O/n ")
@@ -72,6 +86,6 @@ while nouveauMot:
 				print("Un prochain mot un autre jour !")
 				
 				nouveauMot = False 
-				break
+		break
 
 print("A bientôt !")

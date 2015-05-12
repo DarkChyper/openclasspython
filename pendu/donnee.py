@@ -36,5 +36,5 @@ def selectMot():
 		15:"dos",
 		16:"docteur"
 	} 
-	return motWoasar[randrange(len(motWoasar))]
+	return motWoasar[randrange(16)]
 

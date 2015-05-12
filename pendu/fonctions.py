@@ -78,7 +78,7 @@ def initWord():
 def chiffreMot(mot):
 	hidden = ""
 	for i in range(len(mot)):
-		hidden += hidden + "_"
+		hidden += "_"
 	return hidden
 
 """
@@ -163,7 +163,7 @@ def affEtatPendu(**dico):
 	Prend en argument une chaine de caratères
 """
 def affHiddenWord(mot):
-	print mot
+	print("Mot à trouver :{}".format(mot))
 
 """
 	Demande une lettre au joueur et la retourne
@@ -185,17 +185,23 @@ def askLettre():
 	Renvoi un dico
 """
 def verifLettre(lettre, **dico):
-	#on ajoute la lettre aux lettres proposées
-	dico['tantative'] = dico['tantative'] + lettre
+	# on ajoute la lettre aux lettres proposées
+	dico['tantativ'] = dico['tantativ'] + lettre
 
-	#on verifie la presence de la lettre dans le mot
+	# on verifie la presence de la lettre dans le mot
 	verif = False
 	mot = ""
-	for i in len(dico['hidden']):
-		if dico[hidden[i]] == lettre:
+	for i in range(len(dico['hidden'])):
+		if dico['hidden'][i] == lettre:
 			mot += lettre
 			verif = True
-		else: mot += "_"
+		elif dico['founded'][i] <> "_":
+			mot += dico['founded'][i]
+		else:
+			 mot += "_"
+
+	# on reffecte le mot calculé
+	dico['founded'] = mot
 
 	if verif == True:
 		print ("La lettre \"{}\" fait bien partie du mot mystère !".format(lettre))
