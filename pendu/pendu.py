@@ -20,7 +20,8 @@ dico = dict()
 
 """ Main
 """
-print("Bienvenue dans le jeu de pendu.\n")
+print("Bienvenue dans le jeu du pendu.\n")
+affRegles()
 
 # On demande au joueur de renseigner son nom/pseudo
 pseudo = askName()

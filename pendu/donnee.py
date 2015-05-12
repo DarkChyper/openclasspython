@@ -6,7 +6,17 @@ from random import randrange
 """
 	Definition des données utiles pour le jeu de pendu.py
 """
-
+def affRegles():
+	print("\n==============")
+	print("Règles du jeu:")
+	print("     _ à chaque mot, le joueur à 8 tentatives pour trouver")
+	print("       les lettres qui le compose")
+	print("     _ le nombre de point est le nombre de tentative(s) restante(s)")
+	print("     _ à chaque mot vous cululez des points")
+	print("     _ ATTENTION si le nombre de tentative passe à 0")
+	print("       votre score revient à 0!!!")
+	print("==============\n")
+	
 def defNameScores():
 	fichier_des_scores = "scores"
 	return fichier_des_scores
