@@ -14,7 +14,22 @@ class Personne:
         self.nom = nom
         self.prenom = prenom
         self.age = 29
-        self.lieu_residence = "Lille"
+        self._lieu_residence = "Lille"
+
+    def _get_lieu_residence(self):
+
+        """Méthode qui sera appelée quand on souhaitera accéder en lecture 
+        à l'attribut 'lieu_residence'"""
+
+        print("On accède à l'attribut lieu_residence !")
+        print self._lieu_residence
+    def _set_lieu_residence(self, nouvelle_residence):
+        """Méthode appelée quand on souhaite modifier le lieu de résidence"""
+        print("Attention, il semble que {} déménage à {}.".format(self.prenom, nouvelle_residence))
+        self._lieu_residence = nouvelle_residence
+    # On va dire à Python que notre attribut lieu_residence pointe vers une
+    # propriété
+    lieu_residence = property(_get_lieu_residence, _set_lieu_residence)
 
 class Compteur:
     """Cette classe possède un attribut de classe qui s'incrémente à chaque
@@ -26,7 +41,7 @@ class Compteur:
     def combien(cls):
         print("jusqu'à présent, {} objet(s) ont été créé(s)".format(cls.objets_crees))
 
-combien = classmethod(combien)
+    combien = classmethod(combien)
 class TableauNoir:
     """Classe définissant un tableau noir sur lequel on peut écrire, lire et effacer"""
 
@@ -50,19 +65,12 @@ class TableauNoir:
         """Cette méthode permet d'effacer la surface du tableau"""
         self.surface= ""
 
-print("Voici un tableau vide :")
-tab = TableauNoir()
-tab.lire()
-
-print("On écrit sur le tableau")
-tab.ecrire("F*ck ce ne sont pas les vacances :(")
-tab.lire()
-
-print("On ajoute une ligne")
-tab.ecrire("Et en plus il fait moche !!!")
-tab.lire()
-
-print("A la fin on efface tout")
-tab.effacer()
-tab.lire()
+print("On crée la personne 'Simon'")
+simon = Personne("Lhoir","Simon")
+print simon.nom
+print simon.prenom
+print simon.age
+simon.lieu_residence
+simon.lieu_residence = "Wasquehal"
+print simon.lieu_residence
 
