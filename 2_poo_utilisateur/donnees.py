@@ -11,7 +11,7 @@
 # For more informations, please read pendu.py's description
 #########################################################################################
 
-nb_coups_max = 8
+nb_coups_max = 10
 
 adresse_fichier = "F:/hubiC/Linux/python_mooc/python_mooc_open_classroom/openclasspython/2_poo_utilisateur/scores"
 
@@ -37,3 +37,19 @@ mots = [
         "vampire",
         "volant",
         ]
+
+# Contient 11 états du pendu,
+# l'indice 0 étant le pendu vide et l'indice 10 le pendu entier
+pendu_ascii =   (
+                "\n\n\n\n\n\n\n",
+                "\n\n\n\n\n\n_____________\n",
+                "\n |\n |\n |\n |\n |\n_|___________\n",
+                "_____________\n |\n |\n |\n |\n |\n_|___________\n",
+                "_____________\n | /\n |/\n |\n |\n |\n_|___________\n",
+                "_____________\n | /       |\n |/\n |\n |\n |\n_|___________\n",
+                "_____________\n | /       |\n |/        O\n |\n |\n |\n_|___________\n",
+                "_____________\n | /       |\n |/        O\n |         |\n |\n |\n_|___________\n",
+                "_____________\n | /       |\n |/        O\n |        -|-\n |\n |\n_|___________\n",
+                "_____________\n | /       |\n |/        O\n |        -|-\n |         /\\\n |\n_|___________\nOn suffoque, non?",
+                "_____________\n | /       |\n |/        O\n |        -|-\n |         /\\\n |\n_|____________\nTrop tard vous etes mort !\n",
+                )
