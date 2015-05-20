@@ -4,7 +4,8 @@
 """
 Labyrinthe pour TP openclassroom
 """
-
+# permet entre autre l'enregistrement d'objet directement récupérables dans un fichier
+import pickle
 from roboc_class import *
 from roboc_fonc import *
 
@@ -20,18 +21,37 @@ except: #si le fichier est corrompu au point de ne pas pouvoir le lire ou n'exis
             svgpartie = svg()
 
 intro()
+aide()
 
 if svgpartie.carte == None:
     svgpartie = choixcarte(svgpartie) #fonction du menu de choix de carte
 
-svgpartie = affichcarte(svgpartie) #fonction d'affichage de la carte
-"""    
-while ??: #définir les critères de fin de partie victoire ou ordre quit
-    mvt = input("dans quelle direction se déplacer?" ) #prévoir des sécurités pour entrée débile
+svgpartie = affichcarte_init(svgpartie) #fonction d'affichage de la carte
+mvt = ""
     
+while svgpartie.victoire == False and mvt.upper() != "QUIT": #définir les critères de fin de partie victoire ou ordre quit
+    """
     3 types d'entrée
         direction + chiffre pour mvt robot
         "quit" pour quitter la partie
         "help" pour rappeler les commandes
     """
+    mvt = input("dans quelle direction se déplacer? ") #prévoir des sécurités pour entrée débile
+    
+    if mvt.upper() == "HELP":
+        aide()
+        continue
+    elif mvt.upper() == "QUIT":
+        continue
 
+    svgpartie = mouvement(svgpartie, mvt)
+
+    affichecarte(svgpartie)
+
+    svgpartie.save()
+
+
+if svgpartie.victoire == True:
+    svgpartie.clear()
+
+svgpartie.save()
