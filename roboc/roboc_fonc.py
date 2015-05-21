@@ -111,6 +111,44 @@ def mouvement(svgpartie, mvt):
                 
     return svgpartie
 
+def mouvementlong(svgpartie, mvt):
+    longueur = mvt[1:]
+    
+    try:
+        longueur = int(longueur)
+    except:
+        print("longueur de déplacement invalide!")
+        return svgpartie
+        
+    while longueur > 0:
+        if mvt[0].upper() == "N":
+            tempposX[0] -= 1
+        elif mvt[0].upper() == "S":
+            tempposX[0] += 1
+        elif mvt[0].upper() == "E":
+            tempposX[1] += 1
+        elif mvt[0].upper() == "O":
+            tempposX[1] -= 1
+
+        valide = svgpartie.checkpos(tempposX)
+
+        if valide == True:
+            path = "cartes/" + svgpartie.carte
+            Nbrline = 0
+        
+            with open(path, "r") as carte:
+                for line in carte:
+                    if Nbrline == tempposX[0]:
+                        if line[tempposX[1]] == "O":
+                            print("Ce déplacement est impossible !")
+                        elif line[tempposX[1]] == "U":
+                            svgpartie.victoire = True
+                    Nbrline += 1
+        longueur -= 1
+        
+    svgpartie.posX = list(tempposX)          
+    return svgpartie
+
 def aide():
     """
     rappelle les commandes du jeu
