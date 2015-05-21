@@ -41,7 +41,7 @@ def affichcarte_init(svgpartie):
         for line in carte:
             svgpartie.plan.append(line)
             if nbrline == 0:
-                Lline = len(line)
+                Lline = len(line) - 1
                 
             if "X" in line:
                 svgpartie.posX.append(nbrline)
@@ -146,7 +146,11 @@ def mouvementlong(svgpartie, mvt):
                         return svgpartie
                     elif line[tempposX[1]] == "U":
                         svgpartie.victoire = True
+                        svgpartie.posX = list(tempposX)
+                        return svgpartie
                 nbrline += 1
+        else:
+            return svgpartie
         longueur -= 1
         
     svgpartie.posX = list(tempposX)          
