@@ -16,7 +16,7 @@ def choixcarte(svgpartie):
     lstcartes = listdir("cartes") #permet de récupérer tous les noms de fichier/dossier dans un dossier, retour est une liste
     i = 1
     for crt in lstcartes:
-        crtname = findall('^[a-zA-Z0-9]+', crt) #on extrait le nom de la carte sans l'extension
+        crtname = findall('^[a-zA-Z0-9 _-]+', crt) #on extrait le nom de la carte sans l'extension
         print("{} - {}".format(i, crtname[0]))
         i += 1
         
@@ -33,24 +33,25 @@ def affichcarte_init(svgpartie):
     """
     path = "cartes/" + svgpartie.carte
     Lline = 0
-    Nbrline = 0
+    nbrline = 0
     hX = 0
     lX = 0
     
     with open(path, "r") as carte:
         for line in carte:
-            if Nbrline == 0:
+            svgpartie.plan.append(line)
+            if nbrline == 0:
                 Lline = len(line)
                 
             if "X" in line:
-                svgpartie.posX.append(Nbrline)
+                svgpartie.posX.append(nbrline)
                 svgpartie.posX.append(line.index('X'))
                 
             print(line, end = "")
-            Nbrline += 1
+            nbrline += 1
         print("")
     
-    svgpartie.Nbrligne = Nbrline
+    svgpartie.Nbrligne = nbrline
     svgpartie.Longueurligne = Lline
     
     return svgpartie
@@ -62,19 +63,18 @@ def affichecarte(svgpartie):
     path = "cartes/" + svgpartie.carte
     nbrline = 0
     
-    with open(path, "r") as carte:
-        for line in carte:
-            if 'X' in line: #on efface X de la carte
-                line = line.replace('X', ' ')
-                
-            if nbrline == svgpartie.posX[0]: #on place le nouveau X
-                tempbefore = line[:svgpartie.posX[1]]
-                tempafter = line[svgpartie.posX[1]+1:]
-                line = tempbefore + "X" + tempafter
+    for line in svgpartie.plan:
+        if 'X' in line: #on efface X de la carte
+            line = line.replace('X', ' ')
+            
+        if nbrline == svgpartie.posX[0]: #on place le nouveau X
+            tempbefore = line[:svgpartie.posX[1]]
+            tempafter = line[svgpartie.posX[1]+1:]
+            line = tempbefore + "X" + tempafter
 
-            print(line, end = "")
-            nbrline += 1
-        print("")
+        print(line, end = "")
+        nbrline += 1
+    print("")
         
     return
 
@@ -101,16 +101,15 @@ def mouvement(svgpartie, mvt):
         path = "cartes/" + svgpartie.carte
         nbrline = 0
         
-        with open(path, "r") as carte:
-            for line in carte:
-                if nbrline == tempposX[0]:
-                    if line[tempposX[1]] == "O":
-                        print("Ce déplacement est impossible !")
-                    elif line[tempposX[1]] == "U":
-                        svgpartie.victoire = True
-                    else:
-                        svgpartie.posX = list(tempposX)
-                nbrline += 1
+        for line in svgpartie.plan:
+            if nbrline == tempposX[0]:
+                if line[tempposX[1]] == "O":
+                    print("Ce déplacement est impossible !")
+                elif line[tempposX[1]] == "U":
+                    svgpartie.victoire = True
+                else:
+                    svgpartie.posX = list(tempposX)
+            nbrline += 1
                 
     return svgpartie
 
@@ -140,14 +139,14 @@ def mouvementlong(svgpartie, mvt):
             path = "cartes/" + svgpartie.carte
             nbrline = 0
         
-            with open(path, "r") as carte:
-                for line in carte:
-                    if nbrline == tempposX[0]:
-                        if line[tempposX[1]] == "O":
-                            print("Ce déplacement est impossible !")
-                        elif line[tempposX[1]] == "U":
-                            svgpartie.victoire = True
-                    nbrline += 1
+            for line in svgpartie.plan:
+                if nbrline == tempposX[0]:
+                    if line[tempposX[1]] == "O":
+                        print("Ce déplacement est impossible !")
+                        return svgpartie
+                    elif line[tempposX[1]] == "U":
+                        svgpartie.victoire = True
+                nbrline += 1
         longueur -= 1
         
     svgpartie.posX = list(tempposX)          

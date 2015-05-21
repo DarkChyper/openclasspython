@@ -11,6 +11,7 @@ class svg:
         self.Longueurligne = 0
         self.Nbrligne = 0
         self.posX = []
+        self.plan = []
         self.victoire = False
 
     def checkpos(self, tempposX):
@@ -43,5 +44,6 @@ class svg:
         self.Longueurligne = 0
         self.Nbrligne = 0
         self.posX = []
+        self.plan = []
         self.victoire = False
 

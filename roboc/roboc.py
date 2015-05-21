@@ -39,8 +39,10 @@ while suite.upper() != "N": #après une victoire si le joueur veut arrêter
     suite = ""
     if svgpartie.carte == None:
         svgpartie = choixcarte(svgpartie) #fonction du menu de choix de carte
-
-    svgpartie = affichcarte_init(svgpartie) #fonction d'affichage de la carte
+        svgpartie = affichcarte_init(svgpartie) #fonction d'affichage de la carte
+    else:
+        affichecarte(svgpartie)
+        
     mvt = ""
 
     while svgpartie.victoire == False and mvt.upper() != "QUIT": #on boucle jusqu'à la victoire ou si le joueur demande à arrêter
@@ -51,6 +53,7 @@ while suite.upper() != "N": #après une victoire si le joueur veut arrêter
             aide()
             continue
         elif mvt.upper() == "QUIT": #arrêt volontaire en cours de partie
+            suite = "N"
             continue
 
         #séparation entre mouvement simple et multiple
