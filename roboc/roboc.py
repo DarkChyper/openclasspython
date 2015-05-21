@@ -23,6 +23,17 @@ except: #si le fichier est corrompu au point de ne pas pouvoir le lire ou n'exis
 intro()
 aide()
 
+if svgpartie.carte != None:
+    restart = ""
+    while restart == "":
+        restart = input("Voulez vous reprendre la précédente partie? Y/N ")
+        if restart.upper() == "N":
+            svgpartie.clear()
+        elif restart.upper() == "Y":
+            pass
+        else:
+            restart = ""
+
 if svgpartie.carte == None:
     svgpartie = choixcarte(svgpartie) #fonction du menu de choix de carte
 
