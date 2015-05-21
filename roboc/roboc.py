@@ -44,7 +44,10 @@ while svgpartie.victoire == False and mvt.upper() != "QUIT": #dÃ©finir les critÃ
     elif mvt.upper() == "QUIT":
         continue
 
-    svgpartie = mouvement(svgpartie, mvt)
+    if len(mvt) == 1:
+        svgpartie = mouvement(svgpartie, mvt)
+    elif len(mvt) > 1:
+        svgpartie = mouvementlong(svgpartie, mvt)
 
     affichecarte(svgpartie)
 
