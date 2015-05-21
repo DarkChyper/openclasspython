@@ -29,7 +29,6 @@ class svg:
         via pickle sauvegarde la partie
         pas de retour
         """
-        # permet entre autre l'enregistrement d'objet directement récupérables dans un fichier
         import pickle
         with open("scores", "wb") as Scores:
             mon_pickler = pickle.Pickler(Scores)

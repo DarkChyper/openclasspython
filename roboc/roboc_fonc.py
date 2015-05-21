@@ -2,6 +2,9 @@ from os import listdir
 from re import findall
 
 def intro():
+    """
+    Pour le moment ne sert pas à grand chose mais laisse la possibilité d'ajouter des choses au lancement
+    """
     print("Bienvenu sur Roboc!")
 
 def choixcarte(svgpartie):
@@ -57,20 +60,20 @@ def affichecarte(svgpartie):
     Cette fonction gère le réaffichage de la carte après chaque demande de mouvement
     """
     path = "cartes/" + svgpartie.carte
-    Nbrline = 0
+    nbrline = 0
     
     with open(path, "r") as carte:
         for line in carte:
             if 'X' in line: #on efface X de la carte
                 line = line.replace('X', ' ')
                 
-            if Nbrline == svgpartie.posX[0]: #on place le nouveau X
+            if nbrline == svgpartie.posX[0]: #on place le nouveau X
                 tempbefore = line[:svgpartie.posX[1]]
                 tempafter = line[svgpartie.posX[1]+1:]
                 line = tempbefore + "X" + tempafter
 
             print(line, end = "")
-            Nbrline += 1
+            nbrline += 1
         print("")
         
     return
@@ -96,23 +99,24 @@ def mouvement(svgpartie, mvt):
 
     if valide == True:
         path = "cartes/" + svgpartie.carte
-        Nbrline = 0
+        nbrline = 0
         
         with open(path, "r") as carte:
             for line in carte:
-                if Nbrline == tempposX[0]:
+                if nbrline == tempposX[0]:
                     if line[tempposX[1]] == "O":
                         print("Ce déplacement est impossible !")
                     elif line[tempposX[1]] == "U":
                         svgpartie.victoire = True
                     else:
                         svgpartie.posX = list(tempposX)
-                Nbrline += 1
+                nbrline += 1
                 
     return svgpartie
 
 def mouvementlong(svgpartie, mvt):
     longueur = mvt[1:]
+    tempposX = list(svgpartie.posX)
     
     try:
         longueur = int(longueur)
@@ -134,16 +138,16 @@ def mouvementlong(svgpartie, mvt):
 
         if valide == True:
             path = "cartes/" + svgpartie.carte
-            Nbrline = 0
+            nbrline = 0
         
             with open(path, "r") as carte:
                 for line in carte:
-                    if Nbrline == tempposX[0]:
+                    if nbrline == tempposX[0]:
                         if line[tempposX[1]] == "O":
                             print("Ce déplacement est impossible !")
                         elif line[tempposX[1]] == "U":
                             svgpartie.victoire = True
-                    Nbrline += 1
+                    nbrline += 1
         longueur -= 1
         
     svgpartie.posX = list(tempposX)          

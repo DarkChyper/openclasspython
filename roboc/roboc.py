@@ -9,7 +9,7 @@ import pickle
 from roboc_class import *
 from roboc_fonc import *
 
-#tentative de récupération des scores d'une précédente partie
+#récupération des scores d'une précédente partie
 try:
     with open("scores", "rb") as Scores:
         try:
@@ -18,12 +18,12 @@ try:
         except: #pas de sauvegarde en cours
             svgpartie = svg()
 except: #si le fichier est corrompu au point de ne pas pouvoir le lire ou n'existe pas
-            svgpartie = svg()
+    svgpartie = svg()
 
 intro()
 aide()
 
-if svgpartie.carte != None:
+if svgpartie.carte != None: #si une partie existe on propose de la continuer
     restart = ""
     while restart == "":
         restart = input("Voulez vous reprendre la précédente partie? Y/N ")
@@ -34,38 +34,39 @@ if svgpartie.carte != None:
         else:
             restart = ""
 
-if svgpartie.carte == None:
-    svgpartie = choixcarte(svgpartie) #fonction du menu de choix de carte
+suite = ""
+while suite.upper() != "N": #après une victoire si le joueur veut arrêter
+    suite = ""
+    if svgpartie.carte == None:
+        svgpartie = choixcarte(svgpartie) #fonction du menu de choix de carte
 
-svgpartie = affichcarte_init(svgpartie) #fonction d'affichage de la carte
-mvt = ""
+    svgpartie = affichcarte_init(svgpartie) #fonction d'affichage de la carte
+    mvt = ""
+
+    while svgpartie.victoire == False and mvt.upper() != "QUIT": #on boucle jusqu'à la victoire ou si le joueur demande à arrêter
+
+        mvt = input("dans quelle direction se déplacer? ")
     
-while svgpartie.victoire == False and mvt.upper() != "QUIT": #définir les critères de fin de partie victoire ou ordre quit
-    """
-    3 types d'entrée
-        direction + chiffre pour mvt robot
-        "quit" pour quitter la partie
-        "help" pour rappeler les commandes
-    """
-    mvt = input("dans quelle direction se déplacer? ") #prévoir des sécurités pour entrée débile
-    
-    if mvt.upper() == "HELP":
-        aide()
-        continue
-    elif mvt.upper() == "QUIT":
-        continue
+        if mvt.upper() == "HELP": #rappel des règles
+            aide()
+            continue
+        elif mvt.upper() == "QUIT": #arrêt volontaire en cours de partie
+            continue
 
-    if len(mvt) == 1:
-        svgpartie = mouvement(svgpartie, mvt)
-    elif len(mvt) > 1:
-        svgpartie = mouvementlong(svgpartie, mvt)
+        #séparation entre mouvement simple et multiple
+        if len(mvt) == 1:
+            svgpartie = mouvement(svgpartie, mvt)
+        elif len(mvt) > 1:
+            svgpartie = mouvementlong(svgpartie, mvt)
 
-    affichecarte(svgpartie)
+        affichecarte(svgpartie)
 
-    svgpartie.save()
+        svgpartie.save()
 
-
-if svgpartie.victoire == True:
-    svgpartie.clear()
+    if svgpartie.victoire == True: #contrôle de victoire
+        print("Félicitations! Vous êtes sorti!")
+        svgpartie.clear()
+        while suite.upper() != "N" and suite.upper() != "Y": #demande de nouvelle partie
+            suite = input("Voulez vous refaire une partie? Y/N ")
 
 svgpartie.save()
