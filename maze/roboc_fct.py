@@ -7,7 +7,14 @@
 """
 
 import os
+import pickle
 from roboc_cls import *
+
+"""
+	Maze est une class qui crée l'objet Maze
+	mazes est une liste contenant des objets Maze
+	maze est un objet de type Maze
+"""
 
 def initMazes():
 	""" 
@@ -15,7 +22,7 @@ def initMazes():
 		On les charge dans le jeu sous forme d'une liste d'objets maze
 		On retourne cette liste au programme principale
 	"""
-	cartes = []
+	mazes = []
 	for nom_fichier in os.listdir("cartes"):
 		if nom_fichier.endswith(".txt"):
 			chemin = os.path.join("cartes", nom_fichier)
@@ -24,8 +31,8 @@ def initMazes():
 				grille = fichier.read()
 				# On va construire l'objet Maze à partir
 				# du nom de la carte, de son chemin d'accès et de son contenu
-				cartes.append(Maze(nom_maze,chemin,False,grille))
-	return cartes
+				mazes.append(Maze(nom_maze,chemin,False,grille))
+	return mazes
 
 def intro():
 	"""
@@ -58,14 +65,98 @@ def verifSvg(pseudo,mazes):
 			> Sauvegarde la parie 
 			> retourne le labyrinthe en cours
 	"""
-	file = pseudo + ".maze"
+	fichier = pseudo + ".maze"
 	try:
-		with open(file, 'rb') as fichier:
-			mazeDico = pickle.Unpickler(fichier)
-			maze = Maze(mazeDico[nom],mazeDico[path],mazeDico[door],mazeDico[grille])
+		with open(fichier, 'rb') as monFichier:
+			mazeDico = pickle.Unpickler(monFichier)
+			maze = Maze(mazeDico['nom'],mazeDico['path'],mazeDico['door'],mazeDico['grille'])
 			print("Reprise de la partie sauvegardée.")
 			return maze
 	except IOError:
 		print("New Challenger !!!")
+		return selectMaze(mazes)
+
+def selectMaze(mazes):
+	"""
+		Affiche au joueur le choix des labyrinthes
+	"""
+	print("Voici la liste des labyrinthes disponibles :")
+	x = 1
+	liste = list()
+	for maze in range(len(mazes)):
+		print(" {}. {}".format(x, mazes[maze].nom))
+		liste.append(str(x))
+		x += 1
+
+	while 1:
+		choix = raw_input("Quel Labyrinthe voulez-vous résoudre ? ")
+		if choix in liste:
+			return mazes[int(choix)]
+
+def svg(pseudo, maze):
+	"""
+		Sauvegarde la partie en cours dans le fichier "pseudo.maze"
+	"""
+	mazeDico = dict()
+	mazeDico['nom'] = maze.nom
+	mazeDico['path'] = maze.path
+	mazeDico['door'] = maze.door
+	mazeDico['grille'] = maze.grille
+	fichier = pseudo + ".maze"
+
+	with open(fichier, 'wb') as monFichier :
+		mon_pickler = pickle.Pickler(monFichier)
+		mon_pickler.dump(mazeDico)
+
+
+def action(pseudo, maze):
+	"""
+	"""
+	choix = afficheGrille(maze)
+	if choix == "quit":
+		return choix
+	return resolution(choix, maze)
+
+
+
+
+def afficheGrille(maze):
+	"""
+		On affiche la grille et on propose au joueur un choix
+	"""
+	liste = [1,2]
+	while 1:
+		print("\n\nAffichage de la grille :\n")
+		print maze.grille
+		print("\n Q pour quitter")
+		print("H pour l'aide")
+		choix = raw_input("Que voulez-vous faire ? ")
+		if len(choix) in liste:
+			if len(choix) == 2:
+				print("A Faire") # a faire
+			elif choix.lower() == "q":
+				return "quit"
+			elif choix.lower() == "h":
+				afficheHelp()
+
+def afficheHelp():
+	"""
+		Affichage d'une aide pour le joueur
+	"""
+	print("\n\n\n\n")
+	print("Aide :")
+	print("------")
+	print("   N pour aller vers le haut de l'écran")
+	print("   S pour aller vers le bas de l'écran")
+	print("   E pour aller vers la droite de l'écran")
+	print("   O pour aller vers la gauche de l'écran")
+	print("\n")
+	print("   Indiquez un chiffre pour avancer de plusieures cases")
+	print("     > N7 avance vers le haut de l'écran de 7 cases")
+	print("\n")
+	print("   Q pour quitter le jeu")
+	print("   H pour afficher cet écran")
+	print("\n")
+
 
 
