@@ -6,6 +6,27 @@
 	labyrinthe pour OpenClassRooms
 """
 
+import os
+from roboc_cls import *
+
+def initCartes():
+	""" 
+		On récupère les cartes au format txt dan le dossier ./cartes
+		On les charge dans le jeu sous forme d'une liste d'objets maze
+		On retourne cette liste au programme principale
+	"""
+	cartes = []
+	for nom_fichier in os.listdir("cartes"):
+		if nom_fichier.endswith(".txt"):
+			chemin = os.path.join("cartes", nom_fichier)
+			nom_carte = nom_fichier[:-4].lower()
+			with open(chemin, "r") as fichier:
+				grille = fichier.read()
+				# On va construire l'objet Maze à partir
+				# du nom de la carte, de son chemin d'accès et de son contenu
+				cartes.append(Maze(nom_carte,chemin,grille))
+	return cartes
+
 def intro():
 	"""
 		Affichage de l'introduction du jeu
@@ -37,4 +58,4 @@ def verifSvg(pseudo):
 			> Sauvegarde la parie 
 			> retourne le labyrinthe en cours
 	"""
-	
+

@@ -14,18 +14,9 @@ import os
 from roboc_fct import *
 
 # On importe les cartes existantes
-cartes = []
-for nom_fichier in os.listdir("cartes"):
-	if nom_fichier.endswith(".txt"):
-		chemin = os.path.join("cartes", nom_fichier)
-		nom_carte = nom_fichier[:-4].lower()
-		print(nom_carte)
-		print(chemin)
-		with open(chemin, "r") as fichier:
-			contenu = fichier.read()
-			print(contenu)
-			print type(contenu)
-
+cartes = initCartes()
+for x in range(len(cartes)):	
+	print cartes[x]
 # Fonction d'introduction du jeu
 pseudo = intro()
 
