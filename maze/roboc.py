@@ -14,10 +14,9 @@ import os
 from roboc_fct import *
 
 # On importe les cartes existantes
-cartes = initCartes()
-for x in range(len(cartes)):	
-	print cartes[x]
+mazes = initMazes()
+
 # Fonction d'introduction du jeu
 pseudo = intro()
 
-verifSvg(pseudo)
+maze = verifSvg(pseudo,mazes) # On récupère le labyrinthe de la partie

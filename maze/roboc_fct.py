@@ -9,7 +9,7 @@
 import os
 from roboc_cls import *
 
-def initCartes():
+def initMazes():
 	""" 
 		On récupère les cartes au format txt dan le dossier ./cartes
 		On les charge dans le jeu sous forme d'une liste d'objets maze
@@ -19,12 +19,12 @@ def initCartes():
 	for nom_fichier in os.listdir("cartes"):
 		if nom_fichier.endswith(".txt"):
 			chemin = os.path.join("cartes", nom_fichier)
-			nom_carte = nom_fichier[:-4].lower()
+			nom_maze = nom_fichier[:-4].lower()
 			with open(chemin, "r") as fichier:
 				grille = fichier.read()
 				# On va construire l'objet Maze à partir
 				# du nom de la carte, de son chemin d'accès et de son contenu
-				cartes.append(Maze(nom_carte,chemin,grille))
+				cartes.append(Maze(nom_maze,chemin,False,grille))
 	return cartes
 
 def intro():
@@ -49,7 +49,7 @@ def askName():
 		else:
 			return pseudo
 
-def verifSvg(pseudo):
+def verifSvg(pseudo,mazes):
 	"""
 		Vérifie la présence d'un éventuel fichier "pseudo.maze" 
 			> Charge le fichier si il le trouve,
@@ -58,4 +58,14 @@ def verifSvg(pseudo):
 			> Sauvegarde la parie 
 			> retourne le labyrinthe en cours
 	"""
+	file = pseudo + ".maze"
+	try:
+		with open(file, 'rb') as fichier:
+			mazeDico = pickle.Unpickler(fichier)
+			maze = Maze(mazeDico[nom],mazeDico[path],mazeDico[door],mazeDico[grille])
+			print("Reprise de la partie sauvegardée.")
+			return maze
+	except IOError:
+		print("New Challenger !!!")
+
 

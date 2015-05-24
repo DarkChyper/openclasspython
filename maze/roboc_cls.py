@@ -10,7 +10,7 @@ class Maze:
 		La classe qui crée un labyrinthe avec toutes ses caractéristiques
 		Comme son nom, la position de chaque élément et la grille à afficher
 	"""
-	def __init__(self, nom_carte, chemin, grille):
+	def __init__(self, nom_carte, chemin, door, grille):
 		"""initialisation d'un labyrinthe avec
 			son nom et le chemin où on le trouve
 			la grille du jeu, a afficher et modifier
@@ -23,7 +23,7 @@ class Maze:
 		self.path = chemin
 		self.grille = grille
 		self.posX = self.defPosX(grille)
-		self.door = False # Devient True si le robot est sur une porte
+		self.door = door # Devient True si le robot est sur une porte sinon est False
 		self.dim = self.defDimensions(grille)
 
 	def __str__(self):
