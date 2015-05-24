@@ -1,0 +1,25 @@
+
+# Déroulement du jeu de labyrinthe
+
+	# verification d'une partie existante
+		# oui => reprise de la partie
+		# non => on propose le choix d'une map
+
+	# chargement de la map
+		# on accede au fichier de la map
+		# pour chaque ligne lue
+			#pour chaque caractère de la ligne
+				# on enregistre sa position et sa valeur
+		# on a une liste de liste contenant les coordonnees et la valeur de chaque case de la map
+		exemple : 
+		map = ((1,1,1,o),(2,1,1,o),(3,1,1,o),(1,2,1,o),)
+
+
+
+
+
+	# affichage de la map
+
+	# boucle de déplacement
+
+	#fin du jeu
