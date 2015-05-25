@@ -29,16 +29,18 @@ while 1:
 		On affiche la grille.
 		On propose au joueur de se déplacer
 		On résoud le "coup"
-			> On boucle
-			< On sort
+			ok   > On boucle
+			quit > On sort
 	"""
 	svg(pseudo, maze)
 
-	resolution = action(pseudo, maze)
+	choix = afficheGrille(maze)
 	
-	if resolution == "quit":
+	if choix == "quit":
 		print("A bientôt {}".format(pseudo))
 		break
+	maze = resolution(choix, maze)
+
 
 # Si on est ici c'est que le joueur a décidé d'arrêter
 svg(pseudo, maze)

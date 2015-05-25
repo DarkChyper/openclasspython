@@ -69,7 +69,8 @@ def verifSvg(pseudo,mazes):
 	try:
 		with open(fichier, 'rb') as monFichier:
 			mazeDico = pickle.Unpickler(monFichier)
-			maze = Maze(mazeDico['nom'],mazeDico['path'],mazeDico['door'],mazeDico['grille'])
+			dico = pickle.load(mazeDico)
+			maze = Maze(dico['nom'],dico['path'],dico['door'],dico['sortie'],dico['grille'])
 			print("Reprise de la partie sauvegardée.")
 			return maze
 	except IOError:
@@ -97,47 +98,52 @@ def svg(pseudo, maze):
 	"""
 		Sauvegarde la partie en cours dans le fichier "pseudo.maze"
 	"""
-	mazeDico = dict()
-	mazeDico['nom'] = maze.nom
-	mazeDico['path'] = maze.path
-	mazeDico['door'] = maze.door
-	mazeDico['grille'] = maze.grille
+	mazeDico = {
+	"nom":maze.nom, 
+	"path":maze.path, 
+	"door":maze.door,
+	"sortie":maze.sortie, 
+	"grille":maze.grille
+	}
+	#mazeDico[nom] = maze.nom
+	#mazeDico[path] = maze.path
+	#mazeDico[door] = maze.door
+	#mazeDico[grille] = maze.grille
 	fichier = pseudo + ".maze"
 
 	with open(fichier, 'wb') as monFichier :
 		mon_pickler = pickle.Pickler(monFichier)
 		mon_pickler.dump(mazeDico)
 
-
-def action(pseudo, maze):
-	"""
-	"""
-	choix = afficheGrille(maze)
-	if choix == "quit":
-		return choix
-	return resolution(choix, maze)
-
-
-
-
 def afficheGrille(maze):
 	"""
 		On affiche la grille et on propose au joueur un choix
+		On vérifie ce choix puis on résoud ce choix.
 	"""
-	liste = [1,2]
+	directions = ("n","s","e","o")
 	while 1:
 		print("\n\nAffichage de la grille :\n")
 		print maze.grille
-		print("\n Q pour quitter")
+		print("\nQ pour quitter")
 		print("H pour l'aide")
 		choix = raw_input("Que voulez-vous faire ? ")
-		if len(choix) in liste:
-			if len(choix) == 2:
-				print("A Faire") # a faire
-			elif choix.lower() == "q":
+		if len(choix) >= 1:
+			if choix.lower() == "q":
 				return "quit"
 			elif choix.lower() == "h":
 				afficheHelp()
+			elif choix.lower()[0] in directions:
+				if len(choix) >= 2:
+					try:
+						distance = int(choix[1:])
+					except ValueError:
+						print("Valeur de distance incorrecte !")
+					else:
+						# Le joueur a défini une direction et une distance valide
+						return (choix[0],int(choix[1:]))
+				else:
+					# Le joueur a definit une direction valide et avance par defaut de 1
+					return (choix[0],1)
 
 def afficheHelp():
 	"""
@@ -158,5 +164,23 @@ def afficheHelp():
 	print("   H pour afficher cet écran")
 	print("\n")
 
+def resolution(choix, maze, mazes):
+	"""
+	Résoud le déplacement du robot si il est possible
+	Prend un tupple, le labyrinthe et la liste des labyrinthes en entrée
+	"""
+	if choix[1] == 0:
+		print("Le robot reste à la même place")
+		return maze
 
+	resultat = maze.mouvement(choix)
+
+	if resultat == "WIN":
+		print("Bravo ! Vous avez gagné !")
+		return selectMaze(mazes) # Si le joueur a gagné, il choisit un nouveau labyrinthe
+
+	if resultat == "KO":
+		print("Mouvement Impossible !!")
+
+	return maze # que le mouvement soit valide ou non, on renvoi l'objet pour continuer
 
