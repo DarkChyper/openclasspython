@@ -9,16 +9,24 @@ from Map        import *
 from donnees    import *
 
 class Partie:
+    """
+        Objet permettant de gérer toute une partie de roboc.
+    """
 
     def __init__(self):
         self._map = self._demarrer_partie()
+        """Carte du labyrinthe avec laquelle on interagis tout au long de la partie"""
+
+        # Premier affichage
         print(self._map)
 
     def _demarrer_partie(self):
-        """Si une partie sauvegardée a été trouvée, on retourne la map,
-        sinon, on la demande au joueur"""
+        """
+            Si une partie sauvegardée a été trouvée, on retourne la map,
+            sinon, on la demande au joueur.
+        """
 
-        map_ = self._obtenir_partie_sauvegarde(adresse_fichier_sauvegarde)
+        map_ = self._obtenir_partie_sauvegarde()
 
         # Demande à l'utilisateur s'il souhaite utiliser la sauvegarde trouvée
         entree = ""
@@ -30,19 +38,21 @@ class Partie:
             # ...On demande au joueur de choisir le labyrinthe
             nom_maps = self._obtenir_liste_maps(dossier_maps)
             indice = self._demander_map(nom_maps)
-            map_str = self._obtenir_map(dossier_maps, indice, nom_maps)
+            map_str = self._obtenir_map(dossier_maps, indice)
             map_ = Map(map_str)
 
         return map_
 
-    def _obtenir_partie_sauvegarde(self, adresse_fichier):
-        """Récupère la dernière partie sauvegardée, s'il n'y en a pas,
-        renvoie None"""
+    def _obtenir_partie_sauvegarde(self):
+        """
+            Récupère la dernière partie sauvegardée, s'il n'y en a pas,
+            renvoie None.
+        """
 
         pas_de_sauv_msg = "Aucune sauvegarde trouvée."
 
         try:
-            with open(adresse_fichier, 'rb') as fichier_sauvegarde:
+            with open(adresse_fichier_sauvegarde, 'rb') as fichier_sauvegarde:
                 #Lecture du fichier
                 unpick = Unpickler(fichier_sauvegarde)
                 map_ = unpick.load()
@@ -53,7 +63,9 @@ class Partie:
             return None
 
     def _obtenir_liste_maps(self, dossier):
-        """Retourne une liste de nom de maps"""
+        """
+            Retourne une liste de nom de maps
+        """
 
         nom_maps = []
 
@@ -66,12 +78,15 @@ class Partie:
         return nom_maps
 
     def _demander_map(self, nom_maps):
-        """Demande au joueur quel map il souhaite choisir"""
+        """
+            Demande au joueur quelle map il souhaite choisir
+        """
 
         # On affiche la liste des labyrinthes disponibles
         map_msg = "Indiquer le chiffre du labyrinthe que vous souhaitez choisir parmi la liste suivante : "
         print(map_msg)
 
+        # On affiche les choix possibles
         for i, nom in enumerate(nom_maps):
             print("{}. {}".format(i + 1, nom))
 
@@ -86,8 +101,12 @@ class Partie:
 
         return indice - 1
 
-    def _obtenir_map(self, dossier, indice, maps):
-        """Retourne un objet Map en fonction de l'indice"""
+    def _obtenir_map(self, dossier, indice):
+        """
+            Récupère le contenu du fichier de map
+            indiqué par l'indice dans le dossier en paramètre.
+        """
+
         nom_fichier = listdir(dossier)[indice]
         chemin = path.join(dossier, nom_fichier)
         with open(chemin, "r") as fichier:
@@ -95,29 +114,37 @@ class Partie:
 
         return contenu
 
-    def _sauvegarder(self, adresse_fichier):
-        """Sauvegarde la map"""
+    def _sauvegarder(self):
+        """
+            Sauvegarde la map.
+        """
 
         try:
-            with open(adresse_fichier, 'wb') as fichier_sauvegarde:
+            with open(adresse_fichier_sauvegarde, 'wb') as fichier_sauvegarde:
                 pick = Pickler(fichier_sauvegarde)
                 pick.dump(self._map)
         except:
             print("Erreur lors de l'enregistrement du fichier")
 
-    def _tuer_sauvegarde(self, adresse_fichier):
-        """Sauvegarde la map"""
+    def _tuer_sauvegarde(self):
+        """
+            Efface la sauvegarde.
+
+            Devient inefficace si le mode de sauvegarde change.
+        """
 
         try:
-            with open(adresse_fichier, 'wb') as fichier_sauvegarde:
+            with open(adresse_fichier_sauvegarde, 'wb') as fichier_sauvegarde:
                 pick = Pickler(fichier_sauvegarde)
                 pick.dump(None)
         except:
             print("Erreur lors de l'enregistrement du fichier")
 
     def jouer(self):
-        """Demande au joueur quel deplacement il souhaite effectuer
-        et renvoie s'il a gagné ou non"""
+        """
+            Demande au joueur quel déplacement il souhaite effectuer
+            et renvoie s'il a gagné ou non
+        """
 
         touche_msg = "Quel déplacement souhaitez-vous effectuer ? "
 
@@ -126,25 +153,31 @@ class Partie:
             entree = self._entree_correcte( input(touche_msg) )
 
         gagne = self._map.deplacement(*entree)
-        self._sauvegarder(adresse_fichier_sauvegarde)
+        self._sauvegarder()
         print(self._map)
 
         return gagne
 
     def terminer(self):
         """Message de sortie pour le joueur, selon qu'il ait gagné ou non"""
-        self._tuer_sauvegarde(adresse_fichier_sauvegarde)
+        self._tuer_sauvegarde()
 
         sorti_msg = "Bravo, vous avez réussi à sortir !"
         print(sorti_msg)
 
     def _afficher_aide(self):
-        pass
+        """
+            Affiche toutes les touches possibles
+        """
+        for c, v in touches.items():
+            print( "{} : {}".format(c.title(), v) )
 
     def _entree_correcte(self, entree):
-        """Renvoie le type de déplacement et la longueur
-        ou None si l'entrée est incorrecte.
-        Si l'utilisateur demande de l'aide, on renvoie entree"""
+        """
+            Renvoie le type de déplacement et la longueur
+            ou None si l'entrée est incorrecte.
+            Si l'utilisateur demande de l'aide, on renvoie entree
+        """
 
         # Si l'utilisateur demande de l'aide, on ne touche à rien
         if entree == touches['aide']:
@@ -159,8 +192,8 @@ class Partie:
             try:
                 lg = int(entree[1:])
             except:
-                # Si aucune longueur n'est indiquée
-                if entree[1:].strip() == '':
+                # Si aucune longueur n'est indiquée ou égale à 0
+                if entree[1:].strip() == '' or entree[1:].strip() == '0':
                     lg = 1
                     return type_deplacement, lg
             else:

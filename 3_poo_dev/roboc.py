@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# Interne
 from Partie import *
 from Map    import *
 from Joueur import *
 
 def main():
-    """Coeur du jeu :
-    tant que le joueur n'est pas sorti, on continue de jouer"""
+    """
+        Coeur du jeu.
+
+        Tant que le joueur n'est pas sorti, on continue de jouer.
+    """
 
     partie = Partie()
     sorti_du_labyrinthe = False
