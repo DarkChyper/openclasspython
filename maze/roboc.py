@@ -39,7 +39,7 @@ while 1:
 	if choix == "quit":
 		print("A bientôt {}".format(pseudo))
 		break
-	maze = resolution(choix, maze)
+	maze = resolution(choix, maze, mazes)
 
 
 # Si on est ici c'est que le joueur a décidé d'arrêter

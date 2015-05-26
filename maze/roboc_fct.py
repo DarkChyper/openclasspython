@@ -70,7 +70,7 @@ def verifSvg(pseudo,mazes):
 		with open(fichier, 'rb') as monFichier:
 			mazeDico = pickle.Unpickler(monFichier)
 			dico = pickle.load(mazeDico)
-			maze = Maze(dico['nom'],dico['path'],dico['door'],dico['sortie'],dico['grille'])
+			maze = Maze(dico['nom'],dico['path'],dico['door'],dico['grille'])
 			print("Reprise de la partie sauvegardée.")
 			return maze
 	except IOError:
@@ -92,7 +92,7 @@ def selectMaze(mazes):
 	while 1:
 		choix = raw_input("Quel Labyrinthe voulez-vous résoudre ? ")
 		if choix in liste:
-			return mazes[int(choix)]
+			return mazes[int(choix)-1]
 
 def svg(pseudo, maze):
 	"""
@@ -176,7 +176,7 @@ def resolution(choix, maze, mazes):
 	resultat = maze.mouvement(choix)
 
 	if resultat == "WIN":
-		print("Bravo ! Vous avez gagné !")
+		print("\n\nBravo ! Vous avez gagné !")
 		return selectMaze(mazes) # Si le joueur a gagné, il choisit un nouveau labyrinthe
 
 	if resultat == "KO":
