@@ -31,7 +31,7 @@ class Map:
                 str_ += colonne
             str_ += "\n"
 
-        return str_
+        return str_.rstrip()
 
 
     def _convert(self, map_str):
