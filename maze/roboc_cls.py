@@ -107,28 +107,28 @@ class Maze:
 		posX = list(self.posX)
 		retour = None
 		if choix[0].lower() == "n": # si on monte
-			while xToPos[1] <> posX[1]:
+			while xToPos[1] != posX[1]:
 				retour = self.verifCollision( [ posX[0],posX[1] - 1 ] ) # la verification se fait sur un tupple contenant la position du robot + pas
 				if retour == "KO":
 					return "KO"
 				posX[1] -= 1
 			# on n'a pas rencontré de mur
 		elif choix[0].lower() == "e": # si on va à droite
-			while xToPos[0] <> posX[0]:
+			while xToPos[0] != posX[0]:
 				retour = self.verifCollision( [ posX[0] + 1,posX[1] ] ) # la verification se fait sur un tupple contenant la position du robot + pas
 				if retour == "KO":
 					return "KO"
 				posX[0] += 1
 			# on n'a pas rencontré de mur
 		elif choix[0].lower() == "s": # si on va en bas
-			while xToPos[1] <> posX[1]:
+			while xToPos[1] != posX[1]:
 				retour = self.verifCollision( [ posX[0],posX[1] + 1 ] ) # la verification se fait sur un tupple contenant la position du robot + pas
 				if retour == "KO":
 					return "KO"
 				posX[1] += 1
 			# on n'a pas rencontré de mur
 		elif choix[0].lower() == "o" : # si on va vers la gauche
-			while xToPos[0] <> posX[0]:
+			while xToPos[0] != posX[0]:
 				retour = self.verifCollision( [ posX[0] - 1,posX[1] ] ) # la verification se fait sur un tupple contenant la position du robot + pas
 				if retour == "KO":
 					return "KO"

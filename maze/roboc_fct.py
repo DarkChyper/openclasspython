@@ -7,7 +7,7 @@
 """
 
 import os
-import pickle
+from pickle import Pickler, Unpickler
 from roboc_cls import *
 
 """
@@ -31,8 +31,8 @@ def askName():
 	"""
 	while 1:
 		try:
-			pseudo = raw_input("Quel est votre nom/Pseudo ? ")
-			assert pseudo <> "" and len(pseudo) < 20 
+			pseudo = input("Quel est votre nom/Pseudo ? ")
+			assert pseudo != "" and len(pseudo) < 20 
 		except AssertionError:
 			print("Votre pseudo ne peut être vide et doit faire moins de 20 caractères")
 		else:
@@ -51,7 +51,7 @@ def verifSvg(pseudo):
 	try:
 		with open(fichier, 'rb') as monFichier:
 			mazeDico = pickle.Unpickler(monFichier)
-			dico = pickle.load(mazeDico)
+			dico = mazeDico.load()
 			maze = Maze(dico['nom'],dico['path'],dico['door'],dico['grille'])
 			print("Reprise de la partie sauvegardée.")
 			return maze
@@ -76,7 +76,7 @@ def selectMaze():
 		x += 1
 
 	while 1:
-		choix = raw_input("Quel Labyrinthe voulez-vous résoudre ? ")
+		choix = input("Quel Labyrinthe voulez-vous résoudre ? ")
 		if choix in liste:
 			return mazes[int(choix)-1]
 
@@ -116,7 +116,7 @@ def svg(pseudo, maze):
 	fichier = pseudo + ".maze"
 
 	with open(fichier, 'wb') as monFichier :
-		mon_pickler = pickle.Pickler(monFichier)
+		mon_pickler = Pickler(monFichier)
 		mon_pickler.dump(mazeDico)
 
 def afficheGrille(maze):
@@ -127,10 +127,10 @@ def afficheGrille(maze):
 	directions = ("n","s","e","o")
 	while 1:
 		print("\n\nAffichage de la grille :\n")
-		print maze.grille
+		print(maze.grille)
 		print("\nQ pour quitter")
 		print("H pour l'aide")
-		choix = raw_input("Que voulez-vous faire ? ")
+		choix = input("Que voulez-vous faire ? ")
 		if len(choix) >= 1:
 			if choix.lower() == "q":
 				return "quit"
