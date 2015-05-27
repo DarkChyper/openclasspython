@@ -16,24 +16,6 @@ from roboc_cls import *
 	maze est un objet de type Maze
 """
 
-def initMazes():
-	""" 
-		On récupère les cartes au format txt dan le dossier ./cartes
-		On les charge dans le jeu sous forme d'une liste d'objets maze
-		On retourne cette liste au programme principale
-	"""
-	mazes = []
-	for nom_fichier in os.listdir("cartes"):
-		if nom_fichier.endswith(".txt"):
-			chemin = os.path.join("cartes", nom_fichier)
-			nom_maze = nom_fichier[:-4].lower()
-			with open(chemin, "r") as fichier:
-				grille = fichier.read()
-				# On va construire l'objet Maze à partir
-				# du nom de la carte, de son chemin d'accès et de son contenu
-				mazes.append(Maze(nom_maze,chemin,False,grille))
-	return mazes
-
 def intro():
 	"""
 		Affichage de l'introduction du jeu
@@ -56,7 +38,7 @@ def askName():
 		else:
 			return pseudo
 
-def verifSvg(pseudo,mazes):
+def verifSvg(pseudo):
 	"""
 		Vérifie la présence d'un éventuel fichier "pseudo.maze" 
 			> Charge le fichier si il le trouve,
@@ -75,12 +57,16 @@ def verifSvg(pseudo,mazes):
 			return maze
 	except IOError:
 		print("New Challenger !!!")
-		return selectMaze(mazes)
+		return selectMaze()
 
-def selectMaze(mazes):
+def selectMaze():
 	"""
-		Affiche au joueur le choix des labyrinthes
+		Initialise les labyrinthes selon les fichiers dans ./cartes/
+		Affiche une liste de choix au joueur 
+		Renvoi la map selectionnée
 	"""
+	# On importe les cartes existantes
+	mazes = initMazes()
 	print("Voici la liste des labyrinthes disponibles :")
 	x = 1
 	liste = list()
@@ -93,6 +79,24 @@ def selectMaze(mazes):
 		choix = raw_input("Quel Labyrinthe voulez-vous résoudre ? ")
 		if choix in liste:
 			return mazes[int(choix)-1]
+
+def initMazes():
+	""" 
+		On récupère les cartes au format txt dan le dossier ./cartes
+		On les charge dans le jeu sous forme d'une liste d'objets maze
+		On retourne cette liste au programme principale
+	"""
+	mazes = []
+	for nom_fichier in os.listdir("cartes"):
+		if nom_fichier.endswith(".txt"):
+			chemin = os.path.join("cartes", nom_fichier)
+			nom_maze = nom_fichier[:-4].lower()
+			with open(chemin, "r") as fichier:
+				grille = fichier.read()
+				# On va construire l'objet Maze à partir
+				# du nom de la carte, de son chemin d'accès et de son contenu
+				mazes.append(Maze(nom_maze,chemin,False,grille))
+	return mazes
 
 def svg(pseudo, maze):
 	"""
@@ -164,10 +168,11 @@ def afficheHelp():
 	print("   H pour afficher cet écran")
 	print("\n")
 
-def resolution(choix, maze, mazes):
+def resolution(choix, maze):
 	"""
-	Résoud le déplacement du robot si il est possible
-	Prend un tupple, le labyrinthe et la liste des labyrinthes en entrée
+		Résoud le déplacement du robot si il est possible
+		Prend un tupple, le labyrinthe en entrée
+		Renvoie un labyrinthe
 	"""
 	if choix[1] == 0:
 		print("Le robot reste à la même place")
@@ -177,7 +182,7 @@ def resolution(choix, maze, mazes):
 
 	if resultat == "WIN":
 		print("\n\nBravo ! Vous avez gagné !")
-		return selectMaze(mazes) # Si le joueur a gagné, il choisit un nouveau labyrinthe
+		return selectMaze() # Si le joueur a gagné, il choisit un nouveau labyrinthe
 
 	if resultat == "KO":
 		print("Mouvement Impossible !!")

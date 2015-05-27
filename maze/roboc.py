@@ -13,14 +13,11 @@
 import os
 from roboc_fct import *
 
-# On importe les cartes existantes
-mazes = initMazes()
-
 # Fonction d'introduction du jeu
 pseudo = intro()
 
 # On récupère le labyrinthe de la partie
-maze = verifSvg(pseudo,mazes) 
+maze = verifSvg(pseudo) 
 
 # On boucle tant que le joueur ne décide pas d'arrêter
 while 1:
@@ -39,7 +36,7 @@ while 1:
 	if choix == "quit":
 		print("A bientôt {}".format(pseudo))
 		break
-	maze = resolution(choix, maze, mazes)
+	maze = resolution(choix, maze)
 
 
 # Si on est ici c'est que le joueur a décidé d'arrêter

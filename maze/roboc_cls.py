@@ -89,8 +89,11 @@ class Maze:
 			xToPos = [self.posX[0] + choix[1],self.posX[1]]
 		elif choix[0].lower() == "s":
 			xToPos = [self.posX[0],self.posX[1] + choix[1]]
-		else:
+		elif choix[0].lower() == "o":
 			xToPos = [self.posX[0] - choix[1],self.posX[1]]
+		else :
+			print("Erreur de mouvement !")
+			return "KO"
 		#print("self.posX {}".format(self.posX))
 		#print("xToPos {}".format(xToPos))
 
@@ -124,13 +127,16 @@ class Maze:
 					return "KO"
 				posX[1] += 1
 			# on n'a pas rencontré de mur
-		else: # si on va vers la gauche
+		elif choix[0].lower() == "o" : # si on va vers la gauche
 			while xToPos[0] <> posX[0]:
 				retour = self.verifCollision( [ posX[0] - 1,posX[1] ] ) # la verification se fait sur un tupple contenant la position du robot + pas
 				if retour == "KO":
 					return "KO"
 				posX[0] -= 1
 			# on n'a pas rencontré de mur
+		else:
+			print("Erreur de mouvement !")
+			return "KO"
 
 		# On vérifie que ce n'est pas la sortie
 		#print("sortie {} xToPos {}".format(self.sortie,xToPos))
