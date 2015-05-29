@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 class svg:
     """
     contient les données de la partie en cours

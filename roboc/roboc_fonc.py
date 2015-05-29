@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from os import listdir
 from re import findall
 
