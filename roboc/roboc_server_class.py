@@ -2,6 +2,7 @@
 
 from threading import Thread
 import time
+import socket
 import select
 
 class Data():
@@ -12,12 +13,14 @@ class Data():
     clients_connectes = []
     infos_clients_connectes = []
     clients_a_lire = []
+    hote = ''
+    port = 12800
+    connexion = None
 
 class NewClient(Thread, Data):
     """Thread chargé de surveiller l'arrivée de nouveaux clients."""
-    def __init__(self, connexion):
+    def __init__(self):
         Thread.__init__(self)
-        self.connexion = connexion
         
     def run(self):
         """Boucle active""" 
@@ -52,3 +55,26 @@ class DataExchange(Thread, Data):
                     print("Reçu {}".format(msg_recu))
                     if msg_recu == "fin":
                         serveur = False
+
+class Network(Data):
+    """
+    ensemble des méthodes régissant la connection TCP
+    """
+    def __init__(self):
+        """
+        Ouverture de la connection
+        """
+        connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connexion.bind((hote, port))
+        connexion.listen(5)
+        print("Le serveur écoute à présent sur le port {}".format(port))
+        
+    def deco(self):
+        """
+        Fermeture de tous les sockets clients et fermeture de la connection principale
+        """
+        print("Fermeture des connexions")
+        for client in clients_connectes:
+            client.close()
+
+        connexion.close()
