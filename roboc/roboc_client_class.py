@@ -1,5 +1,7 @@
 # -*- coding: utf8 -*-
 
+import socket
+
 class Data():
     """
     Classe contenant les données utiles à tous les Threads
