@@ -69,7 +69,7 @@ class Network(Data):
         connexion.listen(5)
         print("Le serveur écoute à présent sur le port {}".format(port))
         
-    def deco(self):
+    def decotot(self):
         """
         Fermeture de tous les sockets clients et fermeture de la connection principale
         """
