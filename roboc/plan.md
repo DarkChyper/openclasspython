@@ -1,15 +1,15 @@
-Version 29/05
-evolution entre le labyrinthe initial
+Version 31/05
+le labyrinthe initial :
   roboc.py
   roboc_class.py
   roboc_fonc.py
   
-et une version client/server, multijoueur.
-la séparation entre les 2 version est faite de la façon suivante :
-  roboc.py => nouvelle version à partir du commit "début nouvelle version"
-  roboc_class.py => nouvelle version à partir du commit "début nouvelle version"
-  roboc_fonc.py => nouvelle version à partir du commit "début nouvelle version"
-  les autres fichiers sont créés pour l'occasion
+La version client/server, multijoueur.
+les fichiers de la nouvelle version sont :
+  roboc_server.py
+  roboc_server_class.py
+  roboc_server.py
+  roboc_server_class.py
   
 fonctionnement extimé pour la nouvelle version :
   client:
