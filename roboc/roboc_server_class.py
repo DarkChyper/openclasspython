@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 
 from threading import Thread
-import time
 import socket
 import select
 
