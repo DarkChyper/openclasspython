@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 
 import socket
+from threading import Thread
 
 class Data():
     """
@@ -20,8 +21,8 @@ class Network(Data):
         """
         Ouverture de la connexion
         """
-        connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        connexion_avec_serveur.connect((hote, port))
+        Data.connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        Data.connexion.connect((Data.hote, Data.port))
         print("Le client est maintenant connecté")
         
     def deco(self):
@@ -29,7 +30,7 @@ class Network(Data):
         Fermeture de  la connexion principale
         """
         print("Fermeture de la connexion")
-        connexion.close()
+        Data.connexion.close()
 
 class DataReceive(Thread, Data):
     """
@@ -41,10 +42,30 @@ class DataReceive(Thread, Data):
 
     def run(self):
         """Boucle active""" 
-        while client:
-            msg_recu = connexion.recv(1024)
+        while Data.client:
+            msg_recu = Data.connexion.recv(1024)
             # Peut planter si le message contient des caractères spéciaux
             msg_recu = msg_recu.decode()
-            lstmsg.append(msg_recu)
+            Data.lstmsg.append(msg_recu)
             if msg_recu == "fin":
-                client = False
+                Data.client = False
+
+class DataSend(Thread, Data):
+    """
+    Thread chargé de l'envoi des messages entrés par l'utilisateur
+    """
+    def __init__(self):
+        Thread.__init__(self)
+    
+    def run(self):
+        """Boucle active"""
+        while Data.client:
+            msg_a_envoyer = input("> ")
+            # Peut planter si vous tapez des caractères spéciaux
+            if msg_a_envoyer == "fin":
+                Data.client = False
+                
+            msg_a_envoyer = msg_a_envoyer.encode()
+            # On envoie le message
+            Data.connexion.send(msg_a_envoyer)
+

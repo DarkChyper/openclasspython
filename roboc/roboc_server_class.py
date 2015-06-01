@@ -24,16 +24,17 @@ class NewClient(Thread, Data):
         
     def run(self):
         """Boucle active""" 
-        while serveur:
+        while Data.serveur:
             #on vérifie si de nouveaux clients demandes à se connecter
-            connexions_demandees, wlist, xlist = select.select([self.connexion],[], [], 0.05)
+            connexions_demandees, wlist, xlist = select.select([Data.connexion],[], [], 0.05)
             
             for connexion in connexions_demandees:
                 connexion_avec_client, infos_connexion = connexion.accept()
                 # On ajoute le socket connecté à la liste des clients
-                clients_connectes.append(connexion_avec_client)
+                Data.clients_connectes.append(connexion_avec_client)
                 #les infos sont sauvegardées au cas où...
-                infos_clients_connectés.append(infos_connexion)
+                Data.infos_clients_connectes.append(infos_connexion)
+                print("Nouveau client")
 
 class DataExchange(Thread, Data):
     """Thread chargé de surveiller l'envoi de données par les clients."""
@@ -42,19 +43,22 @@ class DataExchange(Thread, Data):
 
     def run(self):
         """Boucle active""" 
-        while serveur:
+        while Data.serveur:
+            msg_recu = ""
+            clients_a_lire = []
             try:
-                clients_a_lire, wlist, xlist = select.select(clients_connectes, [], [], 0.05)
+                clients_a_lire, wlist, xlist = select.select(Data.clients_connectes, [], [], 0.05)
             except select.error:
                 pass
             else:
-                for client in clients_a_lire:
-                    msg_recu = client.recv(1024)
-                    # Peut planter si le message contient des caractères spéciaux
-                    msg_recu = msg_recu.decode()
-                    print("Reçu {}".format(msg_recu))
-                    if msg_recu == "fin":
-                        serveur = False
+                if len(clients_a_lire) > 0:
+                    for client in clients_a_lire:
+                        msg_recu = client.recv(1024)
+                        # Peut planter si le message contient des caractères spéciaux
+                        msg_recu = msg_recu.decode()
+                        print("Reçu {}".format(msg_recu))
+                        if msg_recu == "fin":
+                            Data.serveur = False
 
 class Network(Data):
     """
@@ -64,17 +68,17 @@ class Network(Data):
         """
         Ouverture de la connection
         """
-        connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        connexion.bind((hote, port))
-        connexion.listen(5)
-        print("Le serveur écoute à présent sur le port {}".format(port))
+        Data.connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        Data.connexion.bind((Data.hote, Data.port))
+        Data.connexion.listen(5)
+        print("Le serveur écoute à présent sur le port {}".format(Data.port))
         
     def decotot(self):
         """
         Fermeture de tous les sockets clients et fermeture de la connection principale
         """
         print("Fermeture des connexions")
-        for client in clients_connectes:
+        for client in Data.clients_connectes:
             client.close()
 
-        connexion.close()
+        Data.connexion.close()

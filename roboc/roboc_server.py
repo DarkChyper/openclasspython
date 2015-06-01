@@ -1,7 +1,7 @@
 #!/usr/bin/python3.4
 # -*- coding: utf8 -*-
 
-from roboc_serveur_class import *
+from roboc_server_class import *
 
 network = Network()
 
@@ -11,7 +11,7 @@ msgclients = DataExchange()
 listenclients.start()
 msgclients.start()
 
-#join est bloquant jusqu'à la fermeture es 2 processus
+#join est bloquant jusqu'à la fermeture les 2 processus
 listenclients.join()
 msgclients.join()
 
