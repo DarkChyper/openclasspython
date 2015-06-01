@@ -155,7 +155,6 @@ class Partie:
 
         gagne = self._map.deplacement(*entree)
         self._sauvegarder()
-        print(self._map)
         print( "Pour obtenir de l'aide : {}".format(touches['aide']) )
 
         return gagne

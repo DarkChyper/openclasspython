@@ -18,11 +18,14 @@ class Joueur:
 
     def __init__(self, map_):
         self._position_courante = (0,0)
-        """_position_courante (ligne, colonne)"""
+        """_position_courante (ligne, colonne): Position courante du joueur"""
+
+        self._porte_courante = None
+        """_porte_courante: Position d'une porte écrasée par le joueur"""
 
         self._evaluer_position_joueur(map_)
 
-    def aller_ouest(self, map_, lg):
+    def se_deplacer(self, map_, type_):
         """
             Effectue un déplacement vers l'Ouest en fonction de la position
             courante du joueur et de la map.
@@ -34,176 +37,57 @@ class Joueur:
         # On efface le robot sur la map
         map_[self._position_courante[0]][self._position_courante[1]] = representation['vide']
 
-        # Variables plus intelligibles
-        idx_col_courante = self._position_courante[1]
-        idx_ligne_courante = self._position_courante[0]
 
-        # Si le premier déplacement est une porte...
-        if map_[idx_ligne_courante][idx_col_courante - 1] == representation['porte']:
-            # ...on la franchit
-            map_[idx_ligne_courante][idx_col_courante - 2] = representation['robot']
-            self._evaluer_position_joueur(map_)
+        # Paramétrage du déplacement
+        if type_ == 'o':
+            idx_ligne_prochain = self._position_courante[0]
+            idx_col_prochain = self._position_courante[1] - 1
+        if type_ == 'n':
+            idx_ligne_prochain = self._position_courante[0] - 1
+            idx_col_prochain = self._position_courante[1]
+        if type_ == 'e':
+            idx_ligne_prochain = self._position_courante[0]
+            idx_col_prochain = self._position_courante[1] + 1
+        if type_ == 's':
+            idx_ligne_prochain = self._position_courante[0] + 1
+            idx_col_prochain = self._position_courante[1]
 
-            return map_
+        # ...est un mur, on arrête
+        if map_[idx_ligne_prochain][idx_col_prochain] == representation['mur']:
+            map_[self._position_courante[0]][self._position_courante[1]] = representation['robot']
+            raise(IndexError)
+        # ...est la sortie, on se positionne dessus, on arrête
+        elif map_[idx_ligne_prochain][idx_col_prochain] == representation['sortie']:
+            map_[idx_ligne_prochain][idx_col_prochain] = representation['robot']
+            raise(IndexError)
 
-        # Pour toute la longueur du déplacement...
-        for i in range(1, lg + 1):
-            # ...si on rencontre un porte ou un mur, on s'arrête
-            if map_[idx_ligne_courante][idx_col_courante - i] in [representation['porte'],representation['mur']]:
-                map_[idx_ligne_courante][idx_col_courante - i + 1] = representation['robot']
-                self._evaluer_position_joueur(map_)
+        # ...est une porte
+        if map_[idx_ligne_prochain][idx_col_prochain] == representation['porte']:
+            # ...on sauvegarde la porte
+            self._porte_courante = (idx_ligne_prochain, idx_col_prochain)
 
-                return map_
-            # ...si on rencontre la sortie, on se positionne dessus
-            elif map_[idx_ligne_courante][idx_col_courante - i] == representation['sortie']:
-                map_[idx_ligne_courante][idx_col_courante - i] = representation['robot']
-                self._evaluer_position_joueur(map_)
+        # On se déplace
+        map_[idx_ligne_prochain][idx_col_prochain] = representation['robot']
 
-                return map_
-            # ...sinon, on continue le déplacement...
-
-        #...pour finalement, faire le déplacement complet
-        map_[idx_ligne_courante][idx_col_courante - lg] = representation['robot']
         self._evaluer_position_joueur(map_)
-
+        _map = self._retablir_porte(map_)
         return map_
 
-
-    def aller_nord(self, map_, lg):
+    def _retablir_porte(self, map_):
         """
-            Effectue un déplacement vers le Nord en fonction de la position
-            courante du joueur et de la map.
-
-            Vers le Nord, on joue sur les ordonnées (1ère dimension)
-            en reculant (-).
+            Remet en place l'éventuelle porte écrasée par le joueur
         """
 
-        # On efface le robot sur la map
-        map_[self._position_courante[0]][self._position_courante[1]] = representation['vide']
+        # Si une porte a été écrasée...
+        if self._porte_courante != None:
+            # Variables plus intelligibles
+            idx_ligne_porte = self._porte_courante[0]
+            idx_col_porte = self._porte_courante[1]
 
-        # Variables plus intelligibles
-        idx_col_courante = self._position_courante[1]
-        idx_ligne_courante = self._position_courante[0]
-
-        # Si le premier déplacement est une porte...
-        if map_[idx_ligne_courante - 1][idx_col_courante] == representation['porte']:
-            # ...on la franchit
-            map_[idx_ligne_courante - 2][idx_col_courante] = representation['robot']
-            self._evaluer_position_joueur(map_)
-
-            return map_
-
-        # Pour toute la longueur du déplacement...
-        for i in range(1, lg + 1):
-            # ...si on rencontre un porte ou un mur, on s'arrête
-            if map_[idx_ligne_courante - i][idx_col_courante] in [representation['porte'],representation['mur']]:
-                map_[idx_ligne_courante - i + 1][idx_col_courante] = representation['robot']
-                self._evaluer_position_joueur(map_)
-
-                return map_
-            # ...si on rencontre la sortie, on se positionne dessus
-            elif map_[idx_ligne_courante - i][idx_col_courante] == representation['sortie']:
-                map_[idx_ligne_courante - i][idx_col_courante] = representation['robot']
-                self._evaluer_position_joueur(map_)
-
-                return map_
-            # ...sinon, on continue le déplacement...
-
-        #...pour finalement, faire le déplacement complet
-        map_[idx_ligne_courante - lg][idx_col_courante] = representation['robot']
-        self._evaluer_position_joueur(map_)
-
-        return map_
-
-    def aller_est(self, map_, lg):
-        """
-            Effectue un déplacement vers l'Est en fonction de la position
-            courante du joueur et de la map.
-
-            Vers l'Est, on joue sur les ordonnées (2nde dimension)
-            en avançant (+).
-        """
-
-        # On efface le robot sur la map
-        map_[self._position_courante[0]][self._position_courante[1]] = representation['vide']
-
-        # Variables plus intelligibles
-        idx_col_courante = self._position_courante[1]
-        idx_ligne_courante = self._position_courante[0]
-
-        # Si le premier déplacement est une porte...
-        if map_[idx_ligne_courante][idx_col_courante + 1] == representation['porte']:
-            # ...on la franchit
-            map_[idx_ligne_courante][idx_col_courante + 2] = representation['robot']
-            self._evaluer_position_joueur(map_)
-
-            return map_
-
-        # Sinon, pour toute la longueur du déplacement...
-        for i in range(1, lg + 1):
-            # ...si on rencontre un porte ou un mur, on s'arrête
-            if map_[idx_ligne_courante][idx_col_courante + i] in [representation['porte'],representation['mur']]:
-                map_[idx_ligne_courante][idx_col_courante + i - 1] = representation['robot']
-                self._evaluer_position_joueur(map_)
-
-                return map_
-            # ...si on rencontre la sortie, on se positionne dessus
-            elif map_[idx_ligne_courante][idx_col_courante + i] == representation['sortie']:
-                map_[idx_ligne_courante][idx_col_courante + i] = representation['robot']
-                self._evaluer_position_joueur(map_)
-
-                return map_
-            # ...sinon, on continue le déplacement...
-
-        #...pour finalement, faire le déplacement complet
-        map_[idx_ligne_courante][idx_col_courante + lg] = representation['robot']
-        self._evaluer_position_joueur(map_)
-
-        return map_
-
-    def aller_sud(self, map_, lg):
-        """
-            Effectue un déplacement vers le Sud en fonction de la position
-            courante du joueur et de la map.
-
-            Vers le Sud, on joue sur les ordonnées (1ère dimension)
-            en avançant (+).
-        """
-
-        # On efface le robot sur la map
-        map_[self._position_courante[0]][self._position_courante[1]] = representation['vide']
-
-        # Variables plus intelligibles
-        idx_col_courante = self._position_courante[1]
-        idx_ligne_courante = self._position_courante[0]
-
-        # Si le premier déplacement est une porte...
-        if map_[idx_ligne_courante + 1][idx_col_courante] == representation['porte']:
-            # ...on la franchit
-            map_[idx_ligne_courante + 2][idx_col_courante] = representation['robot']
-            self._evaluer_position_joueur(map_)
-
-            return map_
-
-        # Pour toute la longueur du déplacement...
-        for i in range(1, lg + 1):
-            # ...si on rencontre un porte ou un mur, on s'arrête
-            if map_[idx_ligne_courante + i][idx_col_courante] in [representation['porte'],representation['mur']]:
-                map_[idx_ligne_courante + i - 1][idx_col_courante] = representation['robot']
-                self._evaluer_position_joueur(map_)
-
-                return map_
-            # ...si on rencontre la sortie, on se positionne dessus
-            elif map_[idx_ligne_courante + i][idx_col_courante] == representation['sortie']:
-                map_[idx_ligne_courante + i][idx_col_courante] = representation['robot']
-                self._evaluer_position_joueur(map_)
-
-                return map_
-            # ...sinon, on continue le déplacement...
-
-        #...pour finalement, faire le déplacement complet
-        map_[idx_ligne_courante + lg][idx_col_courante] = representation['robot']
-        self._evaluer_position_joueur(map_)
+            # ...et qu'elle n'est plus écrasée, on la rétablit
+            if map_[idx_ligne_porte][idx_col_porte] != representation['robot']:
+                map_[idx_ligne_porte][idx_col_porte] = representation['porte']
+                self._porte_courante = None
 
         return map_
 

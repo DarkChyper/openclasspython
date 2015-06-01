@@ -61,23 +61,19 @@ class Map:
 
         return map_
 
-    def deplacement(self, type, longueur):
+    def deplacement(self, type_, longueur):
         """
             En fonction du type de déplacement, on réévalue la map.
             Si un déplacement renvoie un IndexError, on l'ignore.
         """
-        try:
-            if type == 'o':
-                self._representation_map = self._joueur.aller_ouest(self._representation_map, longueur)
-            if type == 'n':
-                self._representation_map = self._joueur.aller_nord(self._representation_map, longueur)
-            if type == 'e':
-                self._representation_map = self._joueur.aller_est(self._representation_map, longueur)
-            if type == 's':
-                self._representation_map = self._joueur.aller_sud(self._representation_map, longueur)
-        except IndexError:
-            pass
 
+        for i in range(0, longueur):
+            try:
+                self._representation_map = self._joueur.se_deplacer(self._representation_map, type_)
+            except IndexError:
+                break
+            finally:
+                print(self)
         return self._etat_jeu(self._representation_map)
 
     def _etat_jeu(self, map_):
