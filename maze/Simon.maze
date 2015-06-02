@@ -1,0 +1,22 @@
+(dp0
+S'sortie'
+p1
+(I10
+I6
+tp2
+sS'nom'
+p3
+S'facile'
+p4
+sS'grille'
+p5
+S'OOOOOOOOOO\r\nO O    O O\r\nO . OO   O\r\nO O O   XO\r\nO OOOO O.O\r\nO O O    U\r\nO OOOOOO.O\r\nO O      O\r\nO O OOOOOO\r\nO . O    O\r\nOOOOOOOOOO '
+p6
+sS'door'
+p7
+I00
+sS'path'
+p8
+S'cartes/facile.txt'
+p9
+s.
