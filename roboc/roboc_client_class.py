@@ -12,6 +12,7 @@ class Data():
     port = 12800
     connexion = None
     lstmsg = []
+    mode = ""
     
 class Network(Data):
     """
@@ -46,6 +47,14 @@ class DataReceive(Thread, Data):
             msg_recu = Data.connexion.recv(1024)
             # Peut planter si le message contient des caractères spéciaux
             msg_recu = msg_recu.decode()
+            
+            if msg_recu[:4] == "chx":
+                msg_recu = msg_recu[4:]
+                Data.mode = "choix"
+            elif msg_recu[:4] == "crt":
+                msg_recu = msg_recu[4:]
+                Data.mode = "carte"
+                
             Data.lstmsg.append(msg_recu)
             if msg_recu == "fin":
                 Data.client = False
