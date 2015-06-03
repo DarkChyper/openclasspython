@@ -24,7 +24,7 @@ class Carte(DataCarte):
         """demande au premier joueur la carte à jouer"""
         lstcartes = listdir("cartes") #permet de récupérer tous les noms de fichier/dossier dans un dossier, retour est une liste
         i = 1
-        message = "choix"
+        message = "chx"
         for crt in lstcartes:
             crtname = findall('^[a-zA-Z0-9 _-]+', crt) #on extrait le nom de la carte sans l'extension
             message += "{} - {}".format(i, crtname[0])
