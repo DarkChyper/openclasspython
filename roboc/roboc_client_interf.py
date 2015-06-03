@@ -8,8 +8,9 @@ class Envoi():
     def __init__(self):
         pass
     
-    def envoi(test):
-        print(test) 
+    def envoi(message):
+        message = message.encore()
+        Data.connexion.send(message) 
 
 class Interface(Frame, Envoi):
     
