@@ -22,29 +22,43 @@ class Partie(Thread):
         """
         corps du jeu
         """
-        #envoi de la carte à tous les joueurs
-        for socketclient in Data.clients_connectes:
-            cartetemp = "crt" + DataCarte.plan
-            socketclient.send(cartetemp.encode())
+        numtour = 0
+        while??:
+            #défini l'indice du joueur dont on attend le message
+            if numtour > 3:
+                numtour = 0
+                
+            #envoi de la carte à tous les joueurs
+            for socketclient in Data.clients_connectes:
+                cartetemp = "crt" + DataCarte.plan
+                socketclient.send(cartetemp.encode())
+            
+            #on signale au joueur actif que c'est son tour
+            message = "trn"
+            Data.clients_connectes[numtour].send(message.encode())
 
 class Carte(DataCarte, Data):
     """Gestion de la carte"""
     def __init__(self):
         """
-        demande au premier joueur la carte à jouer
+        affichage de la liste des cartes disponibles
         """
         lstcartes = listdir("cartes") #permet de récupérer tous les noms de fichier/dossier dans un dossier, retour est une liste
         i = 1
-        message = "chx"
         for crt in lstcartes:
             crtname = findall('^[a-zA-Z0-9 _-]+', crt) #on extrait le nom de la carte sans l'extension
-            message += "{} - {}".format(i, crtname[0])
-            message += "\n"
-            DataCarte.carte[str(i)] = crtname[0]
+            print("{} - {}".format(i, crtname[0]))
+            DataCarte.carte[i] = crtname[0]
             i += 1
-        
-        message = message.encode()
-        Data.clients_connectes[0].send(message)
+    
+    def Definition():
+        """
+        Définition des paramètres de la partie coté serveur
+        """
+        temp = input("Choisissez la carte à charger : ")
+        Datacarte.numcarte = int(temp)
+        temp = input("Choisissez le nombre de joueurs maximum : ")
+        Data.nbr_joueurs_max = int(temp)
         
     def ChargeCarte():
         """
