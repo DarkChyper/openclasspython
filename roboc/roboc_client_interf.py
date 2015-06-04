@@ -1,4 +1,3 @@
-#!/usr/bin/python3.4
 # -*- coding: utf8 -*-
 
 from threading import Thread
@@ -54,6 +53,7 @@ class Interface(Frame, Envoi):
         self.principal = Label(self, text = "Veuillez patienter")
         self.principal.pack()
         
+        #on démarre une première fois majprincipal pour lancer le cycle des mise à jour
         self.majprincipal()
     
     def cliquer(self):
@@ -66,13 +66,14 @@ class Interface(Frame, Envoi):
         
     def majprincipal(self):
         """
+        after permet à la fonction de se relancer en automatique toute les secondes
+        actuelise le contenu de la fenêtre du client
         """
         try:
             self.principal["text"] = Data.lstmsg[0]
         except:
             self.principal["text"] = "Veuillez patienter"
             
-        print("1")
         self.after(1000, self.majprincipal)
         
 
