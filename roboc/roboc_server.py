@@ -4,31 +4,27 @@
 from roboc_server_class import *
 from roboc_server_jeu import *
 
+#ouverture de la connection
 network = Network()
 
+préparation Threads et classes
 listenclients = NewClient()
 msgclients = DataExchange()
+carte = Carte()
 partie = Partie()
 
+#définition des paramètres de la partie
+carte.Definition()
+carte.ChargeCarte()
+
+#début d'écoute
 listenclients.start()
 msgclients.start()
 
-tempo = True
-while tempo == True:
-    if len(Data.clients_connectes) > 0:
-        carte = Carte()
-        tempo = False
-        
-tempo = True
-while tempo == True:
-    DataCarte.numcarte = Data.choix
-    if DataCarte.numcarte != "":
-        Carte.ChargeCarte()
-        tempo = False
-
+#fin d'écoute des nouveaux clients et début de la partie
 partie.start()
 
-#join est bloquant jusqu'à la fermeture les 2 processus
+#join est bloquant jusqu'à la fermeture des processus
 listenclients.join()
 msgclients.join()
 partie.join()
