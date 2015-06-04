@@ -9,6 +9,9 @@ class Data():
     Classe contenant les données utiles à tous les Threads
     """
     serveur = True
+    init = True
+    nbr_joueurs_max = 0
+    nbr_joueurs_actu = 0
     clients_connectes = []
     infos_clients_connectes = []
     clients_a_lire = []
@@ -16,6 +19,7 @@ class Data():
     port = 12800
     connexion = None
     choix = ""
+    mouv = []
 
 class NewClient(Thread, Data):
     """Thread chargé de surveiller l'arrivée de nouveaux clients."""
@@ -24,17 +28,21 @@ class NewClient(Thread, Data):
         
     def run(self):
         """Boucle active""" 
-        while Data.serveur:
+        while Data.init:
             #on vérifie si de nouveaux clients demandes à se connecter
             connexions_demandees, wlist, xlist = select.select([Data.connexion],[], [], 0.05)
             
             for connexion in connexions_demandees:
-                connexion_avec_client, infos_connexion = connexion.accept()
-                # On ajoute le socket connecté à la liste des clients
-                Data.clients_connectes.append(connexion_avec_client)
-                #les infos sont sauvegardées au cas où...
-                Data.infos_clients_connectes.append(infos_connexion)
-                print("Nouveau client")
+                if nbr_joueurs_actu < nbr_joueurs_max:
+                    connexion_avec_client, infos_connexion = connexion.accept()
+                    # On ajoute le socket connecté à la liste des clients
+                    Data.clients_connectes.append(connexion_avec_client)
+                    #les infos sont sauvegardées au cas où...
+                    Data.infos_clients_connectes.append(infos_connexion)
+                    print("Nouveau client")
+                    nbr_joueurs_actu += 1
+                else:
+                    Data.init = False
 
 class DataExchange(Thread, Data):
     """Thread chargé de surveiller l'envoi de données par les clients."""
@@ -57,12 +65,10 @@ class DataExchange(Thread, Data):
                         # Peut planter si le message contient des caractères spéciaux
                         msg_recu = msg_recu.decode()
                         
-                        if msg_recu[:3] == "chx":
+                        if msg_recu[:3] == "mvt":
                             msg_recu = msg_recu[3:]
-                            Data.choix = msg_recu
-                        elif msg_recu[:3] == "mvt":
-                            msg_recu = msg_recu[3:]
-                            Data.mode = "carte"
+                            Data.mouv.append(client)
+                            Data.mouv.append(msg_recu)
                         elif msg_recu == "fin":
                             Data.serveur = False
 
