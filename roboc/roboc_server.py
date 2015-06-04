@@ -16,8 +16,17 @@ msgclients.start()
 tempo = True
 while tempo == True:
     if len(Data.clients_connectes) > 0:
-        partie.start()
+        carte = Carte()
         tempo = False
+        
+tempo = True
+while tempo == True:
+    DataCarte.numcarte = Data.choix
+    if DataCarte.numcarte != "":
+        Carte.ChargeCarte()
+        tempo = False
+
+partie.start()
 
 #join est bloquant jusqu'à la fermeture les 2 processus
 listenclients.join()

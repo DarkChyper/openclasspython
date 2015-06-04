@@ -42,20 +42,24 @@ class DataReceive(Thread, Data):
         Thread.__init__(self)
 
     def run(self):
-        """Boucle active""" 
+        """
+        Boucle active, réceptionne les messages et sert d'aiguilleur pour diriger le message vers la bonne variable de stockage.
+        """ 
         while Data.client:
             msg_recu = Data.connexion.recv(1024)
             # Peut planter si le message contient des caractères spéciaux
             msg_recu = msg_recu.decode()
             
-            if msg_recu[:4] == "chx":
-                msg_recu = msg_recu[4:]
+            if msg_recu[:3] == "chx":
+                msg_recu = msg_recu[3:]
                 Data.mode = "choix"
-            elif msg_recu[:4] == "crt":
-                msg_recu = msg_recu[4:]
+            elif msg_recu[:3] == "crt":
+                msg_recu = msg_recu[3:]
                 Data.mode = "carte"
                 
             Data.lstmsg.append(msg_recu)
+            print(Data.lstmsg[0])
+            
             if msg_recu == "fin":
                 Data.client = False
 

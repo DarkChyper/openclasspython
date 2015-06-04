@@ -15,6 +15,7 @@ class Data():
     hote = ''
     port = 12800
     connexion = None
+    choix = ""
 
 class NewClient(Thread, Data):
     """Thread chargé de surveiller l'arrivée de nouveaux clients."""
@@ -55,8 +56,14 @@ class DataExchange(Thread, Data):
                         msg_recu = client.recv(1024)
                         # Peut planter si le message contient des caractères spéciaux
                         msg_recu = msg_recu.decode()
-                        print("Reçu {}".format(msg_recu))
-                        if msg_recu == "fin":
+                        
+                        if msg_recu[:3] == "chx":
+                            msg_recu = msg_recu[3:]
+                            Data.choix = msg_recu
+                        elif msg_recu[:3] == "mvt":
+                            msg_recu = msg_recu[3:]
+                            Data.mode = "carte"
+                        elif msg_recu == "fin":
                             Data.serveur = False
 
 class Network(Data):
