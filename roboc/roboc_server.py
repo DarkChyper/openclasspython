@@ -7,7 +7,7 @@ from roboc_server_jeu import *
 #ouverture de la connection
 network = Network()
 
-préparation Threads et classes
+#préparation Threads et classes
 listenclients = NewClient()
 msgclients = DataExchange()
 carte = Carte()

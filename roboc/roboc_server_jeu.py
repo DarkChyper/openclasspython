@@ -4,6 +4,7 @@ from roboc_server_class import *
 from threading import Thread
 from os import listdir
 from re import findall
+from time import sleep
 
 class DataCarte():
     """Stocke les données de la carte"""
@@ -23,7 +24,9 @@ class Partie(Thread):
         corps du jeu
         """
         numtour = 0
-        while??:
+        while Data.nbr_joueurs_actu != Data.nbr_joueurs_max:
+            sleep(0.1)
+        while True:
             #défini l'indice du joueur dont on attend le message
             if numtour > 3:
                 numtour = 0
@@ -36,6 +39,11 @@ class Partie(Thread):
             #on signale au joueur actif que c'est son tour
             message = "trn"
             Data.clients_connectes[numtour].send(message.encode())
+            
+            tempo = True
+            while tempo == True:
+                if len(Data.mouv) == 1:
+                    tempo = False
 
 class Carte(DataCarte, Data):
     """Gestion de la carte"""
@@ -43,7 +51,8 @@ class Carte(DataCarte, Data):
         """
         affichage de la liste des cartes disponibles
         """
-        lstcartes = listdir("cartes") #permet de récupérer tous les noms de fichier/dossier dans un dossier, retour est une liste
+        #permet de récupérer tous les noms de fichier/dossier dans un dossier, retour est une liste
+        lstcartes = listdir("cartes") 
         i = 1
         for crt in lstcartes:
             crtname = findall('^[a-zA-Z0-9 _-]+', crt) #on extrait le nom de la carte sans l'extension
@@ -51,16 +60,23 @@ class Carte(DataCarte, Data):
             DataCarte.carte[i] = crtname[0]
             i += 1
     
-    def Definition():
+    def Definition(self):
         """
         Définition des paramètres de la partie coté serveur
         """
         temp = input("Choisissez la carte à charger : ")
-        Datacarte.numcarte = int(temp)
+        try:
+            DataCarte.numcarte = int(temp)
+        except:
+            DataCarte.numcarte = 2
+            
         temp = input("Choisissez le nombre de joueurs maximum : ")
-        Data.nbr_joueurs_max = int(temp)
+        try:
+            Data.nbr_joueurs_max = int(temp)
+        except:
+            Data.nbr_joueurs_max = 1
         
-    def ChargeCarte():
+    def ChargeCarte(self):
         """
         Chargement de la carte dans la liste qui servira pour le reste du programme
         """

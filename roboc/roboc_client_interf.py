@@ -1,6 +1,7 @@
 #!/usr/bin/python3.4
 # -*- coding: utf8 -*-
 
+from threading import Thread
 from tkinter import *
 from roboc_client_class import *
 
@@ -17,32 +18,11 @@ class Envoi():
         suivant le point du programme le "mode" varie et permet de préfixer différement le message pour que le serveur les reconnaissent.
         là encore un préfixe sera ajouté pour le chat
         """
-        if Data.mode == "choix":
-            message = "chx" + message
-            Data.lstmsg = []
+        message = "mvt" + message
         message = message.encode()
         Data.connexion.send(message)
-        
-class MajPrincipal(Data):
-    """
-    Thread chargé de la réception des messages en provenance du server.
-    Les données sont stockées dans une liste commune avant affichage.
-    """
-    def __init__(self):
-        #Thread.__init__(self)
-        pass
-        
-    def rafraich(interf):
-        """
-        effectue en continu la mise à jour du cadre principal de la fenêtre
-        """
-        while Data.client:
-            try:
-                interf.principal["text"] = Data.lstmsg[0]
-            except:
-                interf.principal["text"] = "Veuillez patienter"
 
-class Interface(Frame, Envoi, MajPrincipal):
+class Interface(Frame, Envoi):
     """
     Notre fenêtre principale.
     Tous les widgets sont stockés comme attributs de cette fenêtre.
@@ -74,7 +54,7 @@ class Interface(Frame, Envoi, MajPrincipal):
         self.principal = Label(self, text = "Veuillez patienter")
         self.principal.pack()
         
-        MajPrincipal.rafraich(self)
+        self.majprincipal()
     
     def cliquer(self):
         """
@@ -83,7 +63,32 @@ class Interface(Frame, Envoi, MajPrincipal):
         """
         Envoi.envoi(self.var_texte.get())
         self.var_texte.set("")
+        
+    def majprincipal(self):
+        """
+        """
+        try:
+            self.principal["text"] = Data.lstmsg[0]
+        except:
+            self.principal["text"] = "Veuillez patienter"
+            
+        print("1")
+        self.after(1000, self.majprincipal)
+        
 
-
-
-
+class Affichage(Thread):
+    """
+    Thread chargé de l'envoi des messages entrés par l'utilisateur
+    """
+    def __init__(self):
+        Thread.__init__(self)
+    
+    def run(self):
+        """Boucle active"""
+        self.fenetre = Tk()
+        self.interface = Interface(self.fenetre)
+        self.interface.mainloop()
+    
+    def stop(self):
+        self.interface.destroy()
+                

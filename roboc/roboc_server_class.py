@@ -33,14 +33,14 @@ class NewClient(Thread, Data):
             connexions_demandees, wlist, xlist = select.select([Data.connexion],[], [], 0.05)
             
             for connexion in connexions_demandees:
-                if nbr_joueurs_actu < nbr_joueurs_max:
+                if Data.nbr_joueurs_actu < Data.nbr_joueurs_max:
                     connexion_avec_client, infos_connexion = connexion.accept()
                     # On ajoute le socket connecté à la liste des clients
                     Data.clients_connectes.append(connexion_avec_client)
                     #les infos sont sauvegardées au cas où...
                     Data.infos_clients_connectes.append(infos_connexion)
                     print("Nouveau client")
-                    nbr_joueurs_actu += 1
+                    Data.nbr_joueurs_actu += 1
                 else:
                     Data.init = False
 

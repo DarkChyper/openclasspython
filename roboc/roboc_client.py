@@ -4,25 +4,22 @@
 from roboc_client_class import *
 from roboc_client_interf import *
 
-fenetre = Tk()
-interface = Interface(fenetre)
-
 network = Network()
 
+#initialisation des threads
 #datasend = DataSend()
 datareceive = DataReceive()
-majprincipal = MajPrincipal()
+affichage = Affichage()
 
+#lancement des threads
 #datasend.start()
+affichage.start()
 datareceive.start()
-majprincipal.start()
 
-interface.mainloop()
-interface.destroy()
-
+#attente de l'arrêt des thread
 #datasend.join()
 datareceive.join()
-majprincipal.join()
+affichage.join()
 
 network.deco()
 
