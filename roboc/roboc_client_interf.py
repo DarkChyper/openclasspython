@@ -49,6 +49,7 @@ class Envoi():
         message = "mvt" + message
         message = message.encode()
         Data.connexion.send(message)
+        Data.turn = False
 
 class Interface(Frame, Envoi):
     """
@@ -90,11 +91,11 @@ class Interface(Frame, Envoi):
         Il y a eu un clic sur le bouton.
         On envoi le contenu du champ vers le server.
         """
-        if Data.turn = True:
+        if Data.turn == True:
             valide = Envoi.verifmvt(self.var_texte.get())
             if valide:
                 Envoi.envoi(self.var_texte.get())
-            self.var_texte.set("")
+        self.var_texte.set("")
         
     def majprincipal(self):
         """

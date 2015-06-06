@@ -11,7 +11,7 @@ class Data():
     hote = "localhost"
     port = 12800
     connexion = None
-    lstmsg = []
+    lstmsg = [None]
     turn = False
     
 class Network(Data):
@@ -53,10 +53,12 @@ class DataReceive(Thread, Data):
             
             if msg_recu[:3] == "crt":
                 msg_recu = msg_recu[3:]
-            if msg_recu == "trn":
-                turn = True
+                Data.lstmsg[0] = msg_recu
+            elif msg_recu == "trn":
+                Data.turn = True
+            elif msg_recu[:3] == "pos":
+                pass
                 
-            Data.lstmsg.append(msg_recu)
             print(msg_recu)
             
             if msg_recu == "fin":

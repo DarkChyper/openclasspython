@@ -60,7 +60,16 @@ class Partie(Thread):
                     tempo = False
             
             print("mouvement reçu!")
-            verif = 
+            
+            if Data.mouv[1][0] == "P" or Data.mouv[1][0] == "M":
+                pass
+            else:
+                npos = Carte.nouvpos(Data.mouv)
+                verif = Carte.verifpos(npos)
+                if verif:
+                    Carte.clearpos(Data.mouv[0])
+                    Carte.updatepos(Data.mouv[0], npos)
+
             Data.mouv = []
             numtour += 1
 
@@ -158,7 +167,57 @@ class Carte(DataCarte, Data):
         if status == True:
             DataCarte.plan = templine
         return status
+        
+    def nouvpos(mvt):
+        """
+        calcule la nouvelle position par rapport au mouvement demandé
+        """
+        tempindex = Data.clients_connectes.index(mvt[0])
+        tempinitpos = DataCarte.Posjoueurs[tempindex]
+        temppos = [tempinitpos[0], tempinitpos[1]]
+        
+        if mvt[1][0] == "N":
+            temppos[1] -= 1
+        elif mvt[1][0] == "S":
+            temppos[1] += 1
+        elif mvt[1][0] == "O":
+            temppos[0] -= 1
+        elif mvt[1][0] == "E":
+            temppos[0] += 1
+        
+        npos = (temppos[0], temppos[1])
+        return npos
 
+    def clearpos(client):
+        """
+        supprime l'ancien x du joueur
+        """
+        tempindex = Data.clients_connectes.index(client)
+        temppos = DataCarte.Posjoueurs[tempindex]
+        line = 1
+        carac = 1
+        templine = ""
+        for char in DataCarte.plan:
+            carac += 1
+            if char == "\n":
+                line +=1
+                carac = 0
+                templine += char
+                continue
+                
+            if line == temppos[1] and carac == temppos[0]:
+                templine += " "
+            else:
+                templine += char
+        
+        DataCarte.plan = templine
+    
+    def updatepos(client, npos):
+        """
+        mise à jour de la position actuelle du client dans la liste des position
+        """
+        tempindex = Data.clients_connectes.index(client)
+        DataCarte.Posjoueurs[tempindex] = npos
 
 
 
