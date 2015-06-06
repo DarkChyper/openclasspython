@@ -69,6 +69,9 @@ class Partie(Thread):
                 if verif:
                     Carte.clearpos(Data.mouv[0])
                     Carte.updatepos(Data.mouv[0], npos)
+                else:
+                    message = "err"
+                    Data.clients_connectes[numtour].send(message.encode())
 
             Data.mouv = []
             numtour += 1
