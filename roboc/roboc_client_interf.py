@@ -51,8 +51,27 @@ class Envoi():
         Data.connexion.send(message)
         Data.turn = False
         
-#def uppercarte():
-    
+def uppercarte():
+    """
+    Mise en majuscule du X correspondant au joueur
+    """
+    line = 1
+    carac = 1
+    templine = ""
+    for char in Data.lstmsg[0]:
+        carac += 1
+        if char == "\n":
+            line +=1
+            carac = 0
+            templine += char
+            continue
+                
+        if line == Data.pos[1] and carac == Data.pos[0]:
+            templine += char.upper()
+        else:
+            templine += char
+        
+    Data.lstmsg[0] = templine
 
 class Interface(Frame, Envoi):
     """
@@ -106,7 +125,7 @@ class Interface(Frame, Envoi):
         actuelise le contenu de la fenêtre du client
         """
         if Data.lstmsg[0] != None:
-            
+            uppercarte()
             self.principal["text"] = Data.lstmsg[0]
         else:
             self.principal["text"] = "Veuillez patienter"

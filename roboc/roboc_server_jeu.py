@@ -32,20 +32,20 @@ class Partie(Thread):
             #défini l'indice du joueur dont on attend le message
             if numtour > Data.nbr_joueurs_max - 1:
                 numtour = 0
-                
-            #envoi de la carte à tous les joueurs
-            for socketclient in Data.clients_connectes:
-                cartetemp = "crt" + DataCarte.plan
-                socketclient.send(cartetemp.encode())
-            
-            #temporisation pour laisser le message précédent être réceptionné
-            sleep(0.5)
-            
+
             #envoi de sa position à chaque joueur
             for socketclient in Data.clients_connectes:
                 indextemp = Data.clients_connectes.index(socketclient)
                 postemp = "pos" + str(DataCarte.Posjoueurs[indextemp])
                 socketclient.send(postemp.encode())
+            
+            #temporisation pour laisser le message précédent être réceptionné
+            sleep(0.5)
+
+            #envoi de la carte à tous les joueurs
+            for socketclient in Data.clients_connectes:
+                cartetemp = "crt" + DataCarte.plan
+                socketclient.send(cartetemp.encode())
             
             #temporisation pour laisser le message précédent être réceptionné
             sleep(0.5)
