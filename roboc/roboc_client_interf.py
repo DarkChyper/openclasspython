@@ -50,6 +50,9 @@ class Envoi():
         message = message.encode()
         Data.connexion.send(message)
         Data.turn = False
+        
+#def uppercarte():
+    
 
 class Interface(Frame, Envoi):
     """
@@ -102,9 +105,10 @@ class Interface(Frame, Envoi):
         after permet à la fonction de se relancer en automatique toute les secondes
         actuelise le contenu de la fenêtre du client
         """
-        try:
+        if Data.lstmsg[0] != None:
+            
             self.principal["text"] = Data.lstmsg[0]
-        except:
+        else:
             self.principal["text"] = "Veuillez patienter"
             
         self.after(1000, self.majprincipal)

@@ -2,6 +2,7 @@
 
 import socket
 from threading import Thread
+from re import findall
 
 class Data():
     """
@@ -12,6 +13,7 @@ class Data():
     port = 12800
     connexion = None
     lstmsg = [None]
+    pos = None
     turn = False
     
 class Network(Data):
@@ -57,7 +59,10 @@ class DataReceive(Thread, Data):
             elif msg_recu == "trn":
                 Data.turn = True
             elif msg_recu[:3] == "pos":
-                pass
+                temp0 = findall('^\(([0-9])+,', msg_recu[3:])
+                temp1 = findall(' ([0-9]+)\)$', msg_recu[3:])
+                print("recuppos : ", temp0, temp1)
+                Data.pos = (temp0, temp1)
                 
             print(msg_recu)
             
