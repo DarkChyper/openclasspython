@@ -12,11 +12,40 @@ class Envoi():
     def __init__(self):
         pass
     
+    def verifmvt(message):
+        """
+        on contrôle la validité (d'un point de vue règles) du mouvement avant son envoi
+        l'idée est de limiter les échanges avec le serveur
+        """
+        status = False
+        message = message.upper()
+        #message de mouvement strictement uniquement
+        if message[0] == "N" or message[0] == "S" or message[0] == "E" or message[0] == "O":
+            if len(message) == 1:
+                status = True
+            else:
+                try:
+                    temp = int(message[1:])
+                    status = True
+                except:
+                    pass
+        #messages de ouverture porte ou murer uniquement
+        elif message[0] == "P" or message[0] == "M":
+            if message[1:] == "N" or message[1:] == "S" or message[1:] == "E" or message[1:] == "O":
+                status = True
+        
+        #les autres messages aboutissent directement ici
+        return status
+    
     def envoi(message):
         """
-        suivant le point du programme le "mode" varie et permet de préfixer différement le message pour que le serveur les reconnaissent.
-        là encore un préfixe sera ajouté pour le chat
+        la fonction envoi les messages qui lui sont passés en ajoutant un préfixe de mouvement.
+        Le passage en uppercase simplifie le travail coté serveur
+        l'ajout du suffixe 1 est fait pour la même raison
         """
+        if len(message) == 1:
+            message += "1"
+        message = message.upper()
         message = "mvt" + message
         message = message.encode()
         Data.connexion.send(message)
@@ -61,8 +90,11 @@ class Interface(Frame, Envoi):
         Il y a eu un clic sur le bouton.
         On envoi le contenu du champ vers le server.
         """
-        Envoi.envoi(self.var_texte.get())
-        self.var_texte.set("")
+        if Data.turn = True:
+            valide = Envoi.verifmvt(self.var_texte.get())
+            if valide:
+                Envoi.envoi(self.var_texte.get())
+            self.var_texte.set("")
         
     def majprincipal(self):
         """

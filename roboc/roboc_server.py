@@ -10,12 +10,14 @@ network = Network()
 #préparation Threads et classes
 listenclients = NewClient()
 msgclients = DataExchange()
-carte = Carte()
-partie = Partie()
 
 #définition des paramètres de la partie
+carte = Carte()
 carte.Definition()
 carte.ChargeCarte()
+carte.PosInitJoueurs()
+
+partie = Partie()
 
 #début d'écoute
 listenclients.start()

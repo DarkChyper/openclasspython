@@ -5,6 +5,7 @@ from threading import Thread
 from os import listdir
 from re import findall
 from time import sleep
+from random import randrange
 
 class DataCarte():
     """Stocke les données de la carte"""
@@ -13,6 +14,7 @@ class DataCarte():
     plan = ""
     Nbrligne = 0
     Longueurligne = 0
+    Posjoueurs = []
 
 class Partie(Thread):
     """déroulement du jeu"""
@@ -28,7 +30,7 @@ class Partie(Thread):
             sleep(0.1)
         while True:
             #défini l'indice du joueur dont on attend le message
-            if numtour > 3:
+            if numtour > Data.nbr_joueurs_max - 1:
                 numtour = 0
                 
             #envoi de la carte à tous les joueurs
@@ -36,14 +38,31 @@ class Partie(Thread):
                 cartetemp = "crt" + DataCarte.plan
                 socketclient.send(cartetemp.encode())
             
+            #temporisation pour laisser le message précédent être réceptionné
+            sleep(0.5)
+            
+            #envoi de sa position à chaque joueur
+            for socketclient in Data.clients_connectes:
+                indextemp = Data.clients_connectes.index(socketclient)
+                postemp = "pos" + str(DataCarte.Posjoueurs[indextemp])
+                socketclient.send(postemp.encode())
+            
+            #temporisation pour laisser le message précédent être réceptionné
+            sleep(0.5)
+            
             #on signale au joueur actif que c'est son tour
             message = "trn"
             Data.clients_connectes[numtour].send(message.encode())
             
             tempo = True
             while tempo == True:
-                if len(Data.mouv) == 1:
+                if len(Data.mouv) > 0:
                     tempo = False
+            
+            print("mouvement reçu!")
+            verif = 
+            Data.mouv = []
+            numtour += 1
 
 class Carte(DataCarte, Data):
     """Gestion de la carte"""
@@ -52,7 +71,7 @@ class Carte(DataCarte, Data):
         affichage de la liste des cartes disponibles
         """
         #permet de récupérer tous les noms de fichier/dossier dans un dossier, retour est une liste
-        lstcartes = listdir("cartes") 
+        lstcartes = listdir("carte") 
         i = 1
         for crt in lstcartes:
             crtname = findall('^[a-zA-Z0-9 _-]+', crt) #on extrait le nom de la carte sans l'extension
@@ -80,16 +99,67 @@ class Carte(DataCarte, Data):
         """
         Chargement de la carte dans la liste qui servira pour le reste du programme
         """
-        path = "cartes/" + DataCarte.carte[DataCarte.numcarte] + ".txt"
+        path = "carte/" + DataCarte.carte[DataCarte.numcarte] + ".txt"
         Lline = 0
         nbrline = 0
     
         with open(path, "r") as carte:
             for line in carte:
-                DataCarte.plan = DataCarte.plan + line + "\n"
+                DataCarte.plan = DataCarte.plan + line
                 if nbrline == 0:
                     Lline = len(line) - 1
                 nbrline += 1
     
         DataCarte.Nbrligne = nbrline
         DataCarte.Longueurligne = Lline
+        
+    def PosInitJoueurs(self):
+        """
+        Définition aléatoire de la position initiale des joueurs
+        """
+        listejoueur = list(range(Data.nbr_joueurs_max))
+        posvalide = False
+        
+        for joueur in listejoueur:
+            while posvalide != True:
+                posinit = (randrange(0, DataCarte.Longueurligne), randrange(0, DataCarte.Nbrligne))
+                posvalide = Carte.verifpos(posinit)
+                if posvalide == True:
+                    DataCarte.Posjoueurs.append(posinit)
+            
+            posvalide = False
+
+    def verifpos(pos):
+        """
+        Vérifie que la position choisie est bien valide au vue de la carte
+        i.e. pas sur un mur, la sortie ou sur un autre joueur
+        """
+        line = 1
+        carac = 1
+        templine = ""
+        status = False
+        for char in DataCarte.plan:
+            carac += 1
+            if char == "\n":
+                line +=1
+                carac = 0
+                templine += char
+                continue
+            
+            if line == pos[1] and carac == pos[0]:
+                if char == "O" or char == "U" or char == "x":
+                    status = False
+                else:
+                    templine += "x"
+                    status = True
+            else:
+                templine += char
+        
+        if status == True:
+            DataCarte.plan = templine
+        return status
+
+
+
+
+

@@ -12,7 +12,7 @@ class Data():
     port = 12800
     connexion = None
     lstmsg = []
-    mode = ""
+    turn = False
     
 class Network(Data):
     """
@@ -53,9 +53,8 @@ class DataReceive(Thread, Data):
             
             if msg_recu[:3] == "crt":
                 msg_recu = msg_recu[3:]
-                Data.mode = "carte"
             if msg_recu == "trn":
-                pass
+                turn = True
                 
             Data.lstmsg.append(msg_recu)
             print(msg_recu)
