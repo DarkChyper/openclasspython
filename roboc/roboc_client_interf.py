@@ -83,34 +83,47 @@ class Interface(Frame, Envoi):
         """
         Création de la fenêtre
         """
-        Frame.__init__(self, fenetre, width=1024, height=1024, **kwargs)
-        self.pack(fill=BOTH)
+        #initialisation globale de la fenêtre
+        Frame.__init__(self, fenetre)
+        self.pack(fill = BOTH)
         
         #création des frames
         
-        self.comm = LabelFrame(fenetre, text="Entrez un message pour le serveur :", padx=10, pady=10)
-        self.comm.pack(fill="both", side=BOTTOM)
+        self.ctrl = Frame(self, borderwidth=2, relief=GROOVE, bg="white")
+        self.ctrl.pack(fill = Y, side = RIGHT)
         
-        self.carte = Canvas(fenetre, width=200, height=400)
-        self.carte.pack(side=LEFT)
+        self.carte = Canvas(self, width=200, height=400)
+        self.carte.pack(fill = Y, side = LEFT)
+        
+        self.comm = LabelFrame(self.ctrl, text="Entrez un message pour le serveur :")
+        self.comm.pack(fill = X, side = BOTTOM)
         
         # Création de nos widgets
         
+            #champ d'entrée
         self.var_texte = StringVar()
-        self.ligne_texte = Entry(self.comm, textvariable=self.var_texte, width=5)
-        self.ligne_texte.pack(side = "left")
+        self.ligne_texte = Entry(self.comm, textvariable = self.var_texte, width = 5)
+        self.ligne_texte.pack(side = LEFT)
         self.ligne_texte.focus_set()
 
-        self.bouton_cliquer = Button(self.comm, text="Envoyer", fg="red",command=self.cliquer)
-        self.bouton_cliquer.pack(side="right")
+            #bouton envoi
+        self.bouton_cliquer = Button(self.comm, text = "Envoyer", fg = "red",command = self.cliquer)
+        self.bouton_cliquer.pack(side = RIGHT)
 
-        self.bouton_quitter = Button(self, text="Quitter", command=self.quit)
-        self.bouton_quitter.pack(side="left")
+            #bouton quitter
+        self.bouton_quitter = Button(self.ctrl, text = "Quitter", command = self.quit)
+        self.bouton_quitter.pack(side = TOP, padx=10, pady=10)
         
-        self.principal = self.carte.create_text(100, 200, text="Veuillez patienter", font="UbuntuMono 16")
+            #message information
+        self.infos = Label(self.ctrl,text="test")
+        self.infos.pack(padx=10,pady=100)
         
-        #on démarre une première fois majprincipal pour lancer le cycle des mise à jour
+            #affichage carte
+        self.principal = self.carte.create_text(100, 200, text = "Veuillez patienter", font = "UbuntuMono 16")
+        
+        #on démarre une première fois majprincipal et majinfos pour lancer le cycle des mise à jour
         self.majprincipal()
+        self.majinfos()
     
     def cliquer(self):
         """
@@ -126,7 +139,7 @@ class Interface(Frame, Envoi):
     def majprincipal(self):
         """
         after permet à la fonction de se relancer en automatique toute les secondes
-        actuelise le contenu de la fenêtre du client
+        actualise le contenu de la fenêtre du client
         """
         if Data.lstmsg[0] != None:
             uppercarte()
@@ -137,6 +150,18 @@ class Interface(Frame, Envoi):
             self.principal = self.carte.create_text(100, 200, text="Veuillez patienter", font="UbuntuMono 16")
             
         self.after(1000, self.majprincipal)
+        
+    def majinfos(self):
+        """
+        after permet à la fonction de se relancer en automatique toute les secondes
+        actualise le contenu de la fenêtre du client
+        """
+        if Data.lstinfos[0] != None:
+            self.infos["text"] = Data.lstinfos[0]
+        else:
+            self.infos["text"] = ""
+            
+        self.after(1000, self.majinfos)
         
 
 class Affichage(Thread):

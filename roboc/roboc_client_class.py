@@ -13,6 +13,7 @@ class Data():
     port = 12800
     connexion = None
     lstmsg = [None]
+    lstinfos = [None]
     pos = None
     turn = False
     
@@ -65,9 +66,9 @@ class DataReceive(Thread, Data):
                 Data.pos = (int(temp0[0]), int(temp1[0]))
             elif msg_recu[:3] == "fin":
                 if len(msg_recu) == 3:
-                    Data.lstmsg[0] = "Vous avez perdu!"
+                    Data.lstinfos[0] = "Vous avez perdu!"
                 elif len(msg_recu) > 3:
-                    Data.lstmsg[0] = "Vous avez gagné!"
+                    Data.lstinfos[0] = "Vous avez gagné!"
                 Data.client = False
             elif msg_recu[:3] == "err":
                 pass
