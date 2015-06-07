@@ -8,13 +8,13 @@ def main():
     try:
         client = Client()
     except:
-        pass
+        raise
 
     # On quitte
     try:
         client.fermer()
     except:
-        pass
+        raise
     finally:
         exit(0)
 

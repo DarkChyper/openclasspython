@@ -55,10 +55,12 @@ class Joueur:
         # ...est un mur, on arrête
         if map_[idx_ligne_prochain][idx_col_prochain] == representation['mur']:
             map_[self._position_courante[0]][self._position_courante[1]] = representation['robot_courant']
+            print('Mur\nProchaine ligne : {}\nProchaine colonne : {}'.format(idx_ligne_prochain,idx_col_prochain)) # DEBUG
             raise(IndexError)
         # ...est la sortie, on se positionne dessus, on arrête
         elif map_[idx_ligne_prochain][idx_col_prochain] == representation['sortie']:
             map_[idx_ligne_prochain][idx_col_prochain] = representation['robot_courant']
+            print('sortie') # DEBUG
             raise(IndexError)
 
         # ...est une porte
@@ -71,7 +73,7 @@ class Joueur:
 
         self._evaluer_position_joueur(map_)
         _map = self._retablir_porte(map_)
-        return map_
+        return idx_ligne_prochain, idx_col_prochain, map_
 
     def _retablir_porte(self, map_):
         """

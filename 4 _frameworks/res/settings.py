@@ -28,7 +28,6 @@ touches =   {
             'nord':         'n',
             'est':          'e',
             'sud':          's',
-            'aide':         'a',
             'quit':         'quit',
             'commencer':    'c'
             }

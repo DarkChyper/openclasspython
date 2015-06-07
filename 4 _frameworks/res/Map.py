@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # Coding: utf-8
 
+# Externe
+from random     import randrange
 # Interne
 from res.Joueur     import *
 from res.settings    import *
@@ -15,9 +17,6 @@ class Map:
     def __init__(self, map_str):
         self._representation_map = self._convert(map_str)
         """Représentation interne de la map : liste 2D"""
-
-        self._joueur = Joueur(self._representation_map)
-        """Joueur qui va manipuler la Map en se déplaçant"""
 
     def __repr__(self):
         """
@@ -61,50 +60,51 @@ class Map:
 
         return map_
 
-    def deplacement(self, type_, longueur):
+    def deplacement(self, type_, longueur, ligne_j_courant, col_j_courant):
         """
             En fonction du type de déplacement, on réévalue la map.
             Si un déplacement renvoie un IndexError, on l'ignore.
         """
 
+        # On signale le joueur actuel en 'X'
+        self._representation_map[ligne_j_courant][col_j_courant] = representation['robot_courant']
+        joueur = Joueur(self._representation_map)
+
+        print("ligne courante : {}, colonne courante : {}".format(ligne_j_courant, col_j_courant)) # DEBUG
+        print(self.__str__()) # DEBUG
         for i in range(0, longueur):
             try:
-                self._representation_map = self._joueur.se_deplacer(self._representation_map, type_)
+                nv_ligne, nv_col, self._representation_map = joueur.se_deplacer(self._representation_map, type_)
             except IndexError:
+                nv_ligne, nv_col = ligne_j_courant, col_j_courant
                 break
-            finally:
-                print(self)
-        return self._etat_jeu(self._representation_map)
 
-    def _etat_jeu(self, map_):
+        return nv_ligne, nv_col
+
+    def set_joueur(self):
+        # Données
+        ligne = len(self._representation_map)
+        colonne = len(self._representation_map[0])
+
+        pos_ligne = randrange(0,ligne)
+        pos_col = randrange(0, colonne)
+
+        while not self._representation_map[pos_ligne][pos_col] == representation['vide']:
+            pos_ligne = randrange(0,ligne)
+            pos_col = randrange(0, colonne)
+
+        self._representation_map[pos_ligne][pos_col] = representation['autre_robot']
+        return pos_ligne, pos_col
+
+        self._map
+
+    def get_map_joueur_courant(self, ligne, colonne):
         """
-            Retourne False si le jeu n'est pas gagné et True s'il est gagné.
-
-            Le robot doit remplacer la sortie lors de son dernier mouvement
-            pour que cette méthode fonctionne correctement.
+            Renvoie une map avec un 'X' pour le joueur courant
         """
 
-        # Pour chacune des lignes...
-        for row, i in enumerate(map_):
-            # ...on cherche l'indice de la colonne...
-            try:
+        self._representation_map[ligne][colonne] = representation['robot_courant']
+        map_str = self.__str__()
+        self._representation_map[ligne][colonne] = representation['autre_robot']
 
-                column = i.index(representation['sortie'])
-
-                # ...si on trouve la sortie, le joueur n'a pas encore gagné
-                return False
-            # ...si la sortie n'est pas encore trouvé, on continue la recherche...
-            except ValueError:
-                continue
-
-        # ...si on arrive ici, c'est que la sortie n'a pas été trouvée et que le joueur a gagné
-        return True
-
-    def len_lig(self):
-        return len(self._representation_map)
-
-    def len_col(self):
-        return len(self._representation_map[0])
-
-    def est_vide(self, ligne, colonne):
-        return self._representation_map[ligne][colonne] == representation['vide']
+        return map_str
