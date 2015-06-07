@@ -10,6 +10,16 @@ import socket
 # Imports internes
 from .client_class import *
 
+def Pseudo():
+	"""
+		On va demander u joueur de s'identifier
+	"""
+	while 1:
+		pseudo = input("Quel est votre pseudonyme ? : ")
+		if pseudo != "":
+			Data.pseudo = pseudo
+			break
+
 def Connexion():
 	"""
 		Fonction qui lance la connexion au serveur

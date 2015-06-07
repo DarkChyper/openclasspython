@@ -11,7 +11,10 @@ from threading import Thread, RLock
 
 # Début du programme
 def main():
-	connexion()
+
+	Pseudo()
+
+	Connexion()
 
 
 
