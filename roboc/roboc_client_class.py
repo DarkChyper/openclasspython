@@ -69,6 +69,8 @@ class DataReceive(Thread, Data):
                 elif len(msg_recu) > 3:
                     Data.lstmsg[0] = "Vous avez gagné!"
                 Data.client = False
+            elif msg_recu[:3] == "err":
+                pass
                 
             print(msg_recu)
 

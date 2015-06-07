@@ -83,27 +83,31 @@ class Interface(Frame, Envoi):
         """
         Création de la fenêtre
         """
-        Frame.__init__(self, fenetre, width=768, height=576, **kwargs)
+        Frame.__init__(self, fenetre, width=1024, height=1024, **kwargs)
         self.pack(fill=BOTH)
+        
+        #création des frames
+        
+        self.comm = LabelFrame(fenetre, text="Entrez un message pour le serveur :", padx=10, pady=10)
+        self.comm.pack(fill="both", side=BOTTOM)
+        
+        self.carte = Canvas(fenetre, width=200, height=400)
+        self.carte.pack(side=LEFT)
         
         # Création de nos widgets
         
-        comm = LabelFrame(fenetre, text="Entrez un message pour le serveur :", padx=25, pady=25)
-        comm.pack(fill="both", expand="yes")
-        
         self.var_texte = StringVar()
-        self.ligne_texte = Entry(comm, textvariable=self.var_texte, width=5)
+        self.ligne_texte = Entry(self.comm, textvariable=self.var_texte, width=5)
         self.ligne_texte.pack(side = "left")
         self.ligne_texte.focus_set()
 
-        self.bouton_cliquer = Button(comm, text="Envoyer", fg="red",command=self.cliquer)
+        self.bouton_cliquer = Button(self.comm, text="Envoyer", fg="red",command=self.cliquer)
         self.bouton_cliquer.pack(side="right")
 
         self.bouton_quitter = Button(self, text="Quitter", command=self.quit)
         self.bouton_quitter.pack(side="left")
         
-        self.principal = Label(self, text = "Veuillez patienter")
-        self.principal.pack()
+        self.principal = self.carte.create_text(100, 200, text="Veuillez patienter", font="UbuntuMono 16")
         
         #on démarre une première fois majprincipal pour lancer le cycle des mise à jour
         self.majprincipal()
@@ -126,9 +130,11 @@ class Interface(Frame, Envoi):
         """
         if Data.lstmsg[0] != None:
             uppercarte()
-            self.principal["text"] = Data.lstmsg[0]
+            self.carte.delete(self.principal)
+            self.principal = self.carte.create_text(100, 200, text=Data.lstmsg[0], font="UbuntuMono 16")
         else:
-            self.principal["text"] = "Veuillez patienter"
+            self.carte.delete(self.principal)
+            self.principal = self.carte.create_text(100, 200, text="Veuillez patienter", font="UbuntuMono 16")
             
         self.after(1000, self.majprincipal)
         
