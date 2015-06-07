@@ -135,6 +135,7 @@ class Interface(Frame, Envoi):
             if valide:
                 Envoi.envoi(self.var_texte.get())
         self.var_texte.set("")
+        Data.lstinfos[0] = ""
         
     def majprincipal(self):
         """
@@ -149,7 +150,7 @@ class Interface(Frame, Envoi):
             self.carte.delete(self.principal)
             self.principal = self.carte.create_text(100, 200, text="Veuillez patienter", font="UbuntuMono 16")
             
-        self.after(1000, self.majprincipal)
+        self.after(10, self.majprincipal)
         
     def majinfos(self):
         """
@@ -161,7 +162,7 @@ class Interface(Frame, Envoi):
         else:
             self.infos["text"] = ""
             
-        self.after(1000, self.majinfos)
+        self.after(10, self.majinfos)
         
 
 class Affichage(Thread):

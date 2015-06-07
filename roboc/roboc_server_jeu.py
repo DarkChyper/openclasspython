@@ -266,6 +266,7 @@ class Carte(DataCarte, Data):
         #dans l'ordre, calcule de la nouvelle position, vérification de sa validité
         npos = Carte.nouvpos(Data.mouv)
         verif = Carte.verifpos(npos)
+        indextemp = Data.clients_connectes.index(Data.mouv[0])
         #si la nouvelle position arrive sur la sortie
         if DataCarte.victoire:
             for socketclient in Data.clients_connectes:
@@ -282,7 +283,6 @@ class Carte(DataCarte, Data):
             Carte.updatepos(Data.mouv[0], npos)
             #on vérifie si un déplacement multiple a été demandé
             distrest = int(Data.mouv[1][1:]) - 1
-            indextemp = Data.clients_connectes.index(Data.mouv[0])
             #si il reste des mvt à faire on les stockes
             if distrest != 0:
                 mvtrest = Data.mouv[1][:1] + str(distrest)
@@ -292,8 +292,11 @@ class Carte(DataCarte, Data):
                 DataCarte.Mvtwaiting[indextemp] = None
         #le reste
         else:
-            message = "err"
-            Data.clients_connectes[numtour].send(message.encode())
+            message = "errmouvement impossible\nVous perdez votre tour!"
+            DataCarte.Mvtwaiting[indextemp] = None
+            Data.clients_connectes[indextemp].send(message.encode())
+            #temporisation contre le téléscopage
+            sleep(0.5)
 
 
 
