@@ -383,8 +383,9 @@ class Carte(DataCarte, Data):
         verif = Carte.verifporte(posp)
         if not verif:
             message = "errcréation/suppréssion de porte impossible\nVous perdez votre tour!"
+            indextemp = Data.clients_connectes.index(Data.mouv[0])
             DataCarte.Mvtwaiting[indextemp] = None
-            Data.clients_connectes[indextemp].send(message.encode())
+            Data.mouv[0].send(message.encode())
             #temporisation contre le téléscopage
             sleep(0.5)
 
