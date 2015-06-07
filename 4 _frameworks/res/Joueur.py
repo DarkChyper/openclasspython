@@ -16,64 +16,51 @@ class Joueur:
         Sinon, il faut catcher les IndexError et utiliser un système de backup de Map.
     """
 
-    def __init__(self, map_):
-        self._position_courante = (0,0)
-        """_position_courante (ligne, colonne): Position courante du joueur"""
-
-        self._porte_courante = None
-        """_porte_courante: Position d'une porte écrasée par le joueur"""
-
-        self._evaluer_position_joueur(map_)
+    def __init__(self, socket, lig_joueur, col_joueur, id_):
+        self._lig_joueur = lig_joueur
+        """Position de la ligne courante du joueur"""
+        self._col_joueur = col_joueur
+        """Position de la colonne courante du joueur"""
+        self.id_ = id_
+        """Identifiant du joueur"""
+        self.socket = socket
+        """Socket permettant de communiquer avec le client joueur"""
 
     def se_deplacer(self, map_, type_):
         """
             Effectue un déplacement vers l'Ouest en fonction de la position
             courante du joueur et de la map.
-
-            Vers l'Est, on joue sur les ordonnées (2nde dimension)
-            en reculant (-).
+            # ToDo : expliquer le système des dimensions
         """
 
         # On efface le robot sur la map
-        map_[self._position_courante[0]][self._position_courante[1]] = representation['vide']
-
+        map_[self._lig_joueur][self._col_joueur] = representation['vide']
 
         # Paramétrage du déplacement
         if type_ == 'o':
-            idx_ligne_prochain = self._position_courante[0]
-            idx_col_prochain = self._position_courante[1] - 1
+            idx_ligne_prochain = self._lig_joueur
+            idx_col_prochain = self._col_joueur - 1
         if type_ == 'n':
-            idx_ligne_prochain = self._position_courante[0] - 1
-            idx_col_prochain = self._position_courante[1]
+            idx_ligne_prochain = self._lig_joueur - 1
+            idx_col_prochain = self._col_joueur
         if type_ == 'e':
-            idx_ligne_prochain = self._position_courante[0]
-            idx_col_prochain = self._position_courante[1] + 1
+            idx_ligne_prochain = self._lig_joueur
+            idx_col_prochain = self._col_joueur + 1
         if type_ == 's':
-            idx_ligne_prochain = self._position_courante[0] + 1
-            idx_col_prochain = self._position_courante[1]
+            idx_ligne_prochain = self._lig_joueur + 1
+            idx_col_prochain = self._col_joueur
 
-        # ...est un mur, on arrête
-        if map_[idx_ligne_prochain][idx_col_prochain] == representation['mur']:
-            map_[self._position_courante[0]][self._position_courante[1]] = representation['robot_courant']
+        # Si c'est un mur ou un autre joueur , on arrête
+        if map_[idx_ligne_prochain][idx_col_prochain] in ( representation['mur'], representation['autre_robot'] ):
+            map_[self._lig_joueur][self._col_joueur] = representation['autre_robot']
             print('Mur\nProchaine ligne : {}\nProchaine colonne : {}'.format(idx_ligne_prochain,idx_col_prochain)) # DEBUG
             raise(IndexError)
-        # ...est la sortie, on se positionne dessus, on arrête
-        elif map_[idx_ligne_prochain][idx_col_prochain] == representation['sortie']:
-            map_[idx_ligne_prochain][idx_col_prochain] = representation['robot_courant']
-            print('sortie') # DEBUG
-            raise(IndexError)
+        # Pour le reste, on avance
+        else:
+            map_[idx_ligne_prochain][idx_col_prochain] = representation['autre_robot']
+            self._lig_joueur, self._col_joueur = idx_ligne_prochain, idx_col_prochain
 
-        # ...est une porte
-        if map_[idx_ligne_prochain][idx_col_prochain] == representation['porte']:
-            # ...on sauvegarde la porte
-            self._porte_courante = (idx_ligne_prochain, idx_col_prochain)
-
-        # On se déplace
-        map_[idx_ligne_prochain][idx_col_prochain] = representation['robot_courant']
-
-        self._evaluer_position_joueur(map_)
-        _map = self._retablir_porte(map_)
-        return idx_ligne_prochain, idx_col_prochain, map_
+        return map_
 
     def _retablir_porte(self, map_):
         """
@@ -93,22 +80,41 @@ class Joueur:
 
         return map_
 
-    def _evaluer_position_joueur(self, map_):
+    def envoi_map_client(self, map_, joueur):
         """
-            Met à jour la position du joueur en fonction de la map.
-
-            Ne fonctionne que s'il y a un et un seul robot au sein de la map.
+            Envoie un ID et la map formatée au client
+            Selon l'utilisation, l'ID peut être le tout premier envoyé au joueur
+            ou l'ID du joueur_courant de la map
         """
 
-        # Pour chacune des lignes...
-        for row, i in enumerate(map_):
-            # ...on cherche l'indice de la colonne...
-            try:
-                column = i.index(representation['robot_courant'])
-            # ...si le robot n'y est pas, on continue la recherche
-            except ValueError:
-                continue
+        # On met en évidence le joueur sur la map avec 'X'
+        map_.representation_map[self._lig_joueur][self._col_joueur] = representation['robot_courant']
 
-            # ...et  on la trouve, on la mémorise
-            nouvelles_position = (row, column)
-            self._position_courante = nouvelles_position
+        # On envoie la map au client
+        to_send = "Id:{}:Map:{}".format( joueur, map_.__repr__() )
+        self.socket.send(to_send.encode())
+
+        # On rétablit le joueur avec 'x'
+        map_.representation_map[self._lig_joueur][self._col_joueur] = representation['autre_robot']
+
+    def envoi_message_client(self, balise, msg):
+        """
+            Envoi un message au client
+        """
+        try:
+            to_send = "{}:{}".format(balise, msg)
+            self.socket.send(to_send.encode())
+        except:
+            pass
+
+
+    def fermer_connexion(self):
+        """
+            Si le client est toujours connecté,
+            on le prévient et on ferme la connexion
+        """
+        try:
+            self.envoi_message_client("Sys","quit")
+            self.socket.close()
+        except:
+            pass

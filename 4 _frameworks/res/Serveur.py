@@ -7,6 +7,7 @@ from random     import randrange
 from time       import sleep
 from socket     import *
 from select     import *
+from time       import sleep
 # Interne
 from res.Map        import *
 from res.settings   import *
@@ -21,10 +22,6 @@ class Serveur:
     def __init__(self):
         self._map = Map( obtenir_map(dossier_maps) )
         """Carte du labyrinthe avec laquelle on interagis tout au long de la partie"""
-        self.clients_connectes = []
-        """Liste des clients connectés au serveur"""
-        self.position_clients = []
-        """Liste dela position des clients"""
         self.joueur_courant = None
         """Indice du joueur courant"""
         self.connexion = init_connexion()
@@ -32,38 +29,49 @@ class Serveur:
 
         print(self._map) # DEBUG premier affichage
         self.attente_joueur()
-        self._initialiser_labyrinthe()
-
+        self.definir_premier_joueur()
 
     def jouer(self):
         """
             Demande au joueur quel déplacement il souhaite effectuer
             et renvoie s'il a gagné ou non
         """
-        # On assigne le joueur suivant ne tant que joueur courant
-        self.joueur_courant = (self.joueur_courant + 1) % len(self.clients_connectes)
+        # On assigne le joueur suivant en tant que joueur courant
+        self.joueur_courant = (self.joueur_courant + 1) % self._map.nb_joueurs
 
-        self._send_map()
+        # On envoie la map à tous les joueurs
+        self._map.maj_carte_joueurs(self.joueur_courant)
+
+        # On réceptionne la prochaine action
         type_, lg = self._receive_action()
-        lig_j_courant, col_j_courant = self.position_clients[self.joueur_courant]
-        self.position_clients[self.joueur_courant] = self._map.deplacement(type_, lg, lig_j_courant, col_j_courant)
 
-        return etat_jeu(self._map.__str__())
+        # Tant que le déplacement est incorrect, on continue
+        while True:
+            try:
+                self._map.deplacement(type_, lg, self.joueur_courant)
+            # Si le mouvement est impossible...
+            except IndexError:
+                # ...on prévient le joueur et on récupère une nouvelle action
+                self._map.obtenir_joueur(self.joueur_courant).envoi_message_client("Msg", "Déplacement impossible")
+                type_, lg = self._receive_action()
+            else:
+                break
+
+        return self._map.etat_jeu()
 
     def terminer(self):
         """Message de sortie pour le joueur, selon qu'il ait gagné ou non"""
         #ToDo : indiquer au joueur gagnant qu'il a gagné et fermer toutes les connexions
-        print("Fermeture des connexions")
-        for client in self.clients_connectes:
-            try:
-                client.close()
-            except:
-                pass
-
-        self.connexion.close()
+        self._map.prevenir_joueurs("Msg", "Un joueur est parti ou\nle serveur rencontre un problème.\nVous pouvez quitter")
+        self._map.fermer_connexions()
         exit(0)
 
     def attente_joueur(self):
+        """
+            Toutes les 0.05 secondes, accepte les connexions
+            et vérifie si un joueur n'a pas demandé que la partie commence
+            ToDo : limiter à 4 joueurs
+        """
         self.connexion.listen(5)
         print("On attends les clients")
 
@@ -75,18 +83,27 @@ class Serveur:
             # On ajoute les sockets connectés à la liste des clients et on lui donne son ID
             for con in connexions_demandees:
                 connexion_avec_client, infos_connexion = con.accept()
-                # Envoi de l'ID
-                id_joueur = str(len(self.clients_connectes))
-                connexion_avec_client.send( str.encode(id_joueur) )
+
+                # On ajoute le joueur
+                self._map.ajouter_joueur(connexion_avec_client)
+
                 # On prévient les autres joueurs
-                prevenir_joueur(self.clients_connectes)
-                # Ajout
-                self.clients_connectes.append(connexion_avec_client)
+                sleep(2)
+                msg = "{} autres joueurs\nAppuyez sur c pour commencer !".format(self._map.nb_joueurs - 1)
+                self._map.prevenir_joueurs("Msg", msg)
+
+                # On vérifie qu'il n'y a pas le maximum de joueurs (4)
+                partie_commencee = self._map.nb_joueurs > nb_max_joueurs - 1
+                if partie_commencee:
+                    sleep(1)
+                    self._map.prevenir_joueurs("Msg", "La partie commence !\nAttendez votre tour")
+
+                print("Nb joueurs actuel : {}, Max de joueurs : {}, Partie commencée : {}".format(self._map.nb_joueurs, nb_max_joueurs, partie_commencee)) # DEBUG
 
             # Maintenant, on écoute la liste des clients connectés
             clients_a_lire = []
             try:
-                clients_a_lire, wlist, xlist = select(self.clients_connectes, [], [], 0.05)
+                clients_a_lire, wlist, xlist = select(self._map.sockets, [], [], 0.05)
             except:
                 pass
 
@@ -101,53 +118,42 @@ class Serveur:
 
                 if controler_partie_commencee(msg_recu):
                     partie_commencee = True
-                    prevenir_partie_commence(self.clients_connectes)
+                    self._map.prevenir_joueurs("Msg", "La partie commence !")
 
-    def prevenir_joueur_partie_gagne():
+    def definir_premier_joueur(self):
+        self.joueur_courant = randrange(0, self._map.nb_joueurs)
+
+    def prevenir_joueur_partie_gagne(): # ToDo
         pass
 
-    def _initialiser_labyrinthe(self):
-        """
-            Positionne les joueurs sur la map.
-            Détermine qui sera le premier joueur.
-        """
-        # Positionne tous les joueurs
-        for joueur in self.clients_connectes:
-            ligne, colonne = self._map.set_joueur()
-            self.position_clients.append( (ligne, colonne) )
-
-        # Détermine le premier joueur
-        self.joueur_courant = randrange( 0, len(self.clients_connectes) )
-
     def _receive_action(self):
+        """
+            Attends de recevoir une action correcte du joueur courant
+        """
+
         while True:
             clients_a_lire = []
             try:
-                clients_a_lire, wlist, xlist = select(self.clients_connectes, [], [], 0.05)
-            except error:
+                clients_a_lire, wlist, xlist = select(self._map.sockets, [], [], 0.05)
+            except:
                 pass
 
             for client in clients_a_lire:
                 # Réception du message
-
                 try:
                     msg_recu = client.recv(1024).decode()
+                # Si un des client est parti
                 except (ConnectionResetError, ConnectionAbortedError):
                     print("Un joueur est parti, veuillez redémarrer le serveur.")
                     self.terminer()
 
-                donnees = controler_entree_client(msg_recu,self.joueur_courant)
+                donnees = controler_entree_client(msg_recu, self.joueur_courant)
 
                 if donnees == None:
                     continue
 
                 return donnees
 
-    def _send_map(self):
-       for i, client in enumerate(self.clients_connectes):
-            map_joueur = self._map.get_map_joueur_courant( *self.position_clients[i] )
-            to_send = "Id:{}:Map:{}".format( self.joueur_courant, map_joueur )
-            msg_recu = client.send(to_send.encode())
 
 ########## FONCTIONS SERVEUR ##########
 
@@ -158,13 +164,8 @@ def init_connexion():
 
     return connexion
 
-def prevenir_partie_commence(clients_connectes):
-    for client in clients_connectes:
-        client.send(b"Msg:La partie commence !")
-
 def prevenir_joueur(clients_connectes):
-    nb = len(clients_connectes) - 1
-    msg = "{} autres joueurs".format(nb)
+
 
     for client in clients_connectes:
         client.send(str.encode(msg))
@@ -227,34 +228,6 @@ def obtenir_map(dossier):
 
     return contenu
 
-
-########## FONCTIONS SERVEUR ##########
-
-
-def etat_jeu(map_): # ToDo : Déplacer Map
-    """
-        Retourne False si le jeu n'est pas gagné et True s'il est gagné.
-
-        Le robot doit remplacer la sortie lors de son dernier mouvement
-        pour que cette méthode fonctionne correctement.
-    """
-
-    # Pour chacune des lignes...
-    for row, i in enumerate(map_):
-        # ...on cherche l'indice de la colonne...
-        try:
-
-            column = i.index(representation['sortie'])
-
-            # ...si on trouve la sortie, le joueur n'a pas encore gagné
-            return False
-        # ...si la sortie n'est pas encore trouvé, on continue la recherche...
-        except ValueError:
-            continue
-
-    # ...si on arrive ici, c'est que la sortie n'a pas été trouvée et que le joueur a gagné
-    return True
-
 ########## CONTROLES ##########
 
 
@@ -270,19 +243,30 @@ def controler_partie_commencee(msg_recu):
 
 def controler_entree_client(msg_recu, joueur_courant):
     """
-        Contrôle si le message reçu provient bien du joueur courant
+        Contrôle si le message reçu provient bien du joueur courant et
+        qu'elles sont au bon format (balise et données)
         Les données sont du format suivant :
-        id:1:type:e:lg:3
+        Id:1:Type:e:Lg:3
     """
-    print(msg_recu) # DEBUG
+
     parse = msg_recu.split(":")
 
     try:
+        # On contrôle que les balises sont bien présente
+        if  not parse[0] == "Id" and not parse[2] == "Type" and not parse[4] == "Lg":
+            raise ValueError("Balises incorrectes, message : \"{}\"".format(msg_recu))
+
+        # On contrôle que les données sont au bon format et qu'elle viennent du bon joueur
         if int(parse[1]) == joueur_courant:
             _type = parse[3]
-            longueur = parse[5]
+            longueur = int(parse[5])
+        else:
+            raise ValueError("Réception d'un client qui n'est pas le joueur courant, message : \"{}\"".format(msg_recu))
+    except (ValueError, IndexError) as e:
+        print("Contenu des balises incorrect, message : \"{}\"".format(msg_recu))
+        return None
+    except Exception as e:
+        print(e.value)
+        return None
 
-            return _type, int(longueur)
-    except:
-        raise
-        #return None
+    return _type, int(longueur)

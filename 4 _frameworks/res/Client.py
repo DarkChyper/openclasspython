@@ -3,13 +3,15 @@
 
 # Externe
 from socket         import *
+from select         import select
 from threading      import Thread
 from tkinter        import *
 # Interne
-from res.func       import *
 from res.Listener   import Listener
 from res.Sender     import Sender
 from res.settings   import *
+
+# ToDo : ajouter la première réception de la carte
 
 
 ########## CLASSE CLIENT ##########
@@ -32,7 +34,7 @@ class Client(Frame):
         ligne_texte = Entry(fenetre, textvariable=self._input_client, width=17)
 
         # Pack
-        self._message_label.grid(row=0, column=0, padx=10, pady=5, sticky=W+N)
+        self._message_label.grid(row=0, column=0, padx=10, pady=5, sticky=W+N, columnspan=2)
         self._map_label.grid(row=1, column=0, pady=10, padx=10, sticky=W+N)
         message_aide.grid(row=1, column=1, pady=10, padx=10, sticky=W+N)
         ligne_texte.grid(row=3, column=0,  sticky=W+N, pady=10, padx=10)
@@ -41,10 +43,15 @@ class Client(Frame):
 
         self.connexion = init_connexion_serveur()
         """Connexion avec le serveur"""
-        self.id_ = self._obtenir_id()
+        self.id_ = None
         """Identifiant du joueur du client"""
+
+        self._obtenir_info_connexion()
         self._listener = Listener(self)
         self._sender = Sender(self)
+
+        # On récupère les informations de connexion
+
 
         # On démarre l'écoute du serveur
         self._listener.start()
@@ -70,31 +77,42 @@ class Client(Frame):
             self.quit()
             exit(0)
 
-    def _obtenir_id(self):
+    def _obtenir_info_connexion(self):
         """
-            Permet d'obtenir l'ID sous forme d'entier
+            Contrôle si les informations initiales de connexion sont au bon format (balise et données)
+            Les données sont du format suivant :
+            Id:1:Map:OOOOOOO(...)
         """
 
-        print("obtenir_id") # DEBUG
-
-        try:
-            msg = self.connexion.recv(1024).decode()
-            id_ = int(msg)
-        except:
-            print("Récupération de l'ID impossible")
+        ready = select([self.connexion], [], [], 1)
+        if ready[0]:
+            msg_recu = self.connexion.recv(1024).decode()
+        else:
+            print("La partie a déjà commencée.")
             self.terminer()
 
-        self.message_label = "Bienvenue, joueur {}.\nAppuyez sur c pour commencer !".format(id_ + 1)
+        parse = msg_recu.split(":")
 
-        print(self.message_label) # DEBUG
+        try:
+            # On contrôle que les balises sont bien présentes
+            if  not parse[0] == "Id" and not parse[2] == "Map":
+                raise ValueError("Balises incorrectes, message : \"{}\"".format(msg_recu))
 
-        return id_
+            # On applique les données
+            self.id_ = int(parse[1])
+            self.map_label = parse[3]
+        except ValueError as e:
+            print("Contenu des balises incorrect, message : \"{}\"".format(msg_recu))
+        except Exception as e:
+            print("Contenu des données incorrect ({}), message : \"{}\"".format(type(e), msg_recu))
 
     def _send(self):
         self._sender.send(self._input_client)
         self._input_client.set("")
 
+
 ########## PROPRIETES ##########
+
     def _set_message_label(self, msg):
         self._message_label['text'] = msg
 
@@ -109,6 +127,7 @@ class Client(Frame):
 
     message_label = property(_get_message_label, _set_message_label)
     map_label = property(_get_map_label, _set_map_label)
+
 
 ########## FONCTIONS CLIENT ##########
 
@@ -128,6 +147,7 @@ def init_connexion_serveur():
         print("Connexion établie avec le serveur.")
 
     return connexion
+
 
 ########## FENETRE ##########
 

@@ -15,8 +15,12 @@ class Map:
     """
 
     def __init__(self, map_str):
-        self._representation_map = self._convert(map_str)
+        self.representation_map = self._convert(map_str)
         """Représentation interne de la map : liste 2D"""
+        self._liste_joueurs = []
+        """Liste des joueurs"""
+        self._liste_portes = obtenir_positions_portes(self.representation_map)
+        """Liste des portes de la map"""
 
     def __repr__(self):
         """
@@ -25,13 +29,12 @@ class Map:
         """
 
         str_ = ""
-        for line in self._representation_map:
+        for line in self.representation_map:
             for colonne in line:
                 str_ += colonne
             str_ += "\n"
 
         return str_.rstrip()
-
 
     def _convert(self, map_str):
         """
@@ -60,51 +63,134 @@ class Map:
 
         return map_
 
-    def deplacement(self, type_, longueur, ligne_j_courant, col_j_courant):
+    def deplacement(self, type_, longueur, joueur):
         """
             En fonction du type de déplacement, on réévalue la map.
             Si un déplacement renvoie un IndexError, on l'ignore.
         """
 
-        # On signale le joueur actuel en 'X'
-        self._representation_map[ligne_j_courant][col_j_courant] = representation['robot_courant']
-        joueur = Joueur(self._representation_map)
+        print( self.__str__() ) # DEBUG
+        try:
+            self.representation_map = self._liste_joueurs[joueur].se_deplacer(self.representation_map, type_)
+        except IndexError:
+            raise
 
-        print("ligne courante : {}, colonne courante : {}".format(ligne_j_courant, col_j_courant)) # DEBUG
-        print(self.__str__()) # DEBUG
-        for i in range(0, longueur):
+        self._retablir_portes()
+
+    def maj_carte_joueurs(self, joueur_courant):
+        """
+            Envoie la carte à tous les joueurs
+        """
+
+        for joueur in self._liste_joueurs:
+            joueur.envoi_map_client(self, joueur_courant)
+
+    def _retablir_portes(self):
+        """
+            Pour toutes les portes de la map,
+            les rétablis si elles ne sont pas occupées
+        """
+
+        for lig_porte, col_porte in self._liste_portes:
+            print("Porte : ({}, {})".format(lig_porte, col_porte)) # DEBUG
+            if self.representation_map[lig_porte][col_porte] == representation['vide']:
+                self.representation_map[lig_porte][col_porte] = representation['porte']
+
+    def etat_jeu(self):
+        """
+            Retourne False si le jeu n'est pas gagné et True s'il est gagné.
+
+            Le robot doit remplacer la sortie lors de son dernier mouvement
+            pour que cette méthode fonctionne correctement.
+        """
+
+        # Pour chacune des lignes...
+        for row, i in enumerate(self.representation_map):
+            # ...on cherche l'indice de la colonne...
             try:
-                nv_ligne, nv_col, self._representation_map = joueur.se_deplacer(self._representation_map, type_)
-            except IndexError:
-                nv_ligne, nv_col = ligne_j_courant, col_j_courant
-                break
+                column = i.index(representation['sortie'])
 
-        return nv_ligne, nv_col
+                # ...si on trouve la sortie, le joueur n'a pas encore gagné
+                return False
+            # ...si la sortie n'est pas encore trouvé, on continue la recherche...
+            except ValueError:
+                continue
 
-    def set_joueur(self):
+        # ...si on arrive ici, c'est que la sortie n'a pas été trouvée et que le joueur a gagné
+        return True
+
+    def obtenir_joueur(self, indice):
+        return self._liste_joueurs[indice]
+
+    def ajouter_joueur(self, socket):
+        """
+            Permet d'ajouter un joueur à la map et renvoie la map au client
+        """
+
         # Données
-        ligne = len(self._representation_map)
-        colonne = len(self._representation_map[0])
+        ligne = len(self.representation_map)
+        colonne = len(self.representation_map[0])
+        id_ = len(self._liste_joueurs)
 
-        pos_ligne = randrange(0,ligne)
-        pos_col = randrange(0, colonne)
+        # Tant que la position générée n'est pas du vide...
+        lig_joueur = randrange(0,ligne)
+        col_joueur = randrange(0, colonne)
+        while not self.representation_map[lig_joueur][col_joueur] == representation['vide']:
+            # ...on regénère
+            lig_joueur = randrange(0,ligne)
+            col_joueur = randrange(0, colonne)
 
-        while not self._representation_map[pos_ligne][pos_col] == representation['vide']:
-            pos_ligne = randrange(0,ligne)
-            pos_col = randrange(0, colonne)
+        # On l'ajoute à la map
+        self.representation_map[lig_joueur][col_joueur] = representation['autre_robot']
 
-        self._representation_map[pos_ligne][pos_col] = representation['autre_robot']
-        return pos_ligne, pos_col
+        # On crée un nouveau joueur qu'on préviens
+        nouveau_joueur = Joueur(socket, lig_joueur, col_joueur, id_)
+        nouveau_joueur.envoi_map_client(self, nouveau_joueur.id_)
 
-        self._map
+        # On ajoute le nouveau joueur à la liste
+        self._liste_joueurs.append(nouveau_joueur)
 
-    def get_map_joueur_courant(self, ligne, colonne):
+    def prevenir_joueurs(self, balise, msg):
+        for joueur in self._liste_joueurs:
+            joueur.envoi_message_client(balise, msg)
+
+    def fermer_connexions(self):
         """
-            Renvoie une map avec un 'X' pour le joueur courant
+            On ferme la connexion de tous les joueurs
         """
+        for joueur in self._liste_joueurs:
+            joueur.fermer_connexion()
 
-        self._representation_map[ligne][colonne] = representation['robot_courant']
-        map_str = self.__str__()
-        self._representation_map[ligne][colonne] = representation['autre_robot']
+########## PROPRIÉTÉS ##########
+    def _get_nb_joueurs(self):
+        return len(self._liste_joueurs)
 
-        return map_str
+    def _get_sockets(self):
+        sockets = []
+        for joueur in self._liste_joueurs:
+            sockets.append(joueur.socket)
+
+        return sockets
+
+    nb_joueurs = property(_get_nb_joueurs, None)
+
+    sockets = property(_get_sockets, None)
+
+
+######### FONCTIONS MAP ##########
+
+
+def obtenir_positions_portes(map_):
+    """
+        Mémorise la position des portes d'une map
+    """
+
+    position_portes = []
+    # Pour chacune des lignes...
+    for i, lig in enumerate(map_):
+        # ...on cherche l'indice de la colonne...
+        for j, cell in enumerate(lig):
+            if cell == representation['porte']:
+                position_portes.append( (i, j) )
+
+    return position_portes

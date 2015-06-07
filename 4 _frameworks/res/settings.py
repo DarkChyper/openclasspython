@@ -35,3 +35,4 @@ touches =   {
 # Serveur
 port = 5128
 hote = 'localhost'
+nb_max_joueurs = 4

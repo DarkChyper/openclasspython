@@ -4,7 +4,6 @@
 # Externe
 from socket         import *
 # Interne
-from res.func       import *
 from res.settings   import *
 
 
@@ -24,7 +23,6 @@ class Sender:
 
     def send(self, msg_a_envoyer):
         msg_a_envoyer = msg_a_envoyer.get()
-        print(msg_a_envoyer)
 
         # On quitte
         if msg_a_envoyer == touches['quit']:
@@ -32,15 +30,18 @@ class Sender:
 
         # On envoie le début de partie
         if msg_a_envoyer == touches['commencer']:
+            print(msg_a_envoyer)
             self.connexion.send(msg_a_envoyer.encode())
+            print("Message envoyé : {}".format(msg_a_envoyer)) # DEBUG
             return None
 
         msg_a_envoyer = self._entree_correcte(msg_a_envoyer)
         if msg_a_envoyer != None:
-            msg = "id:{}:type:{}:lg:{}".format(self.id_, msg_a_envoyer[0], msg_a_envoyer[1])
-            print(msg) #DEBUG
+            msg = "Id:{}:Type:{}:Lg:{}".format(self.id_, msg_a_envoyer[0], msg_a_envoyer[1])
             try:
                 self.connexion.send(msg.encode())
+                print("Message envoyé : {}".format(msg_a_envoyer)) # DEBUG
+                self.client.message_label = "Ce n'est plus à votre tour"
             except (ConnectionAbortedError, OSError):
                 self.client.terminer()
 

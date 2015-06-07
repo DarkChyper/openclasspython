@@ -5,7 +5,6 @@
 from socket     import *
 from threading  import Thread
 # Interne
-from res.func       import *
 
 
 ########## CLASSE LISTENER ##########
