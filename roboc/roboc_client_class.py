@@ -59,6 +59,7 @@ class DataReceive(Thread, Data):
                 Data.lstmsg[0] = msg_recu
             elif msg_recu == "trn":
                 Data.turn = True
+                Data.lstinfos[0] = "A vous de jouer"
             elif msg_recu[:3] == "pos":
                 print(msg_recu)
                 temp0 = findall('^\(([0-9])+,', msg_recu[3:])

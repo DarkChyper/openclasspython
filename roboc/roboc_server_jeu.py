@@ -15,6 +15,8 @@ class DataCarte():
     Nbrligne = 0
     Longueurligne = 0
     Posjoueurs = []
+    Surporte = []
+    Surportetemp = False
     Mvtwaiting = []
     victoire = False
 
@@ -69,14 +71,7 @@ class Partie(Thread):
             
             #2 types de mouvement arrivent ici murer/ouvrir une porte
             if Data.mouv[1][0] == "P" or Data.mouv[1][0] == "M":
-                posp = Carte.posporte(Data.mouv)
-                verif = Carte.verifporte(posp)
-                if not verif:
-                    message = "errcréation/suppréssion de porte impossible\nVous perdez votre tour!"
-                    DataCarte.Mvtwaiting[indextemp] = None
-                    Data.clients_connectes[indextemp].send(message.encode())
-                    #temporisation contre le téléscopage
-                    sleep(0.5)
+                Carte.checkporte()
             #ou se déplacer
             else:
                 Carte.checkmvt()
@@ -159,6 +154,7 @@ class Carte(DataCarte, Data):
         carac = 1
         templine = ""
         status = False
+        #parcours de la carte
         for char in DataCarte.plan:
             carac += 1
             if char == "\n":
@@ -166,16 +162,21 @@ class Carte(DataCarte, Data):
                 carac = 0
                 templine += char
                 continue
-            
+            #arrivé à la bonne position
             if line == pos[1] and carac == pos[0]:
                 if char == "O" or char == "U" or char == "x":
                     status = False
+                #cas particulier
                 else:
+                    if char == ".":
+                        DataCarte.Surporte.append(True)
+                    else:
+                        DataCarte.Surporte.append(False)
                     templine += "x"
                     status = True
             else:
                 templine += char
-        
+        #export carte
         if status == True:
             DataCarte.plan = templine
         return status
@@ -209,6 +210,7 @@ class Carte(DataCarte, Data):
         line = 1
         carac = 1
         templine = ""
+        #parcours de la carte
         for char in DataCarte.plan:
             carac += 1
             if char == "\n":
@@ -216,12 +218,15 @@ class Carte(DataCarte, Data):
                 carac = 0
                 templine += char
                 continue
-                
+            #arrivé à la bonne position
             if line == temppos[1] and carac == temppos[0]:
-                templine += " "
+                if DataCarte.Surporte[tempindex] == True:
+                    templine += "."
+                else:
+                    templine += " "
             else:
                 templine += char
-        
+        #export carte
         DataCarte.plan = templine
     
     def updatepos(client, npos):
@@ -230,6 +235,7 @@ class Carte(DataCarte, Data):
         """
         tempindex = Data.clients_connectes.index(client)
         DataCarte.Posjoueurs[tempindex] = npos
+        DataCarte.Surporte[tempindex] = DataCarte.Surportetemp
 
     def verifpos(pos):
         """
@@ -240,6 +246,7 @@ class Carte(DataCarte, Data):
         carac = 1
         templine = ""
         status = False
+        #parcours de la carte
         for char in DataCarte.plan:
             carac += 1
             if char == "\n":
@@ -247,18 +254,24 @@ class Carte(DataCarte, Data):
                 carac = 0
                 templine += char
                 continue
-            
+            #arrivé à la bonne position
             if line == pos[1] and carac == pos[0]:
+                #en fonction du "terrain présent"
                 if char == "O" or char == "x":
                     status = False
                 elif char == "U":
                     DataCarte.victoire = True
+                #cas particulier de la porte car il faudra la réafficher
                 else:
+                    if char == ".":
+                        DataCarte.Surportetemp = True
+                    else:
+                        DataCarte.Surportetemp = False
                     templine += "x"
                     status = True
             else:
                 templine += char
-        
+        #export de la carte
         if status == True:
             DataCarte.plan = templine
         return status
@@ -335,6 +348,7 @@ class Carte(DataCarte, Data):
         carac = 1
         templine = ""
         status = False
+        #parcours de la carte
         for char in DataCarte.plan:
             carac += 1
             if char == "\n":
@@ -342,19 +356,35 @@ class Carte(DataCarte, Data):
                 carac = 0
                 templine += char
                 continue
-            
+            #arrivé à la bonne position
             if line == pos[1] and carac == pos[0]:
+                #vérification de l'action demandée
                 if char == "O" and Data.mouv[1][0] == "P":
                     status = True
                     templine += "."
                 elif char == "." and Data.mouv[1][0] == "M":
                     status = True
                     templine += "O"
+                #en cas d'erreur
                 else:
                     status = False
             else:
                 templine += char
-        
+        #export carte
         if status == True:
             DataCarte.plan = templine
         return status
+
+    def checkporte():
+        """
+        vérification de la possibilité de créer/murer une porte
+        """
+        posp = Carte.posporte(Data.mouv)
+        verif = Carte.verifporte(posp)
+        if not verif:
+            message = "errcréation/suppréssion de porte impossible\nVous perdez votre tour!"
+            DataCarte.Mvtwaiting[indextemp] = None
+            Data.clients_connectes[indextemp].send(message.encode())
+            #temporisation contre le téléscopage
+            sleep(0.5)
+
