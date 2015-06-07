@@ -8,14 +8,14 @@ ToDo :
  - Centraliser les Exceptions
 
 Exigences :
-OK
+OK :
  - Client/serveur
  - Tour par tour
+ - Tkinter
 
 KO :
  - Murer et percer des portes
  - Tests unitaires
-
 
 Bugs :
  - Il est toujours possible de se connecter après le début de la partie
