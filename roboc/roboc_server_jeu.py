@@ -15,6 +15,7 @@ class DataCarte():
     Nbrligne = 0
     Longueurligne = 0
     Posjoueurs = []
+    Mvtwaiting = []
     victoire = False
 
 class Partie(Thread):
@@ -51,9 +52,13 @@ class Partie(Thread):
             #temporisation pour laisser le message précédent être réceptionné
             sleep(0.5)
             
-            #on signale au joueur actif que c'est son tour
-            message = "trn"
-            Data.clients_connectes[numtour].send(message.encode())
+            #on signale au joueur actif que c'est son tour ou on utilise le mouvement stocké
+            if DataCarte.Mvtwaiting[numtour] != None:
+                Data.mouv.append(Data.clients_connectes[numtour])
+                Data.mouv.append(DataCarte.Mvtwaiting[numtour])
+            else:
+                message = "trn"
+                Data.clients_connectes[numtour].send(message.encode())
             
             tempo = True
             while tempo == True:
@@ -67,29 +72,7 @@ class Partie(Thread):
                 pass
             #ou se déplacer
             else:
-                #dans l'ordre, calcule de la nouvelle position, vérification de sa validité
-                npos = Carte.nouvpos(Data.mouv)
-                verif = Carte.verifpos(npos)
-                #si la nouvelle position arrive sur la sortie
-                if DataCarte.victoire:
-                    for socketclient in Data.clients_connectes:
-                        cartetemp = "fin"
-                        if Data.mouv[0] == socketclient:
-                            cartetemp += "vainqueur"
-                        socketclient.send(cartetemp.encode())
-                    Data.serveur = False
-                #si la nouvelle position est sur un case valide
-                elif verif:
-                    #dans l'ordre on enlève l'ancien x de la carte
-                    Carte.clearpos(Data.mouv[0])
-                    #on met à jour la liste des positions
-                    Carte.updatepos(Data.mouv[0], npos)
-                    #on vérifie si un déplacement multiple a été demandé
-                    
-                #le reste
-                else:
-                    message = "err"
-                    Data.clients_connectes[numtour].send(message.encode())
+                Carte.checkmvt()
 
             Data.mouv = []
             numtour += 1
@@ -156,6 +139,7 @@ class Carte(DataCarte, Data):
                 posvalide = Carte.verifposinit(posinit)
                 if posvalide == True:
                     DataCarte.Posjoueurs.append(posinit)
+                    DataCarte.Mvtwaiting.append(None)
             
             posvalide = False
 
@@ -271,6 +255,45 @@ class Carte(DataCarte, Data):
         if status == True:
             DataCarte.plan = templine
         return status
+    
+    def checkmvt():
+        """
+        vérifie que le mouvement envoyé par le joueur est ok au regard de la carte
+        si oui positionne le nouveau x
+        signale la victoire
+        en cas d'erreur envoi un message de signalement
+        """
+        #dans l'ordre, calcule de la nouvelle position, vérification de sa validité
+        npos = Carte.nouvpos(Data.mouv)
+        verif = Carte.verifpos(npos)
+        #si la nouvelle position arrive sur la sortie
+        if DataCarte.victoire:
+            for socketclient in Data.clients_connectes:
+                cartetemp = "fin"
+                if Data.mouv[0] == socketclient:
+                    cartetemp += "vainqueur"
+                    socketclient.send(cartetemp.encode())
+                Data.serveur = False
+        #si la nouvelle position est sur un case valide
+        elif verif:
+            #dans l'ordre on enlève l'ancien x de la carte
+            Carte.clearpos(Data.mouv[0])
+            #on met à jour la liste des positions
+            Carte.updatepos(Data.mouv[0], npos)
+            #on vérifie si un déplacement multiple a été demandé
+            distrest = int(Data.mouv[1][1:]) - 1
+            indextemp = Data.clients_connectes.index(Data.mouv[0])
+            #si il reste des mvt à faire on les stockes
+            if distrest != 0:
+                mvtrest = Data.mouv[1][:1] + str(distrest)
+                DataCarte.Mvtwaiting[indextemp] = mvtrest
+            #sinon on réinitialise
+            else:
+                DataCarte.Mvtwaiting[indextemp] = None
+        #le reste
+        else:
+            message = "err"
+            Data.clients_connectes[numtour].send(message.encode())
 
 
 
