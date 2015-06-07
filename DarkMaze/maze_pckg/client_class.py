@@ -6,6 +6,7 @@
 
 # Imports externes
 from threading import Thread, RLock
+from time import *
 
 # Imports interne
 
@@ -28,18 +29,19 @@ class Data():
 	message_affiche = []
 
 	# donnees des messages
-	typesOK = [INI,UTU,OTU,ETU,MSG,GRI,WIN]
-	longMSG = 3 # définit combien de messages sont gardés en mémoire pour l'affichage
+	typesOK = [INI,STR,UTU,OTU,ETU,MSG,GRI,WIN]
+	longMSG = 3      # définit combien de messages sont gardés en mémoire pour l'affichage
 	txtGrille = ""   # affichge de la grille
 	txtMSG = ""      # affichage des messages du serveur
 	txtListe = ""    # affichage de la liste des joueurs
 
 
 	# données de la partie
-	players = []
-	utu = False # définit si c'est le tour du joueur ou non
-
 	nonEnd = True # Passe a False lorsque la partie se termine
+	init = False  # Passe à True quand il y a assez de joueur pour démarrer 
+	start = False # Passe à True quand le serveur démarrer la partie
+	players = []
+	utu = False   # définit si c'est le tour du joueur ou non
 
 	partie = False
 
@@ -49,7 +51,8 @@ class Data():
 			et les valeurs sont les actions à effectuer, une sorte de switch.
 		"""
 		messagesTypes = { 
-		"INI" = Data.init(donnees),
+		"INI" = Data.ini(),
+		"STR" = Data.str(donnees),
 		"UTU" = Data.utu(),
 		"OTU" = Data.otu(donnees),
 		"MSG" = Data.msg(donnees),
@@ -85,10 +88,17 @@ class Data():
 		Data.txtListe = message
 
 	# modules des types possibles
-	def init(donnees):
+	def ini():
+		""" Permet au joueur de lancer la partie """
+		Data.init = True
+
+	def str(donnees):
 		"""Initialise la partie, récupère la liste des pseudos des joueurs dans l'ordre du tour par tour"""
-		Data.players.extend(donnees)
+		split = str.split(donnees, "|")
+		for word in split:
+			Data.players.append(word)
 		gestionListe()
+		Data.start = True
 
 	def utu():
 		"""modifie le booleen du tour du joueur à True pour enclencher son tour"""
@@ -123,7 +133,7 @@ class Data():
 			message = "Désolé, vous avez perdu.\n{} est sorti du labyrinthe avant vous.".format(donnees)
 		gestionMSG(message)
 
-		# il reste à gérer la fin de la partie
+		Data.nonEnd = False # on arrête la partie
 
 class ConnexionRead(Thread, Data):
 	"""
@@ -135,11 +145,18 @@ class ConnexionRead(Thread, Data):
 	def run(self):
 		while Data.nonEnd:
 			# On commence par vérifier si il y a des messages en arrivée
+			Data.msg_recu = connexion_avec_serveur.recv(1024)
 
 			# On traite le message si il n'est pas vide
+			if Data.msg_recu != "":
+				msgBrut = Data.msg_recu.decode()
+				if msgBrut[:3] in Data.typesOK:
+					leType = msgBrut[:3]
+					donnees = msgBrut[2:]
+					Data.Messages(leType, donnees)
 
 			# On attend 50 ms
-
+			sleep(0.05)
 
 class ConnexionWrite(Thread, Data):
 	"""

@@ -40,7 +40,8 @@ ReadMe.md du jeu de labyrinthe DarkMaze (ou Roboc) pour OpenClassRooms
 			* EXI : fin de la partie pour le joueur et déconnexion côté serveur
 
 		### Messages en réception au client :
-			* INI : Démarrage de la partie côté serveur
+			* INI : La partie est prête à démarrer, en attente d'un retour client
+			* STR : La partie démarre, donne la liste des joueurs
 			* UTU : Début du tour pour le joueur
 			* OTU : Début du tour du joueur "pseudonyme" (message recu : "OTUpseudonyme")
 			* ETU : Fin du tour de "pseudonyme si précisé", sinon du joueur.
