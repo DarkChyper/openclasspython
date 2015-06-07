@@ -69,7 +69,14 @@ class Partie(Thread):
             
             #2 types de mouvement arrivent ici murer/ouvrir une porte
             if Data.mouv[1][0] == "P" or Data.mouv[1][0] == "M":
-                pass
+                posp = Carte.posporte(Data.mouv)
+                verif = Carte.verifporte(posp)
+                if not verif:
+                    message = "errcréation/suppréssion de porte impossible\nVous perdez votre tour!"
+                    DataCarte.Mvtwaiting[indextemp] = None
+                    Data.clients_connectes[indextemp].send(message.encode())
+                    #temporisation contre le téléscopage
+                    sleep(0.5)
             #ou se déplacer
             else:
                 Carte.checkmvt()
@@ -297,6 +304,57 @@ class Carte(DataCarte, Data):
             Data.clients_connectes[indextemp].send(message.encode())
             #temporisation contre le téléscopage
             sleep(0.5)
+            
+    def posporte(mvt):
+        """
+        calcule la position de la porte à ajouter ou à murer
+        """
+        tempindex = Data.clients_connectes.index(mvt[0])
+        tempinitpos = DataCarte.Posjoueurs[tempindex]
+        temppos = [tempinitpos[0], tempinitpos[1]]
+        
+        if mvt[1][1] == "N":
+            temppos[1] -= 1
+        elif mvt[1][1] == "S":
+            temppos[1] += 1
+        elif mvt[1][1] == "O":
+            temppos[0] -= 1
+        elif mvt[1][1] == "E":
+            temppos[0] += 1
+        
+        posp = (temppos[0], temppos[1])
+        return posp
 
-
-
+    def verifporte(pos):
+        """
+        Vérifie que la position choisie est bien valide au vue de la carte
+        i.e. sur un mur ou sur une porte
+        on recréé la carte en même temps
+        """
+        line = 1
+        carac = 1
+        templine = ""
+        status = False
+        for char in DataCarte.plan:
+            carac += 1
+            if char == "\n":
+                line +=1
+                carac = 0
+                templine += char
+                continue
+            
+            if line == pos[1] and carac == pos[0]:
+                if char == "O" and Data.mouv[1][0] == "P":
+                    status = True
+                    templine += "."
+                elif char == "." and Data.mouv[1][0] == "M":
+                    status = True
+                    templine += "O"
+                else:
+                    status = False
+            else:
+                templine += char
+        
+        if status == True:
+            DataCarte.plan = templine
+        return status
