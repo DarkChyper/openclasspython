@@ -28,7 +28,7 @@ class Data():
 	message_affiche = []
 
 	# donnees des messages
-	typesOK = [INI,UTU,OTU,ETU,MSG,GRI]
+	typesOK = [INI,UTU,OTU,ETU,MSG,GRI,WIN]
 	longMSG = 3 # définit combien de messages sont gardés en mémoire pour l'affichage
 	txtGrille = ""   # affichge de la grille
 	txtMSG = ""      # affichage des messages du serveur
@@ -53,14 +53,12 @@ class Data():
 		"UTU" = Data.utu(),
 		"OTU" = Data.otu(donnees),
 		"MSG" = Data.msg(donnees),
-		"GRI" = Data.gri(donnees)
+		"GRI" = Data.gri(donnees),
+		"WIN" = Data.win(donnees)
 		}
 		messagesTypes[tipe]
 
-	def init(donnees):
-		"""Initialise la partie, récupère la liste des pseudos des joueurs dans l'ordre du tour par tour"""
-		Data.players.extend(donnees)
-
+	# modules communs aux différents types
 	def gestionMSG(donnees):
 		"""Gère la mémoire des messages à afficher au joueur
 		Prend en entrée le message à afficher (donnees) et le nombre d'emplacement mémoire Data.longMSG
@@ -75,10 +73,6 @@ class Data():
 		msgTemp = msgTemp(:len(msgTemp) - 1) # on ne garde pas le dernier saut de ligne
 		Data.txtMSG = msgTemp # on affiche les nouveaux messages
 
-	def utu():
-		"""modifie le booleen du tour du joueur à True pour enclencher son tour"""
-		Data.utu = True
-
 	def gestionListe(pseudo=None):
 		""" Crée et modifie la liste des joueurs à afficher et met en avant celui qui doit jouer"""
 		message = ""
@@ -90,7 +84,16 @@ class Data():
 		message = message[:len(message) - 1] # on ne garde pas le dernier saut de ligne
 		Data.txtListe = message
 
+	# modules des types possibles
+	def init(donnees):
+		"""Initialise la partie, récupère la liste des pseudos des joueurs dans l'ordre du tour par tour"""
+		Data.players.extend(donnees)
+		gestionListe()
 
+	def utu():
+		"""modifie le booleen du tour du joueur à True pour enclencher son tour"""
+		Data.utu = True
+		gestionListe(Data.pseudo)
 
 	def otu(donnees):
 		""" Gére la réception d'un message indiquant à qui est le tour de jeu"""
@@ -98,9 +101,29 @@ class Data():
 		gestionMSG(message) # affichage du message
 		gestionListe(donnees) # modification dans la liste des joueurs pour mettre en avant qui est en train de jouer
 
+	def etu(donnees):
+		""" Affiche la fin du tour d'un autre joueur"""
+		message = "Fin du tour de {}".format(donnees)
+		gestionMSG(message) # affichage du message
+		gestionListe()
 
+	def msg(donnees):
+		""" Transmet le message à l'affichage """
+		gestionMSG(donnees)
 
-  
+	def gri(donnees):
+		""" Transmet la grille à l'affichage """
+		Data.txtGrille = donnees
+
+	def win(donnees):
+		""" Affiche qui à gagner et enclenche la fin de la partie """
+		if donnees == Data.pseudo:
+			message = "Félicitation, vous avez gagné !!"
+		else:
+			message = "Désolé, vous avez perdu.\n{} est sorti du labyrinthe avant vous.".format(donnees)
+		gestionMSG(message)
+
+		# il reste à gérer la fin de la partie
 
 class ConnexionRead(Thread, Data):
 	"""
@@ -111,7 +134,11 @@ class ConnexionRead(Thread, Data):
 
 	def run(self):
 		while Data.nonEnd:
-			pass
+			# On commence par vérifier si il y a des messages en arrivée
+
+			# On traite le message si il n'est pas vide
+
+			# On attend 50 ms
 
 
 class ConnexionWrite(Thread, Data):

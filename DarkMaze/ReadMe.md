@@ -8,7 +8,7 @@ ReadMe.md du jeu de labyrinthe DarkMaze (ou Roboc) pour OpenClassRooms
 	* Murer une porte
 	* Creuser une porte
 	* Tests
-	
+
 # Le serveur :
 
 	## La cinétique du serveur :
@@ -46,3 +46,4 @@ ReadMe.md du jeu de labyrinthe DarkMaze (ou Roboc) pour OpenClassRooms
 			* ETU : Fin du tour de "pseudonyme si précisé", sinon du joueur.
 			* MSG : Message
 			* GRI : grille du labyrinthe
+			* WIN : Indique le pseudonyme du gagnant, si non définit c'est que le joueur est gagnant
