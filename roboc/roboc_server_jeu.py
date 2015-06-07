@@ -29,6 +29,7 @@ class Partie(Thread):
         """
         corps du jeu
         """
+        premiertour = True
         numtour = 0
         while Data.nbr_joueurs_actu != Data.nbr_joueurs_max:
             sleep(0.1)
@@ -52,7 +53,12 @@ class Partie(Thread):
                 socketclient.send(cartetemp.encode())
             
             #temporisation pour laisser le message précédent être réceptionné
-            sleep(0.5)
+            sleep(0.5)            
+
+            if premiertour:
+                while Data.nbr_joueurs_prets != Data.nbr_joueurs_max:
+                    pass
+                premiertour = False
             
             #on signale au joueur actif que c'est son tour ou on utilise le mouvement stocké
             if DataCarte.Mvtwaiting[numtour] != None:

@@ -50,6 +50,12 @@ class Envoi():
         message = message.encode()
         Data.connexion.send(message)
         Data.turn = False
+    
+    def debutpartie():
+        message = "C"
+        message = message.encode()
+        Data.connexion.send(message)
+        Data.premiertour = False
         
 def uppercarte():
     """
@@ -134,6 +140,8 @@ class Interface(Frame, Envoi):
             valide = Envoi.verifmvt(self.var_texte.get())
             if valide:
                 Envoi.envoi(self.var_texte.get())
+        elif Data.premiertour == True:
+            Envoi.debutpartie()
         self.var_texte.set("")
         Data.lstinfos[0] = ""
         

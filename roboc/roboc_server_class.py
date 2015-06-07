@@ -12,6 +12,7 @@ class Data():
     init = True
     nbr_joueurs_max = 0
     nbr_joueurs_actu = 0
+    nbr_joueurs_prets = 0
     clients_connectes = []
     infos_clients_connectes = []
     clients_a_lire = []
@@ -68,6 +69,9 @@ class DataExchange(Thread, Data):
                             msg_recu = msg_recu[3:]
                             Data.mouv.append(client)
                             Data.mouv.append(msg_recu)
+                        elif msg_recu == "C":
+                            Data.nbr_joueurs_prets += 1
+                            
 
 class Network(Data):
     """

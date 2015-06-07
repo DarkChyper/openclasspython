@@ -16,6 +16,7 @@ class Data():
     lstinfos = [None]
     pos = None
     turn = False
+    premiertour = True
     
 class Network(Data):
     """
@@ -57,6 +58,8 @@ class DataReceive(Thread, Data):
             if msg_recu[:3] == "crt":
                 msg_recu = msg_recu[3:]
                 Data.lstmsg[0] = msg_recu
+                if Data.premiertour == True:
+                    Data.lstinfos[0] = "C pour commencer la partie"
             elif msg_recu == "trn":
                 Data.turn = True
                 Data.lstinfos[0] = "A vous de jouer"
