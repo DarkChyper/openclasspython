@@ -7,13 +7,12 @@ ToDo :
  - Purifier le code en général
  - Centraliser les Exceptions
 
-Exigences :
-OK :
+Exigences OK :
  - Client/serveur
  - Tour par tour
  - Tkinter
 
-KO :
+Exigences KO :
  - Murer et percer des portes
  - Tests unitaires
 
