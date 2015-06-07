@@ -145,7 +145,6 @@ class Affichage(Thread):
         self.fenetre = Tk()
         self.interface = Interface(self.fenetre)
         self.interface.mainloop()
-    
-    def stop(self):
         self.interface.destroy()
+
                 

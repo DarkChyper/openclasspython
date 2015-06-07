@@ -15,6 +15,7 @@ class DataCarte():
     Nbrligne = 0
     Longueurligne = 0
     Posjoueurs = []
+    victoire = False
 
 class Partie(Thread):
     """déroulement du jeu"""
@@ -28,7 +29,7 @@ class Partie(Thread):
         numtour = 0
         while Data.nbr_joueurs_actu != Data.nbr_joueurs_max:
             sleep(0.1)
-        while True:
+        while Data.serveur:
             #défini l'indice du joueur dont on attend le message
             if numtour > Data.nbr_joueurs_max - 1:
                 numtour = 0
@@ -61,14 +62,31 @@ class Partie(Thread):
             
             print("mouvement reçu!")
             
+            #2 types de mouvement arrivent ici murer/ouvrir une porte
             if Data.mouv[1][0] == "P" or Data.mouv[1][0] == "M":
                 pass
+            #ou se déplacer
             else:
+                #dans l'ordre, calcule de la nouvelle position, vérification de sa validité
                 npos = Carte.nouvpos(Data.mouv)
                 verif = Carte.verifpos(npos)
-                if verif:
+                #si la nouvelle position arrive sur la sortie
+                if DataCarte.victoire:
+                    for socketclient in Data.clients_connectes:
+                        cartetemp = "fin"
+                        if Data.mouv[0] == socketclient:
+                            cartetemp += "vainqueur"
+                        socketclient.send(cartetemp.encode())
+                    Data.serveur = False
+                #si la nouvelle position est sur un case valide
+                elif verif:
+                    #dans l'ordre on enlève l'ancien x de la carte
                     Carte.clearpos(Data.mouv[0])
+                    #on met à jour la liste des positions
                     Carte.updatepos(Data.mouv[0], npos)
+                    #on vérifie si un déplacement multiple a été demandé
+                    
+                #le reste
                 else:
                     message = "err"
                     Data.clients_connectes[numtour].send(message.encode())
@@ -135,13 +153,13 @@ class Carte(DataCarte, Data):
         for joueur in listejoueur:
             while posvalide != True:
                 posinit = (randrange(0, DataCarte.Longueurligne), randrange(0, DataCarte.Nbrligne))
-                posvalide = Carte.verifpos(posinit)
+                posvalide = Carte.verifposinit(posinit)
                 if posvalide == True:
                     DataCarte.Posjoueurs.append(posinit)
             
             posvalide = False
 
-    def verifpos(pos):
+    def verifposinit(pos):
         """
         Vérifie que la position choisie est bien valide au vue de la carte
         i.e. pas sur un mur, la sortie ou sur un autre joueur
@@ -222,6 +240,37 @@ class Carte(DataCarte, Data):
         tempindex = Data.clients_connectes.index(client)
         DataCarte.Posjoueurs[tempindex] = npos
 
+    def verifpos(pos):
+        """
+        Vérifie que la position choisie est bien valide au vue de la carte
+        i.e. pas sur un mur, la sortie ou sur un autre joueur
+        """
+        line = 1
+        carac = 1
+        templine = ""
+        status = False
+        for char in DataCarte.plan:
+            carac += 1
+            if char == "\n":
+                line +=1
+                carac = 0
+                templine += char
+                continue
+            
+            if line == pos[1] and carac == pos[0]:
+                if char == "O" or char == "x":
+                    status = False
+                elif char == "U":
+                    DataCarte.victoire = True
+                else:
+                    templine += "x"
+                    status = True
+            else:
+                templine += char
+        
+        if status == True:
+            DataCarte.plan = templine
+        return status
 
 
 

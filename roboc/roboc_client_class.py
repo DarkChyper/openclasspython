@@ -59,14 +59,18 @@ class DataReceive(Thread, Data):
             elif msg_recu == "trn":
                 Data.turn = True
             elif msg_recu[:3] == "pos":
+                print(msg_recu)
                 temp0 = findall('^\(([0-9])+,', msg_recu[3:])
                 temp1 = findall(' ([0-9]+)\)$', msg_recu[3:])
                 Data.pos = (int(temp0[0]), int(temp1[0]))
+            elif msg_recu[:3] == "fin":
+                if len(msg_recu) == 3:
+                    Data.lstmsg[0] = "Vous avez perdu!"
+                elif len(msg_recu) > 3:
+                    Data.lstmsg[0] = "Vous avez gagné!"
+                Data.client = False
                 
             print(msg_recu)
-            
-            if msg_recu == "fin":
-                Data.client = False
 
 class DataSend(Thread, Data):
     """

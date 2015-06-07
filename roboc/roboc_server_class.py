@@ -18,7 +18,6 @@ class Data():
     hote = ''
     port = 12800
     connexion = None
-    choix = ""
     mouv = []
 
 class NewClient(Thread, Data):
@@ -69,8 +68,6 @@ class DataExchange(Thread, Data):
                             msg_recu = msg_recu[3:]
                             Data.mouv.append(client)
                             Data.mouv.append(msg_recu)
-                        elif msg_recu == "fin":
-                            Data.serveur = False
 
 class Network(Data):
     """
