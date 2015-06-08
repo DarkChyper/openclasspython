@@ -29,7 +29,9 @@ touches =   {
             'est':          'e',
             'sud':          's',
             'quit':         'quit',
-            'commencer':    'c'
+            'commencer':    'c',
+            'murer':        'm',
+            'percer':       'p',
             }
 
 # Serveur

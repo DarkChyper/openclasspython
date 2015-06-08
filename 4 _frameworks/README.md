@@ -6,9 +6,9 @@ Exigences OK :
  - Client/serveur
  - Tour par tour
  - Tkinter
+ - Murer et percer des portes
 
 Exigences KO :
- - Murer et percer des portes
  - Tests unitaires
 
 Bugs :

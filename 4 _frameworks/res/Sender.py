@@ -37,7 +37,7 @@ class Sender:
 
         msg_a_envoyer = self._entree_correcte(msg_a_envoyer)
         if msg_a_envoyer != None:
-            msg = "Id:{}:Type:{}:Lg:{}".format(self.id_, msg_a_envoyer[0], msg_a_envoyer[1])
+            msg = "Id:{}:Type:{}".format(self.id_, msg_a_envoyer)
             try:
                 self.connexion.send(msg.encode())
                 print("Message envoyé : {}".format(msg_a_envoyer)) # DEBUG
@@ -52,20 +52,7 @@ class Sender:
             Si l'utilisateur demande de l'aide, on renvoie entree
         """
 
-        # Si le premier caractère est correct
-        if len(entree) != 0 and entree[0] in touches.values():
-            type_deplacement = entree[0]
-
-            # Si le reste est un nombre
-            try:
-                lg = int(entree[1:])
-            except:
-                # Si aucune longueur n'est indiquée ou égale à 0
-                if entree[1:].strip() == '' or entree[1:].strip() == '0':
-                    lg = 1
-                else:
-                    return None
-
-            return type_deplacement, lg
+        if entree[0] in touches.values() and ( len(entree[1:]) == 0 or entree[1] in touches.values() ):
+            return entree
 
         return None

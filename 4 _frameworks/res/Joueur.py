@@ -26,6 +26,54 @@ class Joueur:
         self.socket = socket
         """Socket permettant de communiquer avec le client joueur"""
 
+    def percer(self, map_, type_):
+        # Paramétrage du déplacement
+        if type_ == 'o':
+            idx_ligne_prochain = self._lig_joueur
+            idx_col_prochain = self._col_joueur - 1
+        if type_ == 'n':
+            idx_ligne_prochain = self._lig_joueur - 1
+            idx_col_prochain = self._col_joueur
+        if type_ == 'e':
+            idx_ligne_prochain = self._lig_joueur
+            idx_col_prochain = self._col_joueur + 1
+        if type_ == 's':
+            idx_ligne_prochain = self._lig_joueur + 1
+            idx_col_prochain = self._col_joueur
+
+        # Si c'est un mur, on le perce
+        if map_[idx_ligne_prochain][idx_col_prochain] == representation['mur']:
+            map_[idx_ligne_prochain][idx_col_prochain] = representation['porte']
+            return map_, ( idx_ligne_prochain, idx_col_prochain )
+
+        # Pour le reste, on refuse
+        else:
+            raise(IndexError)
+
+    def murer(self, map_, type_):
+        # Paramétrage du déplacement
+        if type_ == 'o':
+            idx_ligne_prochain = self._lig_joueur
+            idx_col_prochain = self._col_joueur - 1
+        if type_ == 'n':
+            idx_ligne_prochain = self._lig_joueur - 1
+            idx_col_prochain = self._col_joueur
+        if type_ == 'e':
+            idx_ligne_prochain = self._lig_joueur
+            idx_col_prochain = self._col_joueur + 1
+        if type_ == 's':
+            idx_ligne_prochain = self._lig_joueur + 1
+            idx_col_prochain = self._col_joueur
+
+        # Si c'est un mur, on le mure
+        if map_[idx_ligne_prochain][idx_col_prochain] == representation['porte']:
+            map_[idx_ligne_prochain][idx_col_prochain] = representation['mur']
+            return map_, ( idx_ligne_prochain, idx_col_prochain )
+
+        # Pour le reste, on refuse
+        else:
+            raise(IndexError)
+
     def se_deplacer(self, map_, type_):
         """
             Effectue un déplacement vers l'Ouest en fonction de la position

@@ -63,18 +63,36 @@ class Map:
 
         return map_
 
-    def deplacement(self, type_, longueur, joueur):
+    def action(self, type_, joueur):
         """
             En fonction du type de déplacement, on réévalue la map.
             Si un déplacement renvoie un IndexError, on l'ignore.
         """
 
         print( self.__str__() ) # DEBUG
-        try:
-            self.representation_map = self._liste_joueurs[joueur].se_deplacer(self.representation_map, type_)
-        except IndexError:
-            raise
 
+        # Si on mure
+        if type_[0] == touches['murer']:
+            map_, porte = self._liste_joueurs[joueur].murer(self.representation_map, type_[1])
+            # On MAJ la map
+            self.representation_map = map_
+            # On MAJ la liste des portes
+            self._liste_portes.remove(porte)
+
+        # Si on perce
+        elif type_[0] == touches['percer']:
+            map_, porte = self._liste_joueurs[joueur].percer(self.representation_map, type_[1])
+            # On MAJ la map
+            self.representation_map = map_
+            # On MAJ la liste des portes
+            self._liste_portes.append(porte)
+
+        # Si on se déplace
+        else:
+            self.representation_map = self._liste_joueurs[joueur].se_deplacer(self.representation_map, type_)
+
+
+        # On rétablit les portes
         self._retablir_portes()
 
     def maj_carte_joueurs(self, joueur_courant):

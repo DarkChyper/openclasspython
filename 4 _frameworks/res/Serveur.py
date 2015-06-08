@@ -43,17 +43,17 @@ class Serveur:
         self._map.maj_carte_joueurs(self.joueur_courant)
 
         # On réceptionne la prochaine action
-        type_, lg = self._receive_action()
+        type_ = self._receive_action()
 
         # Tant que le déplacement est incorrect, on continue
         while True:
             try:
-                self._map.deplacement(type_, lg, self.joueur_courant)
+                self._map.action(type_, self.joueur_courant)
             # Si le mouvement est impossible...
             except IndexError:
                 # ...on prévient le joueur et on récupère une nouvelle action
                 self._map.obtenir_joueur(self.joueur_courant).envoi_message_client("Msg", "Déplacement impossible")
-                type_, lg = self._receive_action()
+                type_ = self._receive_action()
             else:
                 break
 
@@ -157,12 +157,12 @@ class Serveur:
                     print("Un joueur est parti, veuillez redémarrer le serveur.")
                     self.terminer("Un joueur est parti ou\nle serveur rencontre un problème.\nVous pouvez quitter")
 
-                donnees = controler_entree_client(msg_recu, self.joueur_courant)
+                type_ = controler_entree_client(msg_recu, self.joueur_courant)
 
-                if donnees == None:
+                if type_ == None:
                     continue
 
-                return donnees
+                return type_
 
 
 ########## FONCTIONS SERVEUR ##########
@@ -257,13 +257,12 @@ def controler_entree_client(msg_recu, joueur_courant):
 
     try:
         # On contrôle que les balises sont bien présente
-        if  not parse[0] == "Id" and not parse[2] == "Type" and not parse[4] == "Lg":
+        if  not parse[0] == "Id" and not parse[2] == "Type":
             raise ValueError("Balises incorrectes, message : \"{}\"".format(msg_recu))
 
         # On contrôle que les données sont au bon format et qu'elle viennent du bon joueur
         if int(parse[1]) == joueur_courant:
             _type = parse[3]
-            longueur = int(parse[5])
         else:
             raise ValueError("Réception d'un client qui n'est pas le joueur courant, message : \"{}\"".format(msg_recu))
     except (ValueError, IndexError) as e:
@@ -273,4 +272,4 @@ def controler_entree_client(msg_recu, joueur_courant):
         print(e.value)
         return None
 
-    return _type, int(longueur)
+    return _type
