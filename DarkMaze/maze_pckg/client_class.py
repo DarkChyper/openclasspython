@@ -28,6 +28,10 @@ class Data():
 	message_send = ""
 	message_affiche = []
 
+	# les locks
+	verrou_send = RLock()
+	verrou_receiv = RLock()
+
 	# donnees des messages
 	typesOK = [INI,STR,UTU,OTU,ETU,MSG,GRI,WIN]
 	longMSG = 3      # définit combien de messages sont gardés en mémoire pour l'affichage
@@ -104,6 +108,8 @@ class Data():
 		"""modifie le booleen du tour du joueur à True pour enclencher son tour"""
 		Data.utu = True
 		gestionListe(Data.pseudo)
+		message = "C'est le début de votre tour !"
+		gestionMSG(message) # affichage du message
 
 	def otu(donnees):
 		""" Gére la réception d'un message indiquant à qui est le tour de jeu"""
@@ -167,7 +173,10 @@ class ConnexionWrite(Thread, Data):
 
 	def run(self):
 		while Data.nonEnd:
-			if Data.message_send != "":
-				message = Data.message_send.encode()
-				Data.connexion.send(message)
-				Data.message_send = ""
+			with verrou_send:
+				if Data.message_send != "":
+					message = Data.message_send.encode()
+					Data.connexion.send(message)
+					Data.message_send = ""
+
+			sleep(0.08)

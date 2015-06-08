@@ -12,12 +12,17 @@ from time import *
 from .client_class import *
 from .client_function import *
 
-class Interface(Frame):
+class Interface(Thread, Frame):
 	"""Notre fenêtre principale.
 	Tous les widgets sont stockés comme attributs de cette fenêtre."""
 
-	def __init__(self, fenetre, **kwargs):
-		Frame.__init__(self, fenetre, width=768, height=576,bg="ivory", **kwargs)
+	def __init__(self):
+		Thread.__init__(self)
+		self.fenetre = Tk()
+
+
+	def run(self, **kwargs):
+		Frame.__init__(self, self.fenetre, width=768, height=576,bg="ivory", **kwargs)
 		self.pack(fill=BOTH, expand=1)
 
 		# creation des cadres
@@ -56,28 +61,79 @@ class Interface(Frame):
 
 		canvas.create_text(60,20,fill="white", text=Data.txtMSG) 
 
-		# cadre des commandes dans le cadre bas
+		# cadre des commandes dans le cadre 
 		cmd = LabelFrame(down, width=270, height=76, borderwidth=0, bg="grey", text="Commandes")
 		cmd.pack(side="left", fill=BOTH, expand=1)
 
-		# cadre du type d'action
-		tipe = Frame(cmd, width=120, height=76, bg="grey")
-		tipe.pack(side="left",fill=BOTH, expand=1)
+		if Data.init and Data.start:
 
-		value = StringVar() 
-		bouton1 = Radiobutton(tipe, text="mouvement", variable=value, value=1, bg="grey")
-		bouton2 = Radiobutton(tipe, text="murer         ", variable=value, value=2, bg="grey")
-		bouton3 = Radiobutton(tipe, text="creuser       ", variable=value, value=3, bg="grey")
-		bouton1.pack()
-		bouton2.pack()
-		bouton3.pack()
+			# cadre du type d'action
+			tipe = Frame(cmd, width=120, height=76, bg="grey")
+			tipe.pack(side="left",fill=BOTH, expand=1)
 
-		# cadre des directions
-		dire = Frame(cmd, width=150, height=76, bg="grey")
-		dire.pack(side="right", fill=BOTH, expand=1)
+			value = StringVar() 
+			bouton1 = Radiobutton(tipe, text="mouvement", variable=value, value="1", bg="grey")
+			bouton2 = Radiobutton(tipe, text="murer         ", variable=value, value="2", bg="grey")
+			bouton3 = Radiobutton(tipe, text="creuser       ", variable=value, value="3", bg="grey")
+			bouton1.pack()
+			bouton2.pack()
+			bouton3.pack()
 
-		# boutons de directions
-		Button(dire, text='^', borderwidth=1, command=fenetre.quit).grid(row=1, column=2)
-		Button(dire, text='<', borderwidth=1, command=fenetre.quit).grid(row=2, column=1)
-		Button(dire, text='>', borderwidth=1, command=fenetre.quit).grid(row=2, column=3)
-		Button(dire, text='v', borderwidth=1, command=fenetre.quit).grid(row=3, column=2)
+			# cadre des directions
+			dire = Frame(cmd, width=150, height=76, bg="grey")
+			dire.pack(side="right", fill=BOTH, expand=1)
+
+			# boutons de directions
+			Button(dire, text='^', borderwidth=1, command=self.haut).grid(row=1, column=2)
+			Button(dire, text='<', borderwidth=1, command=self.gauche).grid(row=2, column=1)
+			Button(dire, text='>', borderwidth=1, command=self.droite).grid(row=2, column=3)
+			Button(dire, text='v', borderwidth=1, command=self.bas).grid(row=3, column=2)
+
+		elif Data.init and ! Data.start:
+			Button(cmd, text="commecer la partie", command=self.begin)
+
+		elif ! Data.init and ! Data.start:
+			pass
+
+	def evaluerType(self):
+		letype = value.get()
+		if letype == "" or letype == "1" or letype == " ":
+			return ""
+		elif letype == "2":
+			return "M"
+		elif letype == "3":
+			return "C"
+		else : 
+			return ""
+
+	def begin(self):
+		message = "INI" = Data.pseudo
+		with verrou_send :
+			Data.message_send = message
+
+	def haut(self):
+		letype = evaluerType()
+		message = "MVT" + letype + "N"
+		with verrou_send :
+			Data.message_send = message
+
+	def bas(self):
+		letype = evaluerType()
+		message = "MVT" + letype + "S"
+		with verrou_send :
+			Data.message_send = message
+
+
+	def gauche(self):
+		letype = evaluerType()
+		message = "MVT" + letype + "O"
+		with verrou_send :
+			Data.message_send = message
+
+
+	def droite(self):
+		letype = evaluerType()
+		message = "MVT" + letype + "E"
+		with verrou_send :
+			Data.message_send = message
+

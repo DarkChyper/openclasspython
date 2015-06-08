@@ -28,9 +28,6 @@ def Connexion():
 	Data.connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	Data.connexion.connect((Data.hote, Data.port))
 	print("Connexion établie avec le serveur sur le port {}".format(Data.port))
-
-	message = ""
-	while message == "":
-		message = Data.connexion.recv(1024).decode()
-
-	print(message)
+	message = "PSD" + Data.pseudo
+	message = message.encode()
+	Data.connexion.send(message)
