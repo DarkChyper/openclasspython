@@ -17,6 +17,7 @@ def main():
     while not sorti_du_labyrinthe:
         sorti_du_labyrinthe = serveur.jouer()
 
+    serveur.prevenir_joueur_partie_gagne()
     serveur.terminer()
     exit(0)
 

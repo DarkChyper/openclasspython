@@ -12,7 +12,7 @@ Exigences KO :
  - Tests unitaires
 
 Bugs :
-
+ S.O.
 
 Bugs corrigés :
  - Un des clients ne voit que des 'X' pour tous les joueurs (potentiellement tous les joueurs sauf le dernier connecté)

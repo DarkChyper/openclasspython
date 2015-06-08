@@ -59,10 +59,13 @@ class Serveur:
 
         return self._map.etat_jeu()
 
-    def terminer(self):
+    def terminer(self, msg):
         """Message de sortie pour le joueur, selon qu'il ait gagné ou non"""
         #ToDo : indiquer au joueur gagnant qu'il a gagné et fermer toutes les connexions
-        self._map.prevenir_joueurs("Msg", "Un joueur est parti ou\nle serveur rencontre un problème.\nVous pouvez quitter")
+
+        if len(msg) != 0:
+            self._map.prevenir_joueurs("Msg", msg)
+
         self._map.fermer_connexions()
         exit(0)
 
@@ -70,7 +73,7 @@ class Serveur:
         """
             Toutes les 0.05 secondes, accepte les connexions
             et vérifie si un joueur n'a pas demandé que la partie commence
-            ToDo : limiter à 4 joueurs
+
         """
         self.connexion.listen(5)
         print("On attends les clients")
@@ -114,7 +117,7 @@ class Serveur:
                     msg_recu = client.recv(1024).decode()
                 except (ConnectionResetError, ConnectionAbortedError):
                     print("Un joueur est parti, veuillez redémarrer le serveur.")
-                    self.terminer()
+                    self.terminer("Un joueur est parti ou\nle serveur rencontre un problème.\nVous pouvez quitter")
 
                 if controler_partie_commencee(msg_recu):
                     partie_commencee = True
@@ -123,8 +126,15 @@ class Serveur:
     def definir_premier_joueur(self):
         self.joueur_courant = randrange(0, self._map.nb_joueurs)
 
-    def prevenir_joueur_partie_gagne(): # ToDo
-        pass
+    def prevenir_joueur_partie_gagne(self): # ToDo
+        self._map.maj_carte_joueurs(self.joueur_courant)
+        # On prévient tous les joueurs que la partie est gagné
+        self._map.prevenir_joueurs("Msg","Un autre joueur a gagné\nla partie.\nVous pouvez quitter.")
+        # On prévient le joueur gagnant que c'est lui le gagnant
+        sleep(0.5)
+        self._map.obtenir_joueur(self.joueur_courant).envoi_message_client("Msg","Vous avez gagné !\nVous pouvez quitter.")
+
+        self.terminer("")
 
     def _receive_action(self):
         """
@@ -145,7 +155,7 @@ class Serveur:
                 # Si un des client est parti
                 except (ConnectionResetError, ConnectionAbortedError):
                     print("Un joueur est parti, veuillez redémarrer le serveur.")
-                    self.terminer()
+                    self.terminer("Un joueur est parti ou\nle serveur rencontre un problème.\nVous pouvez quitter")
 
                 donnees = controler_entree_client(msg_recu, self.joueur_courant)
 
@@ -163,12 +173,6 @@ def init_connexion():
     connexion.bind((hote, port))
 
     return connexion
-
-def prevenir_joueur(clients_connectes):
-
-
-    for client in clients_connectes:
-        client.send(str.encode(msg))
 
 
 ########## RECUPÉRATION MAP ##########

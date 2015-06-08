@@ -161,7 +161,10 @@ class Map:
         for joueur in self._liste_joueurs:
             joueur.fermer_connexion()
 
+
 ########## PROPRIÉTÉS ##########
+
+
     def _get_nb_joueurs(self):
         return len(self._liste_joueurs)
 

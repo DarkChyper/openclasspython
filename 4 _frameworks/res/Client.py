@@ -88,7 +88,7 @@ class Client(Frame):
         if ready[0]:
             msg_recu = self.connexion.recv(1024).decode()
         else:
-            print("La partie a déjà commencée.")
+            print("Le serveur est inaccessible.")
             self.terminer()
 
         parse = msg_recu.split(":")
