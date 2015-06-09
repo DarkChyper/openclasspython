@@ -6,9 +6,10 @@ from res.Serveur    import *
 
 def main():
     """
-        Coeur du jeu.
+        Main du serveur :
 
-        Tant que le joueur n'est pas sorti, on continue de jouer.
+        Tant qu'aucun des joueurs n'est sorti du labyrinthe,
+        on continue de jouer
     """
 
     serveur = Serveur()

@@ -16,7 +16,10 @@ from res.settings   import *
 ########## CLASSE SERVEUR ##########
 class Serveur:
     """
-        Objet permettant de gérer toute une partie de roboc.
+        Classe gérant entièrement la partie serveur.
+        1. Attends les joueurs et le signale de démarrage
+        2. Écoute tous les messages des joueurs et filtre
+           ne faire jouer que le bon joueur
     """
 
     def __init__(self):
@@ -27,14 +30,13 @@ class Serveur:
         self.connexion = init_connexion()
         """self.connexion principale du serveur"""
 
-        print(self._map) # DEBUG premier affichage
         self.attente_joueur()
         self.definir_premier_joueur()
 
     def jouer(self):
         """
-            Demande au joueur quel déplacement il souhaite effectuer
-            et renvoie s'il a gagné ou non
+            Méthode principale permettant de faire jouer au tour par tour
+            les joueurs
         """
         # On assigne le joueur suivant en tant que joueur courant
         self.joueur_courant = (self.joueur_courant + 1) % self._map.nb_joueurs
@@ -60,8 +62,10 @@ class Serveur:
         return self._map.etat_jeu()
 
     def terminer(self, msg):
-        """Message de sortie pour le joueur, selon qu'il ait gagné ou non"""
-        #ToDo : indiquer au joueur gagnant qu'il a gagné et fermer toutes les connexions
+        """
+            Ferme le serveur proprement en prévenant tous les clients
+            avec un message personnalisé facultatif
+        """
 
         if len(msg) != 0:
             self._map.prevenir_joueurs("Msg", msg)
@@ -101,8 +105,6 @@ class Serveur:
                     sleep(1)
                     self._map.prevenir_joueurs("Msg", "La partie commence !\nAttendez votre tour")
 
-                print("Nb joueurs actuel : {}, Max de joueurs : {}, Partie commencée : {}".format(self._map.nb_joueurs, nb_max_joueurs, partie_commencee)) # DEBUG
-
             # Maintenant, on écoute la liste des clients connectés
             clients_a_lire = []
             try:
@@ -126,7 +128,11 @@ class Serveur:
     def definir_premier_joueur(self):
         self.joueur_courant = randrange(0, self._map.nb_joueurs)
 
-    def prevenir_joueur_partie_gagne(self): # ToDo
+    def prevenir_joueur_partie_gagne(self):
+        """
+            Prévient les joueurs qu'un joueur a gagné
+            et prévient le joueur gagnant, qu'il a gagné
+        """
         self._map.maj_carte_joueurs(self.joueur_courant)
         # On prévient tous les joueurs que la partie est gagné
         self._map.prevenir_joueurs("Msg","Un autre joueur a gagné\nla partie.\nVous pouvez quitter.")
@@ -169,6 +175,9 @@ class Serveur:
 
 
 def init_connexion():
+    """
+        Initialisation de la connexion du serveur
+    """
     connexion = socket(AF_INET, SOCK_STREAM)
     connexion.bind((hote, port))
 
@@ -232,6 +241,7 @@ def obtenir_map(dossier):
 
     return contenu
 
+
 ########## CONTROLES ##########
 
 
@@ -250,7 +260,7 @@ def controler_entree_client(msg_recu, joueur_courant):
         Contrôle si le message reçu provient bien du joueur courant et
         qu'elles sont au bon format (balise et données)
         Les données sont du format suivant :
-        Id:1:Type:e:Lg:3
+        Id:1:Type:e
     """
 
     parse = msg_recu.split(":")

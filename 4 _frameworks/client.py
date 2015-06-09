@@ -5,6 +5,10 @@
 from res.Client    import *
 
 def main():
+    """
+        Main du client :
+        tourne sans arrêt jusqu'à la fermeture du serveur et/ou du client par le joueur
+    """
     try:
         client = Client()
     except:

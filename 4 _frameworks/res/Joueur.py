@@ -6,14 +6,8 @@ from res.settings   import *
 
 class Joueur:
     """
-        Classe objet gérant le joueur (robot) dans ses déplacements.
-
-        L'objet Map repose sur une liste à 2 dimensions, chaque déplacement
-        a été développé de sorte que même s'il est trop grand,
-        le joueur va le plus loin possible.
-
-        Pour bénéficier de cet avantage, il faut ignorer les exceptions de type IndexError.
-        Sinon, il faut catcher les IndexError et utiliser un système de backup de Map.
+        Classe objet gérant le joueur (robot) dans ses déplacements et actions.
+        Si un mouvement ou une action est impossible, on lève une exceptions de type IndexError.
     """
 
     def __init__(self, socket, lig_joueur, col_joueur, id_):
@@ -27,6 +21,10 @@ class Joueur:
         """Socket permettant de communiquer avec le client joueur"""
 
     def percer(self, map_, type_):
+        """
+            Définit la direction et si c'est un mur, le perce
+        """
+
         # Paramétrage du déplacement
         if type_ == 'o':
             idx_ligne_prochain = self._lig_joueur
@@ -51,6 +49,10 @@ class Joueur:
             raise(IndexError)
 
     def murer(self, map_, type_):
+        """
+            Définit la direction et si c'est une porte, la mure
+        """
+
         # Paramétrage du déplacement
         if type_ == 'o':
             idx_ligne_prochain = self._lig_joueur
@@ -76,9 +78,8 @@ class Joueur:
 
     def se_deplacer(self, map_, type_):
         """
-            Effectue un déplacement vers l'Ouest en fonction de la position
-            courante du joueur et de la map.
-            # ToDo : expliquer le système des dimensions
+            Effectue un déplacement dans la direction souhaitée et envoie la map
+            modifiée
         """
 
         # On efface le robot sur la map
@@ -101,30 +102,11 @@ class Joueur:
         # Si c'est un mur ou un autre joueur , on arrête
         if map_[idx_ligne_prochain][idx_col_prochain] in ( representation['mur'], representation['autre_robot'] ):
             map_[self._lig_joueur][self._col_joueur] = representation['autre_robot']
-            print('Mur\nProchaine ligne : {}\nProchaine colonne : {}'.format(idx_ligne_prochain,idx_col_prochain)) # DEBUG
             raise(IndexError)
         # Pour le reste, on avance
         else:
             map_[idx_ligne_prochain][idx_col_prochain] = representation['autre_robot']
             self._lig_joueur, self._col_joueur = idx_ligne_prochain, idx_col_prochain
-
-        return map_
-
-    def _retablir_porte(self, map_):
-        """
-            Remet en place l'éventuelle porte écrasée par le joueur
-        """
-
-        # Si une porte a été écrasée...
-        if self._porte_courante != None:
-            # Variables plus intelligibles
-            idx_ligne_porte = self._porte_courante[0]
-            idx_col_porte = self._porte_courante[1]
-
-            # ...et qu'elle n'est plus écrasée, on la rétablit
-            if map_[idx_ligne_porte][idx_col_porte] != representation['robot_courant']:
-                map_[idx_ligne_porte][idx_col_porte] = representation['porte']
-                self._porte_courante = None
 
         return map_
 
@@ -154,7 +136,6 @@ class Joueur:
             self.socket.send(to_send.encode())
         except:
             pass
-
 
     def fermer_connexion(self):
         """

@@ -11,8 +11,6 @@ from res.Listener   import Listener
 from res.Sender     import Sender
 from res.settings   import *
 
-# ToDo : ajouter la première réception de la carte
-
 
 ########## CLASSE CLIENT ##########
 
@@ -20,6 +18,13 @@ from res.settings   import *
 class Client(Frame):
 
     def __init__(self, **kwargs):
+        """
+            Initialise la fenêtre (vue) et les éléments de connexion(modèle), de contrôle (contrôleurs)
+            À la fin de __init__, le client passe en mode événementiel, n'agit qu'en cas :
+            - d'action utilisateur
+            - de réception de message du serveur
+        """
+
         # Intialisation fenêtre
         fenetre = Tk()
         fenetre.resizable(FALSE,FALSE)
@@ -68,6 +73,10 @@ class Client(Frame):
         exit(0)
 
     def terminer(self):
+        """
+            Ferme la connexion et termine le client
+        """
+
         try:
             print("Client.terminer()")
             self.connexion.close()
@@ -107,6 +116,10 @@ class Client(Frame):
             print("Contenu des données incorrect ({}), message : \"{}\"".format(type(e), msg_recu))
 
     def _send(self):
+        """
+            Envoie l'entrée vers le Sender et efface le champ
+        """
+
         self._sender.send(self._input_client)
         self._input_client.set("")
 
@@ -126,7 +139,10 @@ class Client(Frame):
         return self._map_label['text']
 
     message_label = property(_get_message_label, _set_message_label)
+    """Objet label message de la fenêtre cliente"""
+
     map_label = property(_get_map_label, _set_map_label)
+    """Objet label map de la fenêtre cliente"""
 
 
 ########## FONCTIONS CLIENT ##########
@@ -156,6 +172,7 @@ def afficher_aide():
     """
         Affiche toutes les touches possibles
     """
+
     msg = "Aide :\n\n"
     for c, v in touches.items():
         if c == 'commencer':
@@ -164,5 +181,3 @@ def afficher_aide():
         msg +="{} : {}\n".format(c.title(), v)
 
     return msg
-
-client = Client()

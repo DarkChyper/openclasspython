@@ -9,8 +9,7 @@ from res.settings    import *
 
 class Map:
     """
-        Représentation de la carte.
-
+        Représentation de la carte et référentiel des joueurs.
         Utilisation d'une liste à 2 dimensions pour représenter la map.
     """
 
@@ -65,11 +64,9 @@ class Map:
 
     def action(self, type_, joueur):
         """
-            En fonction du type de déplacement, on réévalue la map.
+            En fonction du type d'action, on se déplace, on mure ou on perce.
             Si un déplacement renvoie un IndexError, on l'ignore.
         """
-
-        print( self.__str__() ) # DEBUG
 
         # Si on mure
         if type_[0] == touches['murer']:
@@ -110,7 +107,6 @@ class Map:
         """
 
         for lig_porte, col_porte in self._liste_portes:
-            print("Porte : ({}, {})".format(lig_porte, col_porte)) # DEBUG
             if self.representation_map[lig_porte][col_porte] == representation['vide']:
                 self.representation_map[lig_porte][col_porte] = representation['porte']
 
@@ -169,6 +165,10 @@ class Map:
         self._liste_joueurs.append(nouveau_joueur)
 
     def prevenir_joueurs(self, balise, msg):
+        """
+            Envoie un message à tous les joueurs
+        """
+
         for joueur in self._liste_joueurs:
             joueur.envoi_message_client(balise, msg)
 
@@ -176,6 +176,7 @@ class Map:
         """
             On ferme la connexion de tous les joueurs
         """
+
         for joueur in self._liste_joueurs:
             joueur.fermer_connexion()
 
@@ -194,9 +195,9 @@ class Map:
         return sockets
 
     nb_joueurs = property(_get_nb_joueurs, None)
-
+    """Nombre de joueurs connectés"""
     sockets = property(_get_sockets, None)
-
+    """Liste des sockets de tous les joueurs connectés"""
 
 ######### FONCTIONS MAP ##########
 

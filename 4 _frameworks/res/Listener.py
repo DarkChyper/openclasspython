@@ -11,7 +11,10 @@ from threading  import Thread
 
 
 class Listener(Thread):
-    """Thread chargé d'écouter le serveur."""
+    """
+        Thread chargé d'écouter le serveur pour mettre à jour
+        la carte et le label de message en temps réel
+    """
 
     def __init__(self, client):
         Thread.__init__(self)
@@ -54,6 +57,3 @@ class Listener(Thread):
             # ...on indique si c'est au tour du client
             if joueur_courant_id == self.id_:
                 self.client.message_label = "C'est à votre tour"
-
-
-########## FONCTIONS LISTENER ##########
