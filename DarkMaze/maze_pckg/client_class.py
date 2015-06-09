@@ -18,6 +18,9 @@ class Data():
 	"""
 	pseudo = ""
 
+	# option de debogage True pour afficher les printd() False sinon
+	debug = True 
+
 	# donnees du réseaux 
 	hote = "localhost"
 	port = 10666
@@ -33,17 +36,19 @@ class Data():
 	verrou_receiv = RLock()
 
 	# donnees des messages
-	typesOK = [INI,STR,UTU,OTU,ETU,MSG,GRI,WIN]
+	typesOK = ["INI","STR","UTU","OTU","ETU","MSG","GRI","WIN"]
 	longMSG = 3      # définit combien de messages sont gardés en mémoire pour l'affichage
 	txtGrille = ""   # affichge de la grille
 	txtMSG = ""      # affichage des messages du serveur
 	txtListe = ""    # affichage de la liste des joueurs
+	donnees = ""
 
 
 	# données de la partie
 	nonEnd = True # Passe a False lorsque la partie se termine
 	init = False  # Passe à True quand il y a assez de joueur pour démarrer 
 	start = False # Passe à True quand le serveur démarrer la partie
+	exit = False  # Passe à True quand le joueur décide de quitter la partie
 	players = []
 	utu = False   # définit si c'est le tour du joueur ou non
 
@@ -54,90 +59,104 @@ class Data():
 			On définit ici un dictionnaire dont les clefs sont les types de messages
 			et les valeurs sont les actions à effectuer, une sorte de switch.
 		"""
+		Data.donnees = donnees
 		messagesTypes = { 
-		"INI" = Data.ini(),
-		"STR" = Data.str(donnees),
-		"UTU" = Data.utu(),
-		"OTU" = Data.otu(donnees),
-		"MSG" = Data.msg(donnees),
-		"GRI" = Data.gri(donnees),
-		"WIN" = Data.win(donnees)
+		"INI":Data.ini,
+		"STR":Data.str,
+		"UTU":Data.utu,
+		"OTU":Data.otu,
+		"MSG":Data.msg,
+		"GRI":Data.gri,
+		"WIN":Data.win
 		}
-		messagesTypes[tipe]
+		messagesTypes[tipe]()
+		Data.donnee = ""
 
 	# modules communs aux différents types
-	def gestionMSG(donnees):
+	def gestionMSG():
 		"""Gère la mémoire des messages à afficher au joueur
 		Prend en entrée le message à afficher (donnees) et le nombre d'emplacement mémoire Data.longMSG
 		Lorsqu'il y a DATA.longMSG messages dans data.message_affiche, on efface le plus ancien qui sera en position 0"""
 		taille = len(Data.message_affiche)
 		if taille >= Data.longMSG:
-			del message_affiche[0] 
-		Data.message_affiche.append(donnees) # on place les messages dans le buffer
+			del Data.message_affiche[0] 
+		Data.message_affiche.append(Data.donnees) # on place les messages dans le buffer
 		msgTemp = ""
 		for msg in Data.message_affiche:
-			msgTemp += msg = "\n"
-		msgTemp = msgTemp(:len(msgTemp) - 1) # on ne garde pas le dernier saut de ligne
+			msgTemp += msg 
+			msgTemp += "\n"
+		longueur = len(msgTemp) - 1
+		msgTemp = msgTemp[:longueur] # on ne garde pas le dernier saut de ligne
 		Data.txtMSG = msgTemp # on affiche les nouveaux messages
+		printd(Data.txtMSG)
 
-	def gestionListe(pseudo=None):
+	def gestionListe():
 		""" Crée et modifie la liste des joueurs à afficher et met en avant celui qui doit jouer"""
 		message = ""
 		for p in Data.players:
-			if pseudo != None and p == pseudo:
-				message += ">>> " + pseudo + "\n"
-			else: 
-				message += pseudo + "\n"
+			if Data.donnees != "" and p == Data.donnees:
+				message += ">>> " + p + "\n"
+			else:
+				message += p + "\n"
 		message = message[:len(message) - 1] # on ne garde pas le dernier saut de ligne
 		Data.txtListe = message
 
 	# modules des types possibles
 	def ini():
+		printd("On a recu INI")
 		""" Permet au joueur de lancer la partie """
 		Data.init = True
 
-	def str(donnees):
+	def str():
 		"""Initialise la partie, récupère la liste des pseudos des joueurs dans l'ordre du tour par tour"""
-		split = str.split(donnees, "|")
+		print("On a recu STR")
+		split = str.split(Data.donnees, "|")
 		for word in split:
 			Data.players.append(word)
-		gestionListe()
+		Data.gestionListe()
 		Data.start = True
 
 	def utu():
 		"""modifie le booleen du tour du joueur à True pour enclencher son tour"""
+		printd("On a recu UTU")
 		Data.utu = True
-		gestionListe(Data.pseudo)
+		Data.gestionListe(Data.pseudo)
 		message = "C'est le début de votre tour !"
-		gestionMSG(message) # affichage du message
+		Data.gestionMSG() # affichage du message
 
-	def otu(donnees):
+	def otu():
 		""" Gére la réception d'un message indiquant à qui est le tour de jeu"""
-		message = "Début du tour de {}".format(donnees)
-		gestionMSG(message) # affichage du message
-		gestionListe(donnees) # modification dans la liste des joueurs pour mettre en avant qui est en train de jouer
+		printd("On a recu OTU {}".format(Data.donnees))
+		message = "Début du tour de {}".format(Data.donnees)
+		Data.gestionMSG() # affichage du message
+		Data.gestionListe() # modification dans la liste des joueurs pour mettre en avant qui est en train de jouer
 
-	def etu(donnees):
+	def etu():
 		""" Affiche la fin du tour d'un autre joueur"""
-		message = "Fin du tour de {}".format(donnees)
-		gestionMSG(message) # affichage du message
-		gestionListe()
+		printd("On a recu ETU {}".format(Data.donnees))
+		message = "Fin du tour de {}".format(Data.donnees)
+		Data.gestionMSG() # affichage du message
+		Data.gestionListe()
 
-	def msg(donnees):
+	def msg():
+		printd("On a recu MSG {}".format(Data.donnees))
 		""" Transmet le message à l'affichage """
-		gestionMSG(donnees)
+		print("Gestion du message")
+		Data.gestionMSG()
 
-	def gri(donnees):
+	def gri():
+		printd("On a recu GRI {}".format(Data.donnees))
 		""" Transmet la grille à l'affichage """
 		Data.txtGrille = donnees
 
-	def win(donnees):
+	def win():
 		""" Affiche qui à gagner et enclenche la fin de la partie """
+		printd("On a recu WIN {}".format(Data.donnees))
 		if donnees == Data.pseudo:
 			message = "Félicitation, vous avez gagné !!"
 		else:
-			message = "Désolé, vous avez perdu.\n{} est sorti du labyrinthe avant vous.".format(donnees)
-		gestionMSG(message)
+			message = "Désolé, vous avez perdu.\n{} est sorti du labyrinthe avant vous.".format(Data.donnees)
+		Data.gestionMSG()
 
 		Data.nonEnd = False # on arrête la partie
 
@@ -151,14 +170,17 @@ class ConnexionRead(Thread, Data):
 	def run(self):
 		while Data.nonEnd:
 			# On commence par vérifier si il y a des messages en arrivée
-			Data.msg_recu = connexion_avec_serveur.recv(1024)
+			Data.msg_recu = Data.connexion.recv(1024)
 
 			# On traite le message si il n'est pas vide
 			if Data.msg_recu != "":
 				msgBrut = Data.msg_recu.decode()
+				print(msgBrut)
 				if msgBrut[:3] in Data.typesOK:
 					leType = msgBrut[:3]
-					donnees = msgBrut[2:]
+					donnees = msgBrut[3:]
+					print(leType)
+					print(donnees)
 					Data.Messages(leType, donnees)
 
 			# On attend 50 ms
@@ -173,10 +195,15 @@ class ConnexionWrite(Thread, Data):
 
 	def run(self):
 		while Data.nonEnd:
-			with verrou_send:
+			with Data.verrou_send:
 				if Data.message_send != "":
 					message = Data.message_send.encode()
 					Data.connexion.send(message)
 					Data.message_send = ""
 
 			sleep(0.08)
+
+def printd(donnees):
+	""" Affichage de débogage """
+	if Data.debug:
+		print(donnees)

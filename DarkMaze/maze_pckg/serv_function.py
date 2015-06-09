@@ -59,7 +59,8 @@ def getClient():
 
 		# on compte combien il y a de client(s) connecté(s)
 		nombre = len(Data.clients_connectes)
-		if nombre > 1:
+		if nombre == 1:
+			"""
 			# on commence par dire aux connectes qu'ils peuvent commencer la partie
 			for client in client_temp:
 				message = "Il y a " + str(nombre) + " connectés sur le serveur\nTapez c pour commencer la partie"
@@ -76,5 +77,6 @@ def getClient():
 				for client in clients_a_lire:
 					msg_recu = client.recv(1024).decode()
 					if msg_recu.lower() == "c":
-						Data.getClient = False
+						Data.getClient = False"""
+			Data.getClient = False
 	print("Le jeu commence !")

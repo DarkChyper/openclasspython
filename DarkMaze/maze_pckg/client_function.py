@@ -31,3 +31,8 @@ def Connexion():
 	message = "PSD" + Data.pseudo
 	message = message.encode()
 	Data.connexion.send(message)
+
+def printd(donnees):
+	""" Affichage de débogage """
+	if Data.debug:
+		print(donnees)
