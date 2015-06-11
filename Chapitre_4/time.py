@@ -16,4 +16,4 @@ print(time.strftime("%A %d %B %Y %H:%M:%S"))
 
 print(datetime.date.today())
 
-print(datetime.datetime.now())
+print(type(datetime.datetime.now()))

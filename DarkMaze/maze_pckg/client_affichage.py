@@ -60,9 +60,9 @@ class Affichage(Frame):
 		self.tipe.pack(side="left",fill=BOTH, expand=1)
 
 		self.value = StringVar() 
-		self.bouton1 = Radiobutton(self.tipe, text="mouvement", variable=self.value, value="1", bg="grey")
-		self.bouton2 = Radiobutton(self.tipe, text="murer         ", variable=self.value, value="2", bg="grey")
-		self.bouton3 = Radiobutton(self.tipe, text="creuser       ", variable=self.value, value="3", bg="grey")
+		self.bouton1 = Radiobutton(self.tipe, text="MVT", variable=self.value, value="1", bg="grey")
+		self.bouton2 = Radiobutton(self.tipe, text="MUR", variable=self.value, value="2", bg="grey")
+		self.bouton3 = Radiobutton(self.tipe, text="CRE", variable=self.value, value="3", bg="grey")
 		self.bouton1.pack()
 		self.bouton2.pack()
 		self.bouton3.pack()
