@@ -1,8 +1,7 @@
 #!/usr/bin/python3.4
 # -*- coding: utf8 -*-
 
-"""
-"""
+""" Interface client"""
 
 # Imports externes
 from threading import Thread, RLock
@@ -13,82 +12,148 @@ from time import *
 from .client_class import *
 from .client_function import *
 
-class Affichage(Frame):
+
+class Affichage(Thread):
+	""" Thread d'Affichage """
+	def __init__(self, **kwargs):
+		Thread.__init__(self)
+
+
+	def run(self, **kwargs):
+		
+		fenetre = Tk()
+		self.interface = Interface(fenetre)
+		self.interface.mainloop()
+		self.interface.destroy()
+
+class Interface(Frame):
+	""" Classe instanciée qui crée notre fenêtre d'affichage et les fonctions des boutons """
 	def __init__(self, fenetre, **kwargs):
-		Frame.__init__(self, fenetre, width=768, height=576,bg="ivory", **kwargs)
+		# La fenêtre principale ###################################################################
+		###########################################################################################
+		Frame.__init__(self, fenetre, width=800, height=600,bg="black", **kwargs)
 		self.pack(fill=BOTH, expand=1)
 
-		# creation des cadres
-		# cadre hauts
-		self.up = Frame(self, width=768, height=400, borderwidth=0,bg="ivory")
-		self.up.pack(side="top", fill=BOTH, expand=YES)
+		# Les frames ##############################################################################
+		###########################################################################################
+		self.up = Frame(self, width=780, height=380, bg="ivory")
+		self.up.pack(side="top", padx=10, pady=10, fill=BOTH, expand=1)
 
-		# cadre bas
-		self.down = Frame(self, width=768, height=176, borderwidth=0,bg="ivory")
-		self.down.pack(side="bottom", fill=BOTH, expand=YES)
+		self.down = Frame(self, width=780, height=180, bg="ivory")
+		self.down.pack(side="bottom", padx=10, pady=10, fill=BOTH, expand=1)
 
-		# cadre de la grille dans le cadre haut
-		self.grille = LabelFrame(self.up, width=498, height=500, borderwidth=0, bg="black", fg="white", text="Le labyrinthe :")
-		self.grille.pack(side="left", expand=1, fill=BOTH, padx=10, pady=10)
+		self.grille = Frame(self.up, width=560, height=360, bg="black")
+		self.grille.pack(side="left", padx=10, pady=10, fill=Y, expand=0)
 
-		# texte de la grille
-		Label(self.grille, text=Data.txtGrille, bg="black", fg="white").pack(side="left", fill=BOTH, expand=1)
+		self.menu = Frame(self.up, width=180, height=360, bg="ivory")
+		self.menu.pack(side="right", padx=10, pady=10, fill=Y, expand=0)
 
-		# cadre des infos du jeu das le cadre haut
-		self.infos = LabelFrame(self.up, width=270, height=500, borderwidth=0, bg="blue", text="Infos de la partie :")
-		self.infos.pack(side="right", padx=10, pady=10, fill=BOTH)
+		self.menu_boutons = Frame(self.menu, width=180, height=30, bg="ivory")
+		self.menu_boutons.pack(side="top", padx=0, pady=0, fill=X, expand=0)
 
-		# texte des infos des messages du serveur :
-		self.canvaInfo = Canvas(self.infos, width=270, height=500, bg="black")
-		self.canvaInfo.pack(side="left", padx=10, expand=YES, fill=BOTH)
+		self.menu_liste = LabelFrame(self.menu, width=180, height=330, bg="black", fg="white", text="Liste des joueurs")
+		self.menu_liste.pack(side="bottom", padx=0, pady=0, fill=X, expand=0)
 
-		self.listeInfo = self.canvaInfo.create_text(10,10, fill="white", text=Data.txtListe)
+		self.msg = Frame(self.down, width=560, height=160, bg="black")
+		self.msg.pack(side="left", padx=10, pady=10, fill=Y, expand=0)
 
-		#Label(msg, text="Data.txtMSG").pack(expand="yes", fill=BOTH)
-		self.canvas = Canvas(self.down, width=498, height=76, bg="black")
-		self.canvas.pack(side="left", padx=10, expand=YES, fill=BOTH) 
+		self.cmd = LabelFrame(self.down, width=180, height=160, bg="ivory", text="Commandes")
+		self.cmd.pack(side="right", padx=10, pady=10, fill=BOTH, expand=0)
 
-		self.Messages = self.canvas.create_text(60,20,fill="white", text=Data.txtMSG) 
+		self.cmd_type = Frame(self.cmd, width=180, height=30, bg="ivory")
+		self.cmd_type.pack(side="top", padx=0, pady=0, fill=X, expand=0)
 
-		# cadre des commandes dans le cadre 
-		self.cmd = LabelFrame(self.down, width=270, height=76, borderwidth=0, bg="grey", text="Commandes")
-		self.cmd.pack(side="left", fill=BOTH, expand=1)
+		self.cmd_dir = Frame(self.cmd, width=180, height=30, bg="ivory")
+		self.cmd_dir.pack(side="bottom", padx=10, pady=10, fill=BOTH, expand=1)
 
 
-		# cadre du type d'action
-		self.tipe = Frame(self.cmd, width=120, height=76, bg="grey")
-		self.tipe.pack(side="left",fill=BOTH, expand=1)
+		# les modules ############################################################################
+		##########################################################################################
+		##les canvas
+		self.canvas_grille = Canvas(self.grille, width=560, height=360, bg="black")
+		self.canvas_grille.pack(side="left", padx=0, pady=0, fill=BOTH, expand=1)
+
+
+		################ les textes
+		###########################################################################################
+		self.texte_grille = self.canvas_grille.create_text(280, 180, fill="green",font="LiberationMono", text=Data.txtGrille)
+
+		#texte en provenance du serveur
+		self.texte_console = Text(self.msg, wrap=WORD, relief=FLAT, height=10, bg="black", fg="green")
+		self.texte_console.insert(END, Data.txtMSG)
+		self.texte_console.config(state=DISABLED)
+		self.texte_console.pack(side="left", padx=0, pady=0, expand=0)
+
+		#liste des joueurs 
+		self.texte_liste = Text(self.menu_liste, wrap=WORD, relief=FLAT, bg="black", fg="green", width=25)
+		self.texte_liste.insert(END, Data.txtListe)
+		self.texte_liste.config(state=DISABLED)
+		self.texte_liste.pack(side="left", padx=0, pady=0, expand=0)
+
+
+		################ les boutons
+		########################################################################################
+		Button(self.menu_boutons, text="Commencer", command=self.begin, relief=FLAT, bg="black", fg="ivory", cursor="target").pack(side="left", expand=1)
+		Button(self.menu_boutons, text="Quitter", command=self.quitter, relief=FLAT, bg="black", fg="ivory", cursor="target").pack(side="right", expand=1)
 
 		self.value = StringVar() 
-		self.bouton1 = Radiobutton(self.tipe, text="MVT", variable=self.value, value="1", bg="grey")
-		self.bouton2 = Radiobutton(self.tipe, text="MUR", variable=self.value, value="2", bg="grey")
-		self.bouton3 = Radiobutton(self.tipe, text="CRE", variable=self.value, value="3", bg="grey")
-		self.bouton1.pack()
-		self.bouton2.pack()
-		self.bouton3.pack()
+		self.bouton1 = Radiobutton(self.cmd_type, text="MVT", variable=self.value, value="1")
+		self.bouton2 = Radiobutton(self.cmd_type, text="MUR", variable=self.value, value="2")
+		self.bouton3 = Radiobutton(self.cmd_type, text="CRE", variable=self.value, value="3")
+		self.bouton1.pack(side="left")
+		self.bouton2.pack(side="left")
+		self.bouton3.pack(side="right")
 
-		# cadre des directions
-		self.dire = Frame(self.cmd, width=150, height=76, bg="grey")
-		self.dire.pack(side="right", fill=BOTH, expand=1)
+		Button(self.cmd_dir, text='^', borderwidth=1, command=self.haut).grid(row=1, column=2)
+		Button(self.cmd_dir, text='<', borderwidth=1, command=self.gauche).grid(row=2, column=1)
+		Button(self.cmd_dir, text='>', borderwidth=1, command=self.droite).grid(row=2, column=3)
+		Button(self.cmd_dir, text='v', borderwidth=1, command=self.bas).grid(row=3, column=2)
+	
+		# Appel des méthodes ###################################################################
+		########################################################################################
+		self.majInfos()
 
-		# boutons de directions
-		Button(self.dire, text='^', borderwidth=1, command=self.haut).grid(row=1, column=2)
-		Button(self.dire, text='<', borderwidth=1, command=self.gauche).grid(row=2, column=1)
-		Button(self.dire, text='C', borderwidth=1, command=self.begin).grid(row=2, column=2)
-		Button(self.dire, text='>', borderwidth=1, command=self.droite).grid(row=2, column=3)
-		Button(self.dire, text='v', borderwidth=1, command=self.bas).grid(row=3, column=2)
+	def majInfos(self):
+		""" Méthode qui mets à jour, en boucle, le texte des canvas """
+		self.canvas_grille.delete(self.texte_grille)
 
-	def MaJInfos(self):
-		"""Boucle qui permet de mettre a jour l'affichage des textes"""
-		self.canvaInfo.delete(self.listeInfo)
-		self.canvas.delete(self.Messages)
+		# texte de la grille
+		with Data.verrou_grille :
+			if Data.txtGrille != "":
+				self.texte_grille = self.canvas_grille.create_text(230,180,fill="green", text=Data.txtGrille) 
+			else :
+				self.texte_grille = self.canvas_grille.create_text(230,180,fill="green", text="Please wait") 
 
-		self.Messages = self.canvas.create_text(60,20,fill="white", text=Data.txtMSG) 
-		self.listeInfo = self.canvaInfo.create_text(10,10, fill="white", text=Data.txtListe)
+		# texte de la console
+		self.texte_console.pack(side="left", padx=0, pady=0, expand=0)
 
-		self.after(10, self.MaJInfos)
+		#texte de la liste
+		self.texte_liste.pack(side="left", padx=0, pady=0, expand=0)
+
+		# on boucle si le jeu n'est pas terminé
+		if Data.nonEnd == False:
+			try:
+				self.quit()
+			except RuntimeError: # rustine pour éviter une erreur de sortie liée à une non utilisation d'une file d'attente
+				pass
+		else:
+			self.after(10, self.majInfos)
+
+	def begin(self):
+		""" Méthode qui lance la partie lorsque le joueur appuie sur le bouton"""
+		if Data.init == True and Data.start == False :
+			Data.init = False
+			with Data.verrou_send:
+				Data.message_send = "INI" + Data.pseudo
+
+	def quitter(self):
+		""" Fermeture propre des connexions, du jeu et des fenetres """
+		Deconnexion() 
+		
 
 	def evaluerType(self):
+		"""évalue quelle action est demandée par le joueur
+		   retourne M pour murer, C pour creuse ou "" dans tous les autres cas (un déplacement par exemple)"""
 		letype = value.get()
 		if letype == "" or letype == "1" or letype == " ":
 			return ""
@@ -97,19 +162,8 @@ class Affichage(Frame):
 		elif letype == "3":
 			return "C"
 		else : 
+			print("Type d'action inconnue, Déplacement par défaut.")
 			return ""
-
-	def begin(self):
-		if Data.init and Data.start == False:
-			message = "INI" + Data.pseudo
-			with Data.verrou_send :
-				Data.message_send = message
-
-	def terminer(self):
-		message = "EXI" + Data.pseudo
-		with Data.verrou_send :
-			Data.message_send = message
-		self.quit()
 
 	def haut(self):
 		if Data.init and Data.start and Data.utu:
@@ -144,21 +198,4 @@ class Affichage(Frame):
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.utu = False
-
-class Interface(Thread):
-	"""Notre fenêtre principale.
-	Tous les widgets sont stockés comme attributs de cette fenêtre."""
-
-	def __init__(self, **kwargs):
-		Thread.__init__(self)
-
-
-	def run(self, **kwargs):
-		
-		fenetre = Tk()
-		self.interface = Affichage(fenetre)
-		self.interface.mainloop()
-		self.interface.destroy()
-
-
 

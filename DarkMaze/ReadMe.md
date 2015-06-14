@@ -2,12 +2,21 @@ ReadMe.md du jeu de labyrinthe DarkMaze (ou Roboc) pour OpenClassRooms
 
 # Avant propos :
 
-# Les fonctions écrites :
+La gestion de l'affichage graphine n'est pa correcte et provoque un runtimerror lors de la fermeture de la fenêtre, même avec la fonction quit().
+La solution serait de travailler avec une file d'attente, ce qui sera fait plus tard.
 
-# Les fonctions non écrites :
+La règle étant sujette à discussion, j'ai choisi de ne pas accepter des déplacement sur plusieures case d'un coup, déplacements gérés au tour par tour.
+Cette fonction pourrait être ajoutée facielement.
+
+# Les fonctions écrites :
+	* Affichage utilisateur
+	* Echanges entre client et serveur
+	* gestion du jeu par le serveur
+
+# Ce qui n'a pas été fait :
 	* Murer une porte
 	* Creuser une porte
-	* Tests
+	* les tests unitaires
 
 # Le serveur :
 
@@ -15,8 +24,18 @@ ReadMe.md du jeu de labyrinthe DarkMaze (ou Roboc) pour OpenClassRooms
 		* Demande de choisir un labyrinthe
 		* Lance le serveur
 		* Accepte des nouvelles connexions et cré les robots sur la grille
-		* Lance la partie avec 1 seul thread : écoute des clients
-			
+		* Lance la partie avec 1 seul thread : écoute et réponse aux clients
+
+	## Caractéristiques des clients :
+		Ils sont stockés dans une liste de clients sous la forme d'une liste de données définis comme suit :
+			0 les donnees de connexions socket()
+			1 le pseudo du joueur str()
+			2 un booleen pour savoir si le joueur est encore connecté 
+			3 la coordonnée x du joueur int()
+			4 la coordonnee y du joueur int()
+			5 un booleen pour savoir si le joueur est sur une porte
+		La liste peut s'agrandir au besoin. (exemple gestion d'un déplacement sur )
+					
 
 # Le client :
 

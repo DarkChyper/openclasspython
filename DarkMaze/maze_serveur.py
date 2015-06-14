@@ -20,35 +20,18 @@ def main():
 		Coeur du serveur, tant que l'on ne quitte pas ce main,
 		on reste dans le jeu
 	"""
-
+	# Initialisation du serveur
 	initGame()
 
+	# démarrage du serveur
 	connexion = Connexion()
 
-	getClient()
-	while 1:
-		clients_a_lire = []
-		try:
-			clients_a_lire, wlist, xlist = select.select(Data.clients_connectes,[], [], 0.05)
-		except select.error:
-			send = input("> ")
-			if send != "":
-				send = send.encode()
-				client.send(send)
-		else:
-			# On parcourt la liste des clients à lire
-			for client in clients_a_lire:
-				# Client est de type socket
-				msg_recu = client.recv(1024)
-				# Peut planter si le message contient des caractères spéciaux
-				msg_recu = msg_recu.decode()
-				print("Reçu {}".format(msg_recu))
-				send = input("> ")
-				if send != "":
-					send = send.encode()
-					client.send(send)
-				
-		sleep(0.05)
+	# On lance le thread pour accepter les nouveaux clients
+	thread_accept = NewClient()
+	thread_accept.start()
+	thread_accept.join()
+
+
 
 
 if __name__ == "__main__":

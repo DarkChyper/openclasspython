@@ -9,6 +9,7 @@ import socket
 
 # Imports internes
 from .client_class import *
+from .client_affichage import *
 
 def Pseudo():
 	"""
@@ -31,6 +32,14 @@ def Connexion():
 	message = "PSD" + Data.pseudo
 	message = message.encode()
 	Data.connexion.send(message)
+
+def Deconnexion():
+	with Data.verrou_send:
+			Data.message_send = "EXI" + Data.pseudo
+	sleep(1)
+	Data.connexion.close()
+	Data.nonEnd = False
+
 
 def printd(donnees):
 	""" Affichage de débogage """
