@@ -17,7 +17,7 @@ from random import randrange
 from .serv_function import *
 from .serv_data import *
 
-class Maze:
+class Maze(Data):
 	"""Classe définissant une carte de labyrinthe avec toutes ses caractéristiques"""
 
 	def __init__(self, nom_carte, grille):
@@ -58,6 +58,39 @@ class Maze:
 				x = 0
 			x += 1
 		return (defX,y)
+
+	def genGrille(self, client):
+		lsPos, clPos = self.genPos(client) # retourne une liste de tupple contenant les positions des joueurs et un tupple contenant la position du joueur en cours
+		longueur = range(self.dim[0])
+		largeur = range(self.dim[1])
+
+		grille = ""
+
+		for y in largeur:
+			for x in longueur:
+				if (x,y) in lsPos:
+					if (x,y) == clPos:
+						grille += "X"
+					else :
+						grille += "X"
+				else :
+					grille += self.grille[y][X]
+			grille += "\n"
+
+		return grille
+
+	def genPos(self, client):
+		""" retourne une liste de tupple des positions des joueurs
+			ainsi que le tupple de la position du joueur concerné """
+		pass
+		liste = []
+		for cl in Data.connectes:
+			if Data.Connectes[cl][0] == client:
+				clPos = (Data.Connectes[cl][3],Data.Connectes[cl][4])
+			liste.append((Data.Connectes[cl][3],Data.Connectes[cl][4]))
+
+		return liste, clPos
+
 
 	def __str__(self):
 		"""
@@ -154,11 +187,26 @@ class NewClient(Thread, Data):
 			if Data.connectes[i][0] == client:
 				Data.connectes[i][1] = pseudo
 				break
-			
+
 
 class Partie(Thread, Data):
 	""" Thread qui gère toute la partie en cours """
+	# on commence par envoyer à tous les joueurs la grille de jeu
+	msgListe = Data.listePseudo()
+	for client in Data.connectes:
+		grille = Maze.genGrille(client)
+		grille = grille.encode()
+		client.send(grille)
+
+	#Ensuite on envoi le STR a tous avec la liste des joueurs
+	msgListe = msgListe.encode()
+	for client in Data.connectes:
+		client.send(msgListe)
+
+	# on lance la boucle du jeu
 	while Data.nonEnd :
+		for client in Data.connectes:
+
 		pass
 
 

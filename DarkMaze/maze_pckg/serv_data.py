@@ -33,4 +33,14 @@ class Data():
 
 	connectes = [] #liste contenant les client dans l'ordre de jeu, définition dans le ReadMe
 
+	# Les méthodes 
+	#######################################################################
+	def listePseudo(self):
+		pseudo = ""
+		pseudo += "STR"
+		for cl in Data.connectes:
+			pseudo += Data.connectes[cl][1] 
+			pseudo += ";"
+		return pseudo
+
 
