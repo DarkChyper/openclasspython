@@ -127,6 +127,8 @@ class NewClient(Thread, Data):
 						if msg_recu[:3] == "INI":
 							Data.addClient = False
 							break
+						if msg_recu[:3] == "PSD"
+							self.majPseudo(client, msg_recu[3:])
 
 	def definePosJoueur(self):
 		"""On place le joueur au hasard sur la map"""
@@ -146,6 +148,18 @@ class NewClient(Thread, Data):
 				if dejapris == False :
 					return x, y
 
+	def majPseudo(self, client, pseudo):
+		"""Méthode pour mettre a jour le pseudo d'un joueur"""
+		for i in Data.connectes :
+			if Data.connectes[i][0] == client:
+				Data.connectes[i][1] = pseudo
+				break
+			
+
+class Partie(Thread, Data):
+	""" Thread qui gère toute la partie en cours """
+	while Data.nonEnd :
+		pass
 
 
 

@@ -24,6 +24,7 @@ class Data():
 	# Booleens
 	#######################################################################
 	addClient = True # passer a False quand la partie commencera
+	nonEnd = True # passera à False quand la partie se terminera
 
 	# La partie
 	#######################################################################

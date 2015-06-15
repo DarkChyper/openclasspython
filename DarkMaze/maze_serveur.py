@@ -31,6 +31,10 @@ def main():
 	thread_accept.start()
 	thread_accept.join()
 
+	# On lance le thread principal du serveur
+	thread_game = Partie()
+	thread_game.start()
+	thread_game.join()
 
 
 
