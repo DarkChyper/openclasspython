@@ -44,39 +44,9 @@ def initMazes():
 	return mazes
 
 
-def getClient():
-	client_temp = []
-	while Data.getClient:
-		# On va vérifier que de nouveaux clients ne demandent pas à se connecter
-		connexions_demandees, wlist, xlist = select.select([Data.connexion], [], [], 0.05)
-		
-		for connexion in connexions_demandees:
-			connexion_avec_client, infos_connexion = connexion.accept()
-			# On ajoute le socket connecté à la liste des clients
-			Data.clients_connectes.append(connexion_avec_client)
-			client_temp.append(connexion_avec_client)
-
-
-		# on compte combien il y a de client(s) connecté(s)
-		nombre = len(Data.clients_connectes)
-		if nombre == 1:
-			"""
-			# on commence par dire aux connectes qu'ils peuvent commencer la partie
-			for client in client_temp:
-				message = "Il y a " + str(nombre) + " connectés sur le serveur\nTapez c pour commencer la partie"
-				client.send(message.encode())
-			client_temp = []
-
-			# on essaye de voir si un joueur a lancer la partie
-			clients_a_lire = []
-			try:
-				clients_a_lire, wlist, xlist = select.select(Data.clients_connectes, [], [], 0.05)
-			except select.error:
-				pass
-			else:
-				for client in clients_a_lire:
-					msg_recu = client.recv(1024).decode()
-					if msg_recu.lower() == "c":
-						Data.getClient = False"""
-			Data.getClient = False
-	print("Le jeu commence !")
+def majPseudo(self, client, pseudo):
+	"""Fonction pour mettre a jour le pseudo d'un joueur"""
+	for i in Data.connectes :
+		if Data.connectes[i][0] == client:
+			Data.connectes[i][1] = pseudo
+			break

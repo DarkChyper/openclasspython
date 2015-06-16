@@ -35,6 +35,9 @@ Cette fonction pourrait être ajoutée facielement.
 		4 la coordonnee y du joueur int()
 		5 un booleen pour savoir si le joueur est sur une porte
 	La liste peut s'agrandir au besoin. (exemple gestion d'un déplacement sur )
+
+## Caractéristiques de clients_connectes :
+	
 				
 
 # Le client :
@@ -61,8 +64,7 @@ Cette fonction pourrait être ajoutée facielement.
 ### Messages en réception au client :
 	* INI : La partie est prête à démarrer, en attente d'un retour client
 	* STR : La partie démarre, donne la liste des joueurs
-	* UTU : Début du tour pour le joueur
-	* OTU : Début du tour du joueur "pseudonyme" (message recu : "OTUpseudonyme")
+	* WTU : Début du tour pour le joueur cité ie : WTUJoueur1
 	* ETU : Fin du tour de "pseudonyme si précisé", sinon du joueur.
 	* MSG : Message
 	* GRI : grille du labyrinthe

@@ -68,13 +68,13 @@ class Maze(Data):
 
 		for y in largeur:
 			for x in longueur:
-				if (x,y) in lsPos:
-					if (x,y) == clPos:
+				if (x,y) in lsPos: # Si la case est prise par un robot
+					if (x,y) == clPos: # si le robot est ccelui du client à qui l'on envoie la grille
 						grille += "X"
 					else :
-						grille += "X"
+						grille += "x" # si le robot n'est pas celui du client à qui l'on envoie la grille
 				else :
-					grille += self.grille[y][X]
+					grille += self.grille[y][X] # si la case n'est pas prise par un robot
 			grille += "\n"
 
 		return grille
@@ -139,6 +139,7 @@ class NewClient(Thread, Data):
 				joueur.append(False) # le joueur ne peut être placé sur une porte dès le début.
 				Data.connectes.append(joueur)
 				liste_temp.append(infos_connexion) # une liste des clients temporaire pour envoyer une seule fois le message "La partie peut commencer"
+				Data.clients_connectes.append(infos_connexion) 
 
 			nombre = len(Data.connectes)
 			if nombre >= Data.nbrJoueursMin: # on ne peut lancer la partie que si il y a au moins n joueurs
@@ -162,7 +163,6 @@ class NewClient(Thread, Data):
 							break
 						if msg_recu[:3] == "PSD"
 							self.majPseudo(client, msg_recu[3:])
-
 	def definePosJoueur(self):
 		"""On place le joueur au hasard sur la map"""
 		longueur = Data.maze.dim[0]
@@ -181,33 +181,85 @@ class NewClient(Thread, Data):
 				if dejapris == False :
 					return x, y
 
-	def majPseudo(self, client, pseudo):
-		"""Méthode pour mettre a jour le pseudo d'un joueur"""
-		for i in Data.connectes :
-			if Data.connectes[i][0] == client:
-				Data.connectes[i][1] = pseudo
-				break
-
 
 class Partie(Thread, Data):
-	""" Thread qui gère toute la partie en cours """
-	# on commence par envoyer à tous les joueurs la grille de jeu
-	msgListe = Data.listePseudo()
-	for client in Data.connectes:
-		grille = Maze.genGrille(client)
-		grille = grille.encode()
-		client.send(grille)
 
-	#Ensuite on envoi le STR a tous avec la liste des joueurs
-	msgListe = msgListe.encode()
-	for client in Data.connectes:
-		client.send(msgListe)
+	def __init__(self):
+		""" Déclare les données utiles ppour la partie"""
+		Thread.__init__(self)
+		message : ""
+		client_temp = ""
+		client_joue_temp = ""
+		jouer = False 	# Passera à True si le joueur a fait une action terminant son tour, 
+						# puis repassera a false pour le joueur suivant
 
-	# on lance la boucle du jeu
-	while Data.nonEnd :
+	def run(self):
+		""" Thread qui gère toute la partie en cours """
+		# on commence par envoyer à tous les joueurs la grille de jeu
 		for client in Data.connectes:
+			grille = Maze.genGrille(Data.connectes[client][0])
+			grille = grille.encode()
+			client.send(grille)
 
+		#Ensuite on envoi le STR a tous avec la liste des joueurs
+		msgListe = Data.listePseudo()
+		self.MessageATous(msgListe)
+
+		# on lance la boucle du jeu
+		while Data.nonEnd :
+			for temp in Data.connectes:
+				self.client_joue_temp = []
+				if Data.connectes[self.client_joue_temp][1]: # On ne gère le joueur que si il est encore connecté
+					MessageATous("WTU{}".format(Data.connectes[self.client_joue_temp][2]))
+					self.jouer = False 
+					while  jouer != True: 
+						clients_a_lire = []
+						try:
+							clients_a_lire, wlist, xlist = select.select(Data.clients_connectes, [], [], 0.05)
+						except select.error:
+							pass
+						else: # On permer aux utres joueurs d'envoyer des données même pendant le tour d'un autre
+							for self.client_temp in clients_a_lire:
+								msg_recu = self.client_temp.recv(1024).decode()
+								if self.client_temp == self.clien_joue_temp:
+									if msg_recu[:3] in Data.listeMsgOk:
+										pass
+								else:
+									if msg_recu[:3] in Data.listeMsgOkNonJoueur:
+										Messages(msg_recu[:3],msg_recu[3:]) # on traite le message recu
+
+	def MessageATous(self, message):
+		""" méthode qui envoi à tous les clients encores conectés le message fournnint en entrée"""
+		for client in Data.connectes:
+			if Data.connectes[client][1]: # on vérifie que le joueur l'on envoie qu'aux joueurs encore connectés
+				Data.connectes[client][0].send(message.encode())
+
+
+	def Messages(self, tipe, message):
+		""" Traite la réception des messages en provenance des joueurs """
+		self.message = message
+		messagesTypes = { 
+			"MSG":self.msg,	##########
+			"PSD":self.psd,	#	#   Types possibles par tous les joueurs
+			"EXI":self.exi,	#	######
+			"MVT":self.mvt,	#
+			"MUR":self.mur,	#	Types possibles par le joueur dont c'est le tour
+			"CRE":self.cre	#####
+			}
+		messagesTypes[tipe]()
+
+	def msg(self):
+		""" Fonctionnalité future qui renverra à tous les joueurs connectés le message d'un joueur
+			Ne compte pas pour une action du joueur en cours"""
 		pass
 
-
+	def psd(self):
+		""" Permet de mettre à jour le pseudonyme d'un joueur,
+			utile si un joueur n'a pas eu le temps de le renseigner durant l'initialisation du jeu
+			Ne compte pas pour une action du joueur en cours"""
+		for cl in Data.connectes:
+			if Data.connectes[cl][0] == Data.connectes[self.client_temp][0]:
+				Data.connectes[cl][2] = self.message
+	def exi(self):
+		""" Permet de gérer la déconnection d'un joueur """
 

@@ -41,7 +41,7 @@ class Data():
 
 	# donnees des messages
 	##################################################################################
-	typesOK = ["INI","STR","UTU","OTU","ETU","MSG","GRI","WIN"]
+	typesOK = ["INI","STR","WTU","ETU","MSG","GRI","WIN"]
 	longMSG = 3      # définit combien de messages sont gardés en mémoire pour l'affichage
 	txtGrille = ""   # affichge de la grille
 	txtMSG = ""      # affichage des messages du serveur
@@ -70,8 +70,7 @@ class Data():
 			messagesTypes = { 
 			"INI":Data.ini,
 			"STR":Data.str,
-			"UTU":Data.utu,
-			"OTU":Data.otu,
+			"WTU":Data.utu,
 			"MSG":Data.msg,
 			"GRI":Data.gri,
 			"WIN":Data.win,
@@ -123,20 +122,18 @@ class Data():
 		Data.gestionListe()
 		Data.start = True
 
-	def utu():
-		"""modifie le booleen du tour du joueur à True pour enclencher son tour"""
-		printd("On a recu UTU")
-		Data.utu = True
-		Data.gestionListe(Data.pseudo)
-		message = "C'est le début de votre tour !"
-		Data.gestionMSG(message) # affichage du message
-
-	def otu():
+	def wtu():
 		""" Gére la réception d'un message indiquant à qui est le tour de jeu"""
-		printd("On a recu OTU {}".format(Data.donnees))
-		message = "Début du tour de {}".format(Data.donnees)
-		Data.gestionMSG(message) # affichage du message
-		Data.gestionListe() # modification dans la liste des joueurs pour mettre en avant qui est en train de jouer
+		if Data.donnees == Data.pseudo:
+			Data.utu = True
+			Data.gestionListe(Data.pseudo)
+			message = "C'est le début de votre tour !"
+			Data.gestionMSG(message) # affichage du message
+		else:
+			Data.utu = False
+			Data.gestionListe(Data.donnees)
+			message = "C'est le début du tour de {} !".format(Data.donnees)
+			Data.gestionMSG(message) # affichage du message
 
 	def etu():
 		""" Affiche la fin du tour d'un autre joueur"""

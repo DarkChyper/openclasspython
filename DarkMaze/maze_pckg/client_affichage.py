@@ -153,22 +153,22 @@ class Interface(Frame):
 
 	def evaluerType(self):
 		"""évalue quelle action est demandée par le joueur
-		   retourne M pour murer, C pour creuse ou "" dans tous les autres cas (un déplacement par exemple)"""
+		   retourne MUR pour murer, CRE pour creuser ou MVT dans tous les autres cas (un déplacement par exemple)"""
 		letype = value.get()
 		if letype == "" or letype == "1" or letype == " ":
-			return ""
+			return "MVT"
 		elif letype == "2":
-			return "M"
+			return "MUR"
 		elif letype == "3":
-			return "C"
+			return "CRE"
 		else : 
 			print("Type d'action inconnue, Déplacement par défaut.")
-			return ""
+			return "MVT"
 
 	def haut(self):
 		if Data.init and Data.start and Data.utu:
 			letype = self.evaluerType()
-			message = "MVT" + letype + "N"
+			message =  letype + "N"
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.utu = False
@@ -176,7 +176,7 @@ class Interface(Frame):
 	def bas(self):
 		if Data.init and Data.start and Data.utu:
 			letype = self.evaluerType()
-			message = "MVT" + letype + "S"
+			message = letype + "S"
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.utu = False
@@ -185,7 +185,7 @@ class Interface(Frame):
 	def gauche(self):
 		if Data.init and Data.start and Data.utu:
 			letype = self.evaluerType()
-			message = "MVT" + letype + "O"
+			message = letype + "O"
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.utu = False
@@ -194,7 +194,7 @@ class Interface(Frame):
 	def droite(self):
 		if Data.init and Data.start and Data.utu:
 			letype = self.evaluerType()
-			message = "MVT" + letype + "E"
+			message = letype + "E"
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.utu = False

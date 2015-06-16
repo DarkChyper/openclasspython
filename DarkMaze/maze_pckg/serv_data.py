@@ -26,12 +26,19 @@ class Data():
 	addClient = True # passer a False quand la partie commencera
 	nonEnd = True # passera à False quand la partie se terminera
 
+	# Options systeme du jeu
+	#######################################################################
+	listeMsgOkNonJoueur = ["PSD","MSG","EXI"] 				# définit quelles actions le joueur peut faire durant le tour d'un concurent
+	listeMsgOk = ["PSD","MSG","MVT","MUR", "CRE", "EXI"]	# définit quelles actions le joueur peut faire durant son tour
+
+
 	# La partie
 	#######################################################################
 	nbrJoueursMin = 2
 	maze = None #contient les données du labyrinthe en cours, class Maze
 
-	connectes = [] #liste contenant les client dans l'ordre de jeu, définition dans le ReadMe
+	connectes = [] #liste contenant les clients dans l'ordre de jeu, définition dans le ReadMe
+	clients_connectes = [] # liste contenant les infos de connexion de chaque joueur dans l'ordre de connexion
 
 	# Les méthodes 
 	#######################################################################
