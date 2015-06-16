@@ -18,6 +18,13 @@ Cette fonction pourrait être ajoutée facielement.
 	* Creuser une porte
 	* les tests unitaires
 
+# Evolutions possibles :
+## Chat : 
+Les bases d'un chat sont posées dans le programme. Il existe déjà un préfixe (MSG) que le serveur peut recevoir pour renvoyer à tout le monde le message.
+Un booleen est aussi définit sur le serveur (Partie.joueur) pour déterminer le pseudo a utiliser entre Partie.clientAutre et Partie.clientQuiJoue.
+	ie : Si c'est au tour de ClientQuijoue mais que c'est clientAutre qui envoie un message de type MSG contenant "Je suis le meilleurs", 
+		 tous les joueurs connectés recevront "pseudo_de_clientAutre : Je suis le meilleurs"
+
 # Le serveur :
 
 ## La cinétique du serveur :
@@ -37,7 +44,7 @@ Cette fonction pourrait être ajoutée facielement.
 	La liste peut s'agrandir au besoin. (exemple gestion d'un déplacement sur )
 
 ## Caractéristiques de clients_connectes :
-	
+
 				
 
 # Le client :
@@ -60,6 +67,7 @@ Cette fonction pourrait être ajoutée facielement.
 	* MUR : Tentative de murage d'une porte  (envoi de MN, MS, ME, MO)
 	* CRE : Tentative de creusage d'un mur pour en faire une porte (envoi de CN, CS, CE, CO)
 	* EXI : fin de la partie pour le joueur et déconnexion côté serveur
+	* MSG : à ajouter pour un futur chat
 
 ### Messages en réception au client :
 	* INI : La partie est prête à démarrer, en attente d'un retour client

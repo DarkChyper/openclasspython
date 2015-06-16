@@ -188,54 +188,81 @@ class Partie(Thread, Data):
 		""" Déclare les données utiles ppour la partie"""
 		Thread.__init__(self)
 		message : ""
-		client_temp = ""
-		client_joue_temp = ""
+		clientAutre = ""
+		clientQuiJoue = ""
+		liste = []
+		joueur = False  # Sera utile lors de la gestion d'un chat, déterminera quel pseudo entre clientAutre et clientQuiJoue
 		jouer = False 	# Passera à True si le joueur a fait une action terminant son tour, 
 						# puis repassera a false pour le joueur suivant
 
 	def run(self):
 		""" Thread qui gère toute la partie en cours """
+
 		# on commence par envoyer à tous les joueurs la grille de jeu
-		for client in Data.connectes:
-			grille = Maze.genGrille(Data.connectes[client][0])
-			grille = grille.encode()
-			client.send(grille)
+		self.EnvoieGrille()
 
 		#Ensuite on envoi le STR a tous avec la liste des joueurs
 		msgListe = Data.listePseudo()
 		self.MessageATous(msgListe)
 
+		nbreJoueurs = len(Data.connectes)
+		clients_a_lire = []
 		# on lance la boucle du jeu
-		while Data.nonEnd :
-			for temp in Data.connectes:
-				self.client_joue_temp = []
-				if Data.connectes[self.client_joue_temp][1]: # On ne gère le joueur que si il est encore connecté
-					MessageATous("WTU{}".format(Data.connectes[self.client_joue_temp][2]))
+		while Data.nonEnd : 	# On boucle tant que le jeu n'est pas terminé
+			self.liste = range(nbreJoueurs)
+			for self.clientQuiJoue in liste: # On boucle sur les indices de la liste Data.connectés sans se soucié que le joueur soit connecté ou non
+
+				if Data.connectes[self.clientQuiJoue][1]: # On ne gère le joueur que si il est encore connecté
+
+					MessageATous("WTU{}".format(Data.connectes[self.clientQuiJoue][2]))
 					self.jouer = False 
-					while  jouer != True: 
-						clients_a_lire = []
+
+					while  self.jouer != True: # tant que le joueur n'a pas fait d'action terminant son tour, on boucle pour lire tout le monde
+
+					
 						try:
-							clients_a_lire, wlist, xlist = select.select(Data.clients_connectes, [], [], 0.05)
+							nouveaux_a_lire, wlist, xlist = select.select(Data.clients_connectes, [], [], 0.05)
 						except select.error:
 							pass
-						else: # On permer aux utres joueurs d'envoyer des données même pendant le tour d'un autre
-							for self.client_temp in clients_a_lire:
+						else: 
+							clients_a_lire.append(nouveaux_a_lire) # on récupère les nouvelles personnes à lire que l'on ajoute à ceux que l'on avait déjà
+
+							for self.clientAutre in clients_a_lire:
+
 								msg_recu = self.client_temp.recv(1024).decode()
-								if self.client_temp == self.clien_joue_temp:
+
+								# Si le joueur a lire est le joueur en cours
+								if self.clientAutre == self.clientQuiJoue:
+									Data.joueur = True
 									if msg_recu[:3] in Data.listeMsgOk:
-										pass
+										MessagesIn(msg_recu[:3],msg_recu[3:])
+								# sinon
 								else:
 									if msg_recu[:3] in Data.listeMsgOkNonJoueur:
-										Messages(msg_recu[:3],msg_recu[3:]) # on traite le message recu
+										MessagesIn(msg_recu[:3],msg_recu[3:]) # on traite le message recu
+
+								Data.joueur = False
+
+			if Sortie() : # sera vrai s'il n'y a plus de joueur dans Data.connecté[][1] à True
+				Data.nonEnd = False # termine le jeu
+
+	def Envoiegrille(self):
+		""" Méthode qui envoie à tous les joueurs encore connectés la grille avec la position de tous les joueurs
+			le joueur à qui l'on envoie la grille est différencié par un X à la palce d'un x """
+		for client in Data.connectes:
+			if Data.connectes[client][1]:
+				grille = Maze.genGrille(Data.liste_connectes[client])
+				grille = grille.encode()
+				client.send(grille)
 
 	def MessageATous(self, message):
 		""" méthode qui envoi à tous les clients encores conectés le message fournnint en entrée"""
-		for client in Data.connectes:
+		for client in Data.liste_connectes:
 			if Data.connectes[client][1]: # on vérifie que le joueur l'on envoie qu'aux joueurs encore connectés
-				Data.connectes[client][0].send(message.encode())
+				Data.liste_connectes[client].send(message.encode())
 
 
-	def Messages(self, tipe, message):
+	def MessagesIn(self, tipe, message):
 		""" Traite la réception des messages en provenance des joueurs """
 		self.message = message
 		messagesTypes = { 
@@ -260,6 +287,34 @@ class Partie(Thread, Data):
 		for cl in Data.connectes:
 			if Data.connectes[cl][0] == Data.connectes[self.client_temp][0]:
 				Data.connectes[cl][2] = self.message
+
+
 	def exi(self):
 		""" Permet de gérer la déconnection d'un joueur """
+		message = "EXI" + self.message
+		self.MessageATous(message)
+		if self.joueur :
+			self.jouer = True
+
+	def mvt(self):
+		self.jouer = True
+		pass
+
+	def mur(self):
+		self.jouer = True
+		pass
+
+	def cre(self):
+		self.jouer = True
+		pass
+
+	def Sortie(self):
+		""" Verifie si il y a encore un joueur de connecté
+			renvoir False si il y a au moins une personne de connectée, True sinon"""
+		nbre = 0
+		for l in Data.connectes:
+			if Data.connectes[l][1]:
+				return False
+		return True
+
 
