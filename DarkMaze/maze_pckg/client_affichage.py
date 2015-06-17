@@ -91,6 +91,10 @@ class Interface(Frame):
 		self.texte_liste.pack(side="left", padx=0, pady=0, expand=0)
 
 
+		################ les variables
+		########################################################################################
+		distance = 1
+
 		################ les boutons
 		########################################################################################
 		Button(self.menu_boutons, text="Commencer", command=self.begin, relief=FLAT, bg="black", fg="ivory", cursor="target").pack(side="left", expand=1)
@@ -168,7 +172,7 @@ class Interface(Frame):
 	def haut(self):
 		if Data.init and Data.start and Data.utu:
 			letype = self.evaluerType()
-			message =  letype + "N"
+			message =  letype + "N" + self.distance
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.utu = False
@@ -176,7 +180,7 @@ class Interface(Frame):
 	def bas(self):
 		if Data.init and Data.start and Data.utu:
 			letype = self.evaluerType()
-			message = letype + "S"
+			message = letype + "S" + self.distance
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.utu = False
@@ -185,7 +189,7 @@ class Interface(Frame):
 	def gauche(self):
 		if Data.init and Data.start and Data.utu:
 			letype = self.evaluerType()
-			message = letype + "O"
+			message = letype + "O" + self.distance
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.utu = False
@@ -194,7 +198,7 @@ class Interface(Frame):
 	def droite(self):
 		if Data.init and Data.start and Data.utu:
 			letype = self.evaluerType()
-			message = letype + "E"
+			message = letype + "E" + self.distance
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.utu = False

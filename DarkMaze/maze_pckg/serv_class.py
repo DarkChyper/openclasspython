@@ -103,6 +103,51 @@ class Maze(Data):
 			sortie += "\n"
 		return sortie
 
+	def mouvement(self, client, x, y, mvt, dist):
+		""" Méthode qui vérifie si le mouvement est valide ou non  et modifie la grille au besoin """
+		u = int(x)
+		v = int(y)
+
+		if mvt == "N":
+			v += dist
+		elif mvt == "E":
+			u += dist
+		elif mvt == "S":
+			v -= dist
+		elif mvt == "O":
+			u -= dist
+		else :
+			return False
+
+		if u >= 0 and u <= self.dim[0] and v >= 0 and v <= self.dim[1]:
+			# le mouvement reste dans la grille, on continue
+
+			if self.grille[v][u] == " " or self.grille[v][u] == "." or self.grille[v][u] == "U":
+				# le mouvement n'arrive pas sur un obstacle, on continue
+
+				if Data.connetces[client][5]: 
+					# si le joueur était sur une porte, on la réaffiche
+
+					self.grille[Data.connectes[client][4]][Data.connectes[client][3]] == "."
+					Data.connetces[client][5] = False
+				else :
+					self.grille[Data.connectes[client][4]][Data.connectes[client][3]] == " "
+
+				if self.grille[v][u] == ".": 
+					# si le joueur arrive sur une porte, on la garde en mémoire
+					Data.connetces[client][5] = True
+
+				Data.connetces[client][3] == u
+				Data.connetces[client][4] == v
+				return True
+
+			else: # si le mouvement cible est un mur ou un autre joueur, mouvement impossible
+				return False
+
+		else : # la position visée est hors grille, mouvement impossible
+			return False
+
+
 
 class Connexion(Data):
 	"""
@@ -248,7 +293,7 @@ class Partie(Thread, Data):
 
 	def Envoiegrille(self):
 		""" Méthode qui envoie à tous les joueurs encore connectés la grille avec la position de tous les joueurs
-			le joueur à qui l'on envoie la grille est différencié par un X à la palce d'un x """
+			le joueur à qui l'on envoie la grille est différencié par un X à la place d'un x """
 		for client in Data.connectes:
 			if Data.connectes[client][1]:
 				grille = Maze.genGrille(Data.liste_connectes[client])
@@ -297,7 +342,20 @@ class Partie(Thread, Data):
 			self.jouer = True
 
 	def mvt(self):
+		""" Méthode qui gère le type Mouvement
+			On indique que le joueur a effectuée une action, même si le mouvement est impossible"""
+
 		self.jouer = True
+		if Data.maze.mouvement(self.ClientQuiJoue, Data.connectes[self.ClientQuiJoue][3], Data.connectes[self.ClientQuiJoue][4], self.message[0], self.message[1]):
+			# on envoie la nouvelle grille à tout le monde
+
+			# on termine le tour du joueur
+			message = "ETU" + Data.connectes[self.clientQuiJoue][2]
+			self.messageATous(message)
+			self.Envoiegrille()
+		else :
+
+
 		pass
 
 	def mur(self):
