@@ -12,6 +12,7 @@ import socket
 import select
 from threading import Thread, RLock
 from random import randrange
+from time import *
 
 # Imports internes
 from .serv_function import *
@@ -147,6 +148,51 @@ class Maze(Data):
 		else : # la position visée est hors grille, mouvement impossible
 			return False
 
+	def murer(self, client, x, y , direction):
+
+
+		if direction == "N":
+			x+= 1
+		elif direction == "E":
+			y += 1
+		elif direction == "S":
+			x -= 1
+		elif direction == "O":
+			y -= 1
+		else :
+			return False
+
+		if x >= 0 and x <= self.dim[0] and y >= 0 and y <= self.dim[1]:
+			if self.grille[y][x] == ".":
+				pself.grille[y][x] = "O"
+				return True
+			else :
+				return False
+		else:
+			return False
+
+	def creuser(self, client, x, y , direction):
+
+
+		if direction == "N":
+			x+= 1
+		elif direction == "E":
+			y += 1
+		elif direction == "S":
+			x -= 1
+		elif direction == "O":
+			y -= 1
+		else :
+			return False
+
+		if x >= 0 and x <= self.dim[0] and y >= 0 and y <= self.dim[1]:
+			if self.grille[y][x] == "O":
+				pself.grille[y][x] = "."
+				return True
+			else :
+				return False
+		else:
+			return False
 
 
 class Connexion(Data):
@@ -160,13 +206,10 @@ class Connexion(Data):
 		print("Le serveur écoute à présent sur le port {}".format(Data.port))
 
 
-class NewClient(Thread, Data):
+class NewClient(Data):
 	"""	Classe définissant le thread qui va ajouter des nouvelles connexions tant que c'est possible"""
 
 	def __init__(self):
-		Thread.__init__(self)
-
-	def run(self):
 		liste_temp = []
 		while Data.addClient:
 			# On va vérifier que de nouveaux clients ne demandent pas à se connecter
@@ -175,7 +218,7 @@ class NewClient(Thread, Data):
 			for connexion in connexions_demandees:
 				connexion_avec_client, infos_connexion = connexion.accept()
 				joueur = []
-				joueur.append(infos_connexion)
+				joueur.append(connexion_avec_client)
 				joueur.append("NoName") # le pseudonyme sera définit plus tard
 				joueur.append(True) 
 				x, y = self.definePosJoueur() # on place au hasard le joueur
@@ -183,15 +226,16 @@ class NewClient(Thread, Data):
 				joueur.append(y)
 				joueur.append(False) # le joueur ne peut être placé sur une porte dès le début.
 				Data.connectes.append(joueur)
-				liste_temp.append(infos_connexion) # une liste des clients temporaire pour envoyer une seule fois le message "La partie peut commencer"
-				Data.clients_connectes.append(infos_connexion) 
+				liste_temp.append(connexion_avec_client) # une liste des clients temporaire pour envoyer une seule fois le message "La partie peut commencer"
+				Data.clients_connectes.append(connexion_avec_client) 
 
 			nombre = len(Data.connectes)
 			if nombre >= Data.nbrJoueursMin: # on ne peut lancer la partie que si il y a au moins n joueurs
 				for temp in liste_temp:
-					client.send("INI".encode())
+					temp.send("INI".encode())
+					sleep(0.5)
 					message = "MSGIl y a " + str(nombre) + " connectés sur le serveur\nCliquez sur \"Commencer\" pour commencer la partie"
-					client.send(message.encode())
+					temp.send(message.encode())
 				liste_temp = []
 
 				# On vérifie si un joueur déja connecté veut lancer la partie
@@ -203,11 +247,14 @@ class NewClient(Thread, Data):
 				else:
 					for client in clients_a_lire:
 						msg_recu = client.recv(1024).decode()
+						Data.printd(msg_recu)
 						if msg_recu[:3] == "INI":
 							Data.addClient = False
 							break
-						if msg_recu[:3] == "PSD"
+						if msg_recu[:3] == "PSD":
 							self.majPseudo(client, msg_recu[3:])
+
+
 	def definePosJoueur(self):
 		"""On place le joueur au hasard sur la map"""
 		longueur = Data.maze.dim[0]
@@ -219,7 +266,9 @@ class NewClient(Thread, Data):
 			if case != "O" and case != "." and case != "U" :
 				dejapris = False
 				t = (x,y)
-				for joueur in Data.connectes:
+				nbreJoueurs = len(Data.connectes)
+				liste = range(nbreJoueurs)
+				for joueur in liste:
 					T = (Data.connectes[joueur][3],Data.connectes[joueur][4])
 					if T == t:
 						dejapris = True
@@ -232,11 +281,12 @@ class Partie(Thread, Data):
 	def __init__(self):
 		""" Déclare les données utiles ppour la partie"""
 		Thread.__init__(self)
-		message : ""
+		message = ""
 		clientAutre = ""
-		clientQuiJoue = ""
-		liste = []
-		joueur = False  # Sera utile lors de la gestion d'un chat, déterminera quel pseudo entre clientAutre et clientQuiJoue
+		IndiceClientQuiJoue = ""
+		nbreJoueurs = len(Data.connectes)
+		liste_indices = range(self.nbreJoueurs)
+		joueur = False  # Sera utile lors de la gestion d'un chat, déterminera quel pseudo entre clientAutre et IndiceClientQuiJoue
 		jouer = False 	# Passera à True si le joueur a fait une action terminant son tour, 
 						# puis repassera a false pour le joueur suivant
 
@@ -250,16 +300,15 @@ class Partie(Thread, Data):
 		msgListe = Data.listePseudo()
 		self.MessageATous(msgListe)
 
-		nbreJoueurs = len(Data.connectes)
+		
 		clients_a_lire = []
 		# on lance la boucle du jeu
 		while Data.nonEnd : 	# On boucle tant que le jeu n'est pas terminé
-			self.liste = range(nbreJoueurs)
-			for self.clientQuiJoue in liste: # On boucle sur les indices de la liste Data.connectés sans se soucié que le joueur soit connecté ou non
+			for self.IndiceClientQuiJoue in self.liste_indices: # On boucle sur les indices de la liste Data.connectés sans se soucié que le joueur soit connecté ou non
 
-				if Data.connectes[self.clientQuiJoue][1]: # On ne gère le joueur que si il est encore connecté
+				if Data.connectes[self.IndiceClientQuiJoue][1]: # On ne gère le joueur que si il est encore connecté
 
-					MessageATous("WTU{}".format(Data.connectes[self.clientQuiJoue][2]))
+					MessageATous("WTU{}".format(Data.connectes[self.IndiceClientQuiJoue][2]))
 					self.jouer = False 
 
 					while  self.jouer != True: # tant que le joueur n'a pas fait d'action terminant son tour, on boucle pour lire tout le monde
@@ -277,7 +326,7 @@ class Partie(Thread, Data):
 								msg_recu = self.client_temp.recv(1024).decode()
 
 								# Si le joueur a lire est le joueur en cours
-								if self.clientAutre == self.clientQuiJoue:
+								if self.clientAutre == self.IndiceClientQuiJoue:
 									Data.joueur = True
 									if msg_recu[:3] in Data.listeMsgOk:
 										MessagesIn(msg_recu[:3],msg_recu[3:])
@@ -291,20 +340,23 @@ class Partie(Thread, Data):
 			if Sortie() : # sera vrai s'il n'y a plus de joueur dans Data.connecté[][1] à True
 				Data.nonEnd = False # termine le jeu
 
-	def Envoiegrille(self):
+		sleep(2)
+		Data.connextion.close()# on coupe la connexion proprement
+
+	def EnvoieGrille(self):
 		""" Méthode qui envoie à tous les joueurs encore connectés la grille avec la position de tous les joueurs
 			le joueur à qui l'on envoie la grille est différencié par un X à la place d'un x """
-		for client in Data.connectes:
+		for client in self.liste_indices:
 			if Data.connectes[client][1]:
-				grille = Maze.genGrille(Data.liste_connectes[client])
+				grille = Maze.genGrille(Data.clients_connectes[client])
 				grille = grille.encode()
-				client.send(grille)
+				Data.clients_connectes[client].send(grille)
 
 	def MessageATous(self, message):
 		""" méthode qui envoi à tous les clients encores conectés le message fournnint en entrée"""
-		for client in Data.liste_connectes:
+		for client in self.liste_indices:
 			if Data.connectes[client][1]: # on vérifie que le joueur l'on envoie qu'aux joueurs encore connectés
-				Data.liste_connectes[client].send(message.encode())
+				Data.clients_connectes[client].send(message.encode())
 
 
 	def MessagesIn(self, tipe, message):
@@ -346,25 +398,64 @@ class Partie(Thread, Data):
 			On indique que le joueur a effectuée une action, même si le mouvement est impossible"""
 
 		self.jouer = True
-		if Data.maze.mouvement(self.ClientQuiJoue, Data.connectes[self.ClientQuiJoue][3], Data.connectes[self.ClientQuiJoue][4], self.message[0], self.message[1]):
+		if Data.maze.mouvement(self.IndiceClientQuiJoue, Data.connectes[self.IndiceClientQuiJoue][3], Data.connectes[self.IndiceClientQuiJoue][4], self.message[0]):
 			# on envoie la nouvelle grille à tout le monde
+			EnvoieGrille()
 
-			# on termine le tour du joueur
-			message = "ETU" + Data.connectes[self.clientQuiJoue][2]
-			self.messageATous(message)
-			self.Envoiegrille()
+			if (Data.connectes[self.IndiceClientQuiJoue][3],Data.connectes[self.IndiceClientQuiJoue][4]) == Data.maze.dim:
+				message = "WIN" + Data.connectes[self.IndiceClientQuiJoue][2]
+				self.MessageATous(message)
+				Data.nonEnd = False
+				self.jouer = True
+			else :	
+				# on termine le tour du joueur
+				message = "ETU" + Data.connectes[self.IndiceClientQuiJoue][2]
+				self.MessageATous(message)
+				self.EnvoieGrille()
 		else :
+			message = "MSG" + "Mouvement Impossible"
+			Data.connectes[self.IndiceClientQuiJoue][0].send(message.encode())
+			sleep(0.5)
+			message = "ETU" + Data.connectes[self.IndiceClientQuiJoue][2]
+			messageATous(message)
 
 
 		pass
 
 	def mur(self):
 		self.jouer = True
-		pass
+		if Data.maze.murer(self.IndiceClientQuiJoue, Data.connectes[self.IndiceClientQuiJoue][3], Data.connectes[self.IndiceClientQuiJoue][4], self.message[0], self.message[1]):
+			message = "MSG" + "La porte a été murée"
+			Data.connectes[self.IndiceClientQuiJoue][0].send(message.encode())
+			sleep(0.5)
+			message = "ETU" + Data.connectes[self.IndiceClientQuiJoue][2]
+			self.MessageATous(message)
+			sleep(0.5)
+			self.EnvoieGrille
+		else:
+			message = "MSG" + "Murage impossible"
+			Data.connectes[self.IndiceClientQuiJoue][0].send(message.encode())
+			sleep(0.5)
+			message = "ETU" + Data.connectes[self.IndiceClientQuiJoue][2]
+			self.MessageATous(message)
+		
 
 	def cre(self):
 		self.jouer = True
-		pass
+		if Data.maze.creuser(self.IndiceClientQuiJoue, Data.connectes[self.IndiceClientQuiJoue][3], Data.connectes[self.IndiceClientQuiJoue][4], self.message[0], self.message[1]):
+			message = "MSG" + "Une porte a été crée"
+			Data.connectes[self.IndiceClientQuiJoue][0].send(message.encode())
+			sleep(0.5)
+			message = "ETU" + Data.connectes[self.IndiceClientQuiJoue][2]
+			self.MessageATous(message)
+			sleep(0.5)
+			self.EnvoieGrille
+		else:
+			message = "MSG" + "Construction d'une porte impossible."
+			Data.connectes[self.IndiceClientQuiJoue][0].send(message.encode())
+			sleep(0.5)
+			message = "ETU" + Data.connectes[self.IndiceClientQuiJoue][2]
+			self.MessageATous(message)
 
 	def Sortie(self):
 		""" Verifie si il y a encore un joueur de connecté

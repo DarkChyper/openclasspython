@@ -6,6 +6,7 @@
 
 # Imports externes
 import socket
+from time import *
 
 # Imports internes
 from .client_class import *
@@ -29,6 +30,7 @@ def Connexion():
 	Data.connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	Data.connexion.connect((Data.hote, Data.port))
 	print("Connexion établie avec le serveur sur le port {}".format(Data.port))
+	sleep(1)
 	message = "PSD" + Data.pseudo
 	message = message.encode()
 	Data.connexion.send(message)

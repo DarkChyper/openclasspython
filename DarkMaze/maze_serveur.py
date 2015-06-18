@@ -27,14 +27,14 @@ def main():
 	connexion = Connexion()
 
 	# On lance le thread pour accepter les nouveaux clients
-	thread_accept = NewClient()
-	thread_accept.start()
-	thread_accept.join()
+	new = NewClient()
 
 	# On lance le thread principal du serveur
 	thread_game = Partie()
 	thread_game.start()
 	thread_game.join()
+
+	
 
 
 

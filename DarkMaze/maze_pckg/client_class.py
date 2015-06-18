@@ -139,14 +139,14 @@ class Data():
 		""" Affiche la fin du tour d'un autre joueur"""
 		printd("On a recu ETU {}".format(Data.donnees))
 		message = "Fin du tour de {}".format(Data.donnees)
-		Data.gestionMSG() # affichage du message
+		Data.gestionMSG(message) # affichage du message
 		Data.gestionListe()
 
 	def msg():
 		printd("On a recu MSG {}".format(Data.donnees))
 		""" Transmet le message à l'affichage """
 		print("Gestion du message")
-		Data.gestionMSG()
+		Data.gestionMSG(Data.donnees)
 
 	def gri():
 		printd("On a recu GRI {}".format(Data.donnees))
@@ -160,7 +160,7 @@ class Data():
 			Data.donnees = "Félicitation, vous avez gagné !!"
 		else:
 			message = "Désolé, vous avez perdu.\n{} est sorti du labyrinthe avant vous.".format(Data.donnees)
-		Data.gestionMSG()
+		Data.gestionMSG(message)
 
 	def exi():
 		""" Affiche qui a quitté la partie """

@@ -14,6 +14,7 @@ class Data():
 	"""
 		classe contenant les données globales
 	"""
+	DEBUG = True
 
 	# Le réseau 
 	#######################################################################
@@ -42,12 +43,17 @@ class Data():
 
 	# Les méthodes 
 	#######################################################################
-	def listePseudo(self):
+	def listePseudo():
 		pseudo = ""
 		pseudo += "STR"
-		for cl in Data.connectes:
-			pseudo += Data.connectes[cl][1] 
+		nbre = len(Data.clients_connectes)
+		liste = range(nbre)
+		for cl in liste:
+			pseudo += Data.connectes[cl][2] 
 			pseudo += ";"
 		return pseudo
 
+	def printd(message):
+		if Data.DEBUG:
+			print(message)
 
