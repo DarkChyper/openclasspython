@@ -129,6 +129,10 @@ class Interface(Frame):
 				self.texte_grille = self.canvas_grille.create_text(230,180,fill="green", text="Please wait") 
 
 		# texte de la console
+		self.texte_console.config(state=NORMAL)
+		self.texte_console.delete("1.0")
+		self.texte_console.insert(INSERT, Data.txtMSG)
+		self.texte_console.config(state=DISABLED)
 		self.texte_console.pack(side="left", padx=0, pady=0, expand=0)
 
 		#texte de la liste
@@ -136,6 +140,7 @@ class Interface(Frame):
 
 		# on boucle si le jeu n'est pas terminé
 		if Data.nonEnd == False:
+			printd(Data.nonEnd)
 			try:
 				self.quit()
 			except RuntimeError: # rustine pour éviter une erreur de sortie liée à une non utilisation d'une file d'attente

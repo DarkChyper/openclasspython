@@ -35,7 +35,7 @@ class Data():
 
 	# La partie
 	#######################################################################
-	nbrJoueursMin = 2
+	nbrJoueursMin = 1
 	maze = None #contient les données du labyrinthe en cours, class Maze
 
 	connectes = [] #liste contenant les clients dans l'ordre de jeu, définition dans le ReadMe

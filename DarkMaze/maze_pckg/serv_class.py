@@ -211,6 +211,7 @@ class NewClient(Data):
 
 	def __init__(self):
 		liste_temp = []
+		i = 0 # compteur de joueur connectes pour éviter d'avoir plusieurs pseudonymes par defaut identiques
 		while Data.addClient:
 			# On va vérifier que de nouveaux clients ne demandent pas à se connecter
 			connexions_demandees, wlist, xlist = select.select([Data.connexion], [], [], 0.05)
@@ -219,7 +220,8 @@ class NewClient(Data):
 				connexion_avec_client, infos_connexion = connexion.accept()
 				joueur = []
 				joueur.append(connexion_avec_client)
-				joueur.append("NoName") # le pseudonyme sera définit plus tard
+				joueur.append("NoName{}".format(str(i))) # le pseudonyme sera définit plus tard
+				i += 1
 				joueur.append(True) 
 				x, y = self.definePosJoueur() # on place au hasard le joueur
 				joueur.append(x)
@@ -233,7 +235,8 @@ class NewClient(Data):
 			if nombre >= Data.nbrJoueursMin: # on ne peut lancer la partie que si il y a au moins n joueurs
 				for temp in liste_temp:
 					temp.send("INI".encode())
-					sleep(0.5)
+					sleep(5)
+					message = ""
 					message = "MSGIl y a " + str(nombre) + " connectés sur le serveur\nCliquez sur \"Commencer\" pour commencer la partie"
 					temp.send(message.encode())
 				liste_temp = []
@@ -245,14 +248,18 @@ class NewClient(Data):
 				except select.error:
 					pass
 				else:
-					for client in clients_a_lire:
+					for client in clients_a_lire: # pour chaque connexion avec le client dans la liste de client à lire
 						msg_recu = client.recv(1024).decode()
 						Data.printd(msg_recu)
 						if msg_recu[:3] == "INI":
 							Data.addClient = False
 							break
-						if msg_recu[:3] == "PSD":
-							self.majPseudo(client, msg_recu[3:])
+						if msg_recu[:3] == "PSD": # si on veut mettre à jour un pseudo
+							nbre = len(Data.clients_connectes)
+							nbre_range = range(nbre)
+							for cl in nbre_range:
+								if Data.connectes[cl][0] == client:
+									Data.connectes[cl][2] = msg_recu[3:]
 
 
 	def definePosJoueur(self):
@@ -273,6 +280,7 @@ class NewClient(Data):
 					if T == t:
 						dejapris = True
 				if dejapris == False :
+					Data.printd("x={};y={}".format(str(x),str(y)))
 					return x, y
 
 
@@ -281,13 +289,13 @@ class Partie(Thread, Data):
 	def __init__(self):
 		""" Déclare les données utiles ppour la partie"""
 		Thread.__init__(self)
-		message = ""
-		clientAutre = ""
-		IndiceClientQuiJoue = ""
-		nbreJoueurs = len(Data.connectes)
-		liste_indices = range(self.nbreJoueurs)
-		joueur = False  # Sera utile lors de la gestion d'un chat, déterminera quel pseudo entre clientAutre et IndiceClientQuiJoue
-		jouer = False 	# Passera à True si le joueur a fait une action terminant son tour, 
+		self.message = ""
+		self.clientAutre = ""
+		self.IndiceClientQuiJoue = ""
+		self.nbreJoueurs = len(Data.connectes)
+		self.liste_indices = range(self.nbreJoueurs)
+		self.joueur = False  # Sera utile lors de la gestion d'un chat, déterminera quel pseudo entre clientAutre et IndiceClientQuiJoue
+		self.jouer = False 	# Passera à True si le joueur a fait une action terminant son tour, 
 						# puis repassera a false pour le joueur suivant
 
 	def run(self):
@@ -346,11 +354,11 @@ class Partie(Thread, Data):
 	def EnvoieGrille(self):
 		""" Méthode qui envoie à tous les joueurs encore connectés la grille avec la position de tous les joueurs
 			le joueur à qui l'on envoie la grille est différencié par un X à la place d'un x """
-		for client in self.liste_indices:
-			if Data.connectes[client][1]:
-				grille = Maze.genGrille(Data.clients_connectes[client])
+		for iclient in self.liste_indices:
+			if Data.connectes[iclient][1]:
+				grille = Maze.genGrille(Data.clients_connectes[iclient])
 				grille = grille.encode()
-				Data.clients_connectes[client].send(grille)
+				Data.clients_connectes[iclient].send(grille)
 
 	def MessageATous(self, message):
 		""" méthode qui envoi à tous les clients encores conectés le message fournnint en entrée"""
