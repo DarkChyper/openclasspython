@@ -49,7 +49,7 @@ class Data():
 		nbre = len(Data.clients_connectes)
 		liste = range(nbre)
 		for cl in liste:
-			pseudo += Data.connectes[cl][2] 
+			pseudo += Data.connectes[cl][1] 
 			pseudo += ";"
 		return pseudo
 

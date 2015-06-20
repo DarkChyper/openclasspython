@@ -50,18 +50,24 @@ class Maze(Data):
 		"""
 			On parcourt toute la grille pour connaitre sa largeur x et sa hauteur y 
 		"""
-		y = 0
-		x = 0
+		y = len(self.grille)
+		x = len(self.grille[0])
+		return (x,y)
+
+		"""y = 0
+		x = 1
 		for car in grille:
 			if car == "\n":
 				y += 1
-				defX = x-2
-				x = 0
+				defX = x-1
+				x = 1
 			x += 1
-		return (defX,y)
+		return (defX,y)"""
 
-	def genGrille(self, client):
-		lsPos, clPos = self.genPos(client) # retourne une liste de tupple contenant les positions des joueurs et un tupple contenant la position du joueur en cours
+	def genGrille(self, donneesdeconnexion):
+		"""
+		"""
+		lsPos, clPos = self.genPos(donneesdeconnexion) # retourne une liste de tupple contenant les positions des joueurs et un tupple contenant la position du joueur en cours
 		longueur = range(self.dim[0])
 		largeur = range(self.dim[1])
 
@@ -75,7 +81,7 @@ class Maze(Data):
 					else :
 						grille += "x" # si le robot n'est pas celui du client à qui l'on envoie la grille
 				else :
-					grille += self.grille[y][X] # si la case n'est pas prise par un robot
+					grille += self.grille[y][x] # si la case n'est pas prise par un robot
 			grille += "\n"
 
 		return grille
@@ -85,10 +91,12 @@ class Maze(Data):
 			ainsi que le tupple de la position du joueur concerné """
 		pass
 		liste = []
-		for cl in Data.connectes:
-			if Data.Connectes[cl][0] == client:
-				clPos = (Data.Connectes[cl][3],Data.Connectes[cl][4])
-			liste.append((Data.Connectes[cl][3],Data.Connectes[cl][4]))
+		nbre = len(Data.connectes)
+		rnbre = range(nbre)
+		for cl in rnbre:
+			if Data.connectes[cl][0] == client:
+				clPos = (Data.connectes[cl][3],Data.connectes[cl][4])
+			liste.append((Data.connectes[cl][3],Data.connectes[cl][4]))
 
 		return liste, clPos
 
@@ -259,7 +267,7 @@ class NewClient(Data):
 							nbre_range = range(nbre)
 							for cl in nbre_range:
 								if Data.connectes[cl][0] == client:
-									Data.connectes[cl][2] = msg_recu[3:]
+									Data.connectes[cl][1] = msg_recu[3:]
 
 
 	def definePosJoueur(self):
@@ -291,6 +299,7 @@ class Partie(Thread, Data):
 		Thread.__init__(self)
 		self.message = ""
 		self.clientAutre = ""
+		self.clients_a_lire = []
 		self.IndiceClientQuiJoue = ""
 		self.nbreJoueurs = len(Data.connectes)
 		self.liste_indices = range(self.nbreJoueurs)
@@ -300,23 +309,24 @@ class Partie(Thread, Data):
 
 	def run(self):
 		""" Thread qui gère toute la partie en cours """
-
+		sleep(2)
 		# on commence par envoyer à tous les joueurs la grille de jeu
+		print("On envoie la grille à tout le monde")
 		self.EnvoieGrille()
 
 		#Ensuite on envoi le STR a tous avec la liste des joueurs
 		msgListe = Data.listePseudo()
 		self.MessageATous(msgListe)
 
-		
-		clients_a_lire = []
+		sleep(2)
+
 		# on lance la boucle du jeu
 		while Data.nonEnd : 	# On boucle tant que le jeu n'est pas terminé
 			for self.IndiceClientQuiJoue in self.liste_indices: # On boucle sur les indices de la liste Data.connectés sans se soucié que le joueur soit connecté ou non
 
-				if Data.connectes[self.IndiceClientQuiJoue][1]: # On ne gère le joueur que si il est encore connecté
+				if Data.connectes[self.IndiceClientQuiJoue][2]: # On ne gère le joueur que si il est encore connecté
 
-					MessageATous("WTU{}".format(Data.connectes[self.IndiceClientQuiJoue][2]))
+					self.MessageATous("WTU{}".format(Data.connectes[self.IndiceClientQuiJoue][1]))
 					self.jouer = False 
 
 					while  self.jouer != True: # tant que le joueur n'a pas fait d'action terminant son tour, on boucle pour lire tout le monde
@@ -327,11 +337,11 @@ class Partie(Thread, Data):
 						except select.error:
 							pass
 						else: 
-							clients_a_lire.append(nouveaux_a_lire) # on récupère les nouvelles personnes à lire que l'on ajoute à ceux que l'on avait déjà
+							self.clients_a_lire.append(nouveaux_a_lire) # on récupère les nouvelles personnes à lire que l'on ajoute à ceux que l'on avait déjà
 
-							for self.clientAutre in clients_a_lire:
-
-								msg_recu = self.client_temp.recv(1024).decode()
+							for self.clientAutre in self.clients_a_lire:
+								print(self.clientAutre)
+								msg_recu = self.clientAutre.recv(1024).decode()
 
 								# Si le joueur a lire est le joueur en cours
 								if self.clientAutre == self.IndiceClientQuiJoue:
@@ -355,10 +365,12 @@ class Partie(Thread, Data):
 		""" Méthode qui envoie à tous les joueurs encore connectés la grille avec la position de tous les joueurs
 			le joueur à qui l'on envoie la grille est différencié par un X à la place d'un x """
 		for iclient in self.liste_indices:
-			if Data.connectes[iclient][1]:
-				grille = Maze.genGrille(Data.clients_connectes[iclient])
+			print("pseudo {} connecion {}".format(Data.connectes[iclient][1],Data.connectes[iclient][2]))
+			if Data.connectes[iclient][2]:
+				grille = Data.maze.genGrille(Data.clients_connectes[iclient])
+				print(grille)
 				grille = grille.encode()
-				Data.clients_connectes[iclient].send(grille)
+				Data.connectes[iclient][0].send(grille)
 
 	def MessageATous(self, message):
 		""" méthode qui envoi à tous les clients encores conectés le message fournnint en entrée"""
@@ -391,7 +403,7 @@ class Partie(Thread, Data):
 			Ne compte pas pour une action du joueur en cours"""
 		for cl in Data.connectes:
 			if Data.connectes[cl][0] == Data.connectes[self.client_temp][0]:
-				Data.connectes[cl][2] = self.message
+				Data.connectes[cl][1] = self.message
 
 
 	def exi(self):

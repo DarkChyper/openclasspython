@@ -92,9 +92,9 @@ class Data():
 			msgTemp += msg 
 			msgTemp += "\n"
 		longueur = len(msgTemp) - 1
-		msgTemp = msgTemp[:longueur] # on ne garde pas le dernier saut de ligne
-		Data.txtMSG = msgTemp # on affiche les nouveaux messages
-		printd(Data.txtMSG)
+		#msgTemp = msgTemp[:longueur] # on ne garde pas le dernier saut de ligne
+		with Data.verrou_msg:
+			Data.txtMSG = msgTemp # on affiche les nouveaux messages
 
 	def gestionListe():
 		""" Crée et modifie la liste des joueurs à afficher et met en avant celui qui doit jouer"""
@@ -105,20 +105,20 @@ class Data():
 			else:
 				message += p + "\n"
 		message = message[:len(message) - 1] # on ne garde pas le dernier saut de ligne
-		Data.txtListe = message
+		with Data.verrou_liste:
+			Data.txtListe = message
 
 	# modules des types possibles
 	def ini():
-		printd("On a recu INI")
 		""" Permet au joueur de lancer la partie """
 		Data.init = True
 
 	def str():
 		"""Initialise la partie, récupère la liste des pseudos des joueurs dans l'ordre du tour par tour"""
-		print("On a recu STR")
-		split = str.split(Data.donnees, "|")
+		split = str.split(Data.donnees, ";")
 		for word in split:
 			Data.players.append(word)
+		Data.donnees = ""
 		Data.gestionListe()
 		Data.start = True
 
@@ -137,25 +137,20 @@ class Data():
 
 	def etu():
 		""" Affiche la fin du tour d'un autre joueur"""
-		printd("On a recu ETU {}".format(Data.donnees))
 		message = "Fin du tour de {}".format(Data.donnees)
 		Data.gestionMSG(message) # affichage du message
 		Data.gestionListe()
 
 	def msg():
-		printd("On a recu MSG {}".format(Data.donnees))
 		""" Transmet le message à l'affichage """
-		print("Gestion du message")
 		Data.gestionMSG(Data.donnees)
 
 	def gri():
-		printd("On a recu GRI {}".format(Data.donnees))
 		""" Transmet la grille à l'affichage """
 		Data.txtGrille = donnees
 
 	def win():
 		""" Affiche qui à gagner et enclenche la fin de la partie """
-		printd("On a recu WIN {}".format(Data.donnees))
 		if Data.donnees == Data.pseudo:
 			Data.donnees = "Félicitation, vous avez gagné !!"
 		else:

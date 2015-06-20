@@ -29,6 +29,14 @@ class Affichage(Thread):
 class Interface(Frame):
 	""" Classe instanciée qui crée notre fenêtre d'affichage et les fonctions des boutons """
 	def __init__(self, fenetre, **kwargs):
+		# des variables pour les méthodes #########################################################
+		###########################################################################################
+		with Data.verrou_msg:
+			self.msg = Data.txtMSG
+
+		with Data.verrou_liste:
+			self.liste = Data.txtListe
+
 		# La fenêtre principale ###################################################################
 		###########################################################################################
 		Frame.__init__(self, fenetre, width=800, height=600,bg="black", **kwargs)
@@ -80,13 +88,13 @@ class Interface(Frame):
 
 		#texte en provenance du serveur
 		self.texte_console = Text(self.msg, wrap=WORD, relief=FLAT, height=10, bg="black", fg="green")
-		self.texte_console.insert(END, Data.txtMSG)
+		self.texte_console.insert(END, self.msg)
 		self.texte_console.config(state=DISABLED)
 		self.texte_console.pack(side="left", padx=0, pady=0, expand=0)
 
 		#liste des joueurs 
 		self.texte_liste = Text(self.menu_liste, wrap=WORD, relief=FLAT, bg="black", fg="green", width=25)
-		self.texte_liste.insert(END, Data.txtListe)
+		self.texte_liste.insert(END, self.liste)
 		self.texte_liste.config(state=DISABLED)
 		self.texte_liste.pack(side="left", padx=0, pady=0, expand=0)
 
@@ -129,14 +137,23 @@ class Interface(Frame):
 				self.texte_grille = self.canvas_grille.create_text(230,180,fill="green", text="Please wait") 
 
 		# texte de la console
-		self.texte_console.config(state=NORMAL)
-		self.texte_console.delete("1.0")
-		self.texte_console.insert(INSERT, Data.txtMSG)
-		self.texte_console.config(state=DISABLED)
-		self.texte_console.pack(side="left", padx=0, pady=0, expand=0)
+		with Data.verrou_msg :
+			if Data.txtMSG != self.msg:
+				self.texte_console.config(state=NORMAL)
+				self.texte_console.delete("1.0","10.0")
+				self.texte_console.insert(END, Data.txtMSG)
+				self.texte_console.config(state=DISABLED)
+				self.texte_console.pack(side="left", padx=0, pady=0, expand=0)
+				self.msg = Data.txtMSG
 
 		#texte de la liste
-		self.texte_liste.pack(side="left", padx=0, pady=0, expand=0)
+		with Data.verrou_liste:
+			if Data.txtListe != self.liste:
+				self.texte_liste.config(state=NORMAL)
+				self.texte_liste.insert(END, Data.txtListe)
+				self.texte_liste.config(state=DISABLED)
+				self.texte_liste.pack(side="left", padx=0, pady=0, expand=0)
+				self.liste = Data.txtListe
 
 		# on boucle si le jeu n'est pas terminé
 		if Data.nonEnd == False:
