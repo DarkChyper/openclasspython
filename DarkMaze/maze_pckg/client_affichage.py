@@ -101,7 +101,7 @@ class Interface(Frame):
 
 		################ les variables
 		########################################################################################
-		distance = 1
+		self.distance = ""
 
 		################ les boutons
 		########################################################################################
@@ -132,15 +132,15 @@ class Interface(Frame):
 		# texte de la grille
 		with Data.verrou_grille :
 			if Data.txtGrille != "":
-				self.texte_grille = self.canvas_grille.create_text(230,180,fill="green", text=Data.txtGrille) 
+				self.texte_grille = self.canvas_grille.create_text(280,180,fill="green",font="LiberationMono", text=Data.txtGrille) 
 			else :
-				self.texte_grille = self.canvas_grille.create_text(230,180,fill="green", text="Please wait") 
+				self.texte_grille = self.canvas_grille.create_text(280,180,fill="green", text="Please wait") 
 
 		# texte de la console
 		with Data.verrou_msg :
 			if Data.txtMSG != self.msg:
 				self.texte_console.config(state=NORMAL)
-				self.texte_console.delete("1.0","10.0")
+				self.texte_console.delete("1.0","20.0")
 				self.texte_console.insert(END, Data.txtMSG)
 				self.texte_console.config(state=DISABLED)
 				self.texte_console.pack(side="left", padx=0, pady=0, expand=0)
@@ -150,6 +150,7 @@ class Interface(Frame):
 		with Data.verrou_liste:
 			if Data.txtListe != self.liste:
 				self.texte_liste.config(state=NORMAL)
+				self.texte_liste.delete("1.0","20.0")
 				self.texte_liste.insert(END, Data.txtListe)
 				self.texte_liste.config(state=DISABLED)
 				self.texte_liste.pack(side="left", padx=0, pady=0, expand=0)
@@ -180,7 +181,7 @@ class Interface(Frame):
 	def evaluerType(self):
 		"""évalue quelle action est demandée par le joueur
 		   retourne MUR pour murer, CRE pour creuser ou MVT dans tous les autres cas (un déplacement par exemple)"""
-		letype = value.get()
+		letype = self.value.get()
 		if letype == "" or letype == "1" or letype == " ":
 			return "MVT"
 		elif letype == "2":
@@ -192,36 +193,36 @@ class Interface(Frame):
 			return "MVT"
 
 	def haut(self):
-		if Data.init and Data.start and Data.utu:
+		if Data.init == False and Data.start and Data.isutu:
 			letype = self.evaluerType()
 			message =  letype + "N" + self.distance
 			with Data.verrou_send :
 				Data.message_send = message
-				Data.utu = False
+				Data.isutu = False
 
 	def bas(self):
-		if Data.init and Data.start and Data.utu:
+		if Data.init == False and Data.start and Data.isutu:
 			letype = self.evaluerType()
 			message = letype + "S" + self.distance
 			with Data.verrou_send :
 				Data.message_send = message
-				Data.utu = False
+				Data.isutu = False
 
 
 	def gauche(self):
-		if Data.init and Data.start and Data.utu:
+		if Data.init == False and Data.start and Data.isutu:
 			letype = self.evaluerType()
 			message = letype + "O" + self.distance
 			with Data.verrou_send :
 				Data.message_send = message
-				Data.utu = False
+				Data.isutu = False
 
 
 	def droite(self):
-		if Data.init and Data.start and Data.utu:
+		if Data.init == False and Data.start and Data.isutu:
 			letype = self.evaluerType()
 			message = letype + "E" + self.distance
 			with Data.verrou_send :
 				Data.message_send = message
-				Data.utu = False
+				Data.isutu = False
 

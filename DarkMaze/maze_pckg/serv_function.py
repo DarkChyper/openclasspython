@@ -40,7 +40,6 @@ def initMazes():
 			with open(chemin, "r") as fichier:
 				grille = fichier.read()
 				maze = Maze(nom_maze,grille)
-				print(maze)
 				mazes.append(maze)
 	return mazes
 

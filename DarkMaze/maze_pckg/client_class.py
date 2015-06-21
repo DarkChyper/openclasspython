@@ -55,7 +55,7 @@ class Data():
 	start = False # Passe à True quand le serveur démarrer la partie
 	exit = False  # Passe à True quand le joueur décide de quitter la partie
 	players = []
-	utu = False   # définit si c'est le tour du joueur ou non
+	isutu = False   # définit si c'est le tour du joueur ou non
 
 	# Méthodes
 	##################################################################################
@@ -70,7 +70,7 @@ class Data():
 			messagesTypes = { 
 			"INI":Data.ini,
 			"STR":Data.str,
-			"WTU":Data.utu,
+			"WTU":Data.wtu,
 			"MSG":Data.msg,
 			"GRI":Data.gri,
 			"WIN":Data.win,
@@ -115,6 +115,7 @@ class Data():
 
 	def str():
 		"""Initialise la partie, récupère la liste des pseudos des joueurs dans l'ordre du tour par tour"""
+		Data.init = False
 		split = str.split(Data.donnees, ";")
 		for word in split:
 			Data.players.append(word)
@@ -124,14 +125,14 @@ class Data():
 
 	def wtu():
 		""" Gére la réception d'un message indiquant à qui est le tour de jeu"""
+		Data.gestionListe()
 		if Data.donnees == Data.pseudo:
-			Data.utu = True
-			Data.gestionListe(Data.pseudo)
+			Data.isutu = True
+			
 			message = "C'est le début de votre tour !"
 			Data.gestionMSG(message) # affichage du message
 		else:
-			Data.utu = False
-			Data.gestionListe(Data.donnees)
+			Data.isutu = False
 			message = "C'est le début du tour de {} !".format(Data.donnees)
 			Data.gestionMSG(message) # affichage du message
 
@@ -147,7 +148,7 @@ class Data():
 
 	def gri():
 		""" Transmet la grille à l'affichage """
-		Data.txtGrille = donnees
+		Data.txtGrille = Data.donnees
 
 	def win():
 		""" Affiche qui à gagner et enclenche la fin de la partie """
@@ -199,6 +200,7 @@ class ConnexionWrite(Thread, Data):
 		while Data.nonEnd:
 			with Data.verrou_send:
 				if Data.message_send != "":
+					print("SEND => {}".format(Data.message_send))
 					message = Data.message_send.encode()
 					Data.connexion.send(message)
 					Data.message_send = ""

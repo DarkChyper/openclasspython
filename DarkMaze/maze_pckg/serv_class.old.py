@@ -13,7 +13,6 @@ import select
 from threading import Thread, RLock
 from random import randrange
 from time import *
-import re
 
 # Imports internes
 from .serv_function import *
@@ -137,20 +136,20 @@ class Maze(Data):
 			if self.grille[v][u] == " " or self.grille[v][u] == "." or self.grille[v][u] == "U":
 				# le mouvement n'arrive pas sur un obstacle, on continue
 
-				if Data.connectes[client][5]: 
+				if Data.connetces[client][5]: 
 					# si le joueur était sur une porte, on la réaffiche
 
 					self.grille[Data.connectes[client][4]][Data.connectes[client][3]] == "."
-					Data.connectes[client][5] = False
+					Data.connetces[client][5] = False
 				else :
 					self.grille[Data.connectes[client][4]][Data.connectes[client][3]] == " "
 
 				if self.grille[v][u] == ".": 
 					# si le joueur arrive sur une porte, on la garde en mémoire
-					Data.connectes[client][5] = True
+					Data.connetces[client][5] = True
 
-				Data.connectes[client][3] == u
-				Data.connectes[client][4] == v
+				Data.connetces[client][3] == u
+				Data.connetces[client][4] == v
 				return True
 
 			else: # si le mouvement cible est un mur ou un autre joueur, mouvement impossible
@@ -212,13 +211,7 @@ class Connexion(Data):
 	"""
 	def __init__(self):
 		Data.connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		while 1:
-			try :
-				Data.connexion.bind((Data.hote, Data.port))
-			except OSError: # si on relance trop vite le serveur et que la connexion est deja utilisée, on boucle
-				pass
-			else:
-				break
+		Data.connexion.bind((Data.hote, Data.port))
 		Data.connexion.listen(5)
 		print("Le serveur écoute à présent sur le port {}".format(Data.port))
 
@@ -273,32 +266,13 @@ class NewClient(Data):
 								Data.addClient = False
 								break
 							if msg_recu[:3] == "PSD": # si on veut mettre à jour un pseudo
-								Data.connectes[Data.clients_connectes.index(client)][1] = msg_recu[3:]
-
-
-		while 1: # on boucle tant que tous les joueurs connectes n'ont pas envoyé leur pseudonyme
-			sortie = True
-			expression = "^(NoName)[0-9]{1:}$"
-			for client_a_verifier in Data.connectes:
-				pseudo = client_a_verifier[1]
-				if re.match(expression, pseudo):
-					sortie = False
-					break
-
-			if sortie:
-				break
-			else :
-				clients_a_lire = []
-				try:
-					clients_a_lire, wlist, xlist = select.select(Data.clients_connectes, [], [], 0.05)
-				except select.error:
-					pass
-				else:
-					for client in clients_a_lire: # pour chaque connexion avec le client dans la liste de client à lire
-						if Data.connectes[Data.clients_connectes.index(client)][2]:
-							msg_recu = client.recv(1024).decode()
-							if msg_recu[:3] == "PSD": # si on veut mettre à jour un pseudo
-								Data.connectes[Data.clients_connectes.index(client)][1] = msg_recu[3:]
+								nbre = len(Data.clients_connectes)
+								nbre_range = range(nbre)
+								for cl in nbre_range:
+									if Data.connectes[cl][0] == client:
+										Data.connectes[cl][1] = msg_recu[3:]
+						else : 
+							continue
 
 
 	def definePosJoueur(self):
@@ -359,29 +333,33 @@ class Partie(Thread, Data):
 
 				if Data.connectes[self.IndiceClientQuiJoue][2]: # On ne gère le joueur que si il est encore connecté
 
-					# On indique à tous les joueur lequel est en train de jouer
 					self.MessageATous("WTU{}".format(Data.connectes[self.IndiceClientQuiJoue][1]))
-
-					# on initialise le tour du joueur
 					self.jouer = False 
-					dataClientQuiJoue = [Data.connectes[self.IndiceClientQuiJoue][0]]
-
 
 					while  self.jouer != True: # tant que le joueur n'a pas fait d'action terminant son tour, on boucle pour lire tout le monde
 
 						nouveaux_a_lire = []
 						try:
-							nouveaux_a_lire, wlist, xlist = select.select(dataClientQuiJoue, [], [], 0.05)
+							nouveaux_a_lire, wlist, xlist = select.select(Data.clients_connectes, [], [], 0.05)
 						except select.error:
 							print("rien a lire")
 							continue
 						else: 
-							Data.joueur = True
 
 							for self.clientAutre in nouveaux_a_lire:
 								msg_recu = self.clientAutre.recv(1024).decode()
-								if msg_recu[:3] in Data.listeMsgOk:
+
+								# Si le joueur a lire est le joueur en cours
+								if self.clientAutre == self.IndiceClientQuiJoue:
+									Data.joueur = True
+									if msg_recu[:3] in Data.listeMsgOk:
 										self.MessagesIn(msg_recu[:3],msg_recu[3:])
+								# sinon
+								else:
+									if msg_recu[:3] in Data.listeMsgOkNonJoueur:
+										self.MessagesIn(msg_recu[:3],msg_recu[3:]) # on traite le message recu
+
+								Data.joueur = False
 
 			if Sortie() : # sera vrai s'il n'y a plus de joueur dans Data.connecté[][1] à True
 				Data.nonEnd = False # termine le jeu
@@ -420,7 +398,7 @@ class Partie(Thread, Data):
 
 	def msg(self):
 		""" Fonctionnalité future qui renverra à tous les joueurs connectés le message d'un joueur
- 			Ne compte pas pour une action du joueur en cours"""
+			Ne compte pas pour une action du joueur en cours"""
 		pass
 
 	def psd(self):
@@ -444,9 +422,9 @@ class Partie(Thread, Data):
 			On indique que le joueur a effectuée une action, même si le mouvement est impossible"""
 
 		self.jouer = True
-		if Data.maze.mouvement(self.IndiceClientQuiJoue, Data.connectes[self.IndiceClientQuiJoue][3], Data.connectes[self.IndiceClientQuiJoue][4], self.message[0], 1):
+		if Data.maze.mouvement(self.IndiceClientQuiJoue, Data.connectes[self.IndiceClientQuiJoue][3], Data.connectes[self.IndiceClientQuiJoue][4], self.message[0]):
 			# on envoie la nouvelle grille à tout le monde
-			self.EnvoieGrille()
+			EnvoieGrille()
 
 			if (Data.connectes[self.IndiceClientQuiJoue][3],Data.connectes[self.IndiceClientQuiJoue][4]) == Data.maze.dim:
 				message = "WIN" + Data.connectes[self.IndiceClientQuiJoue][2]

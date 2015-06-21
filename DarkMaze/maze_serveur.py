@@ -22,8 +22,7 @@ def main():
 	"""
 	# Initialisation du serveur
 	initGame()
-
-	print(Data.maze)
+	
 	# démarrage du serveur
 	connexion = Connexion()
 
