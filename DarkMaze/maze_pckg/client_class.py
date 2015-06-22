@@ -71,6 +71,7 @@ class Data():
 			"INI":Data.ini,
 			"STR":Data.str,
 			"WTU":Data.wtu,
+			"ETU":Data.etu,
 			"MSG":Data.msg,
 			"GRI":Data.gri,
 			"WIN":Data.win,
