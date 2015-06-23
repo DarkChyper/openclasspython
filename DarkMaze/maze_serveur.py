@@ -11,11 +11,11 @@ from socket import *
 from time import *
 
 # Imports internes
-from sv_clientsIn import *
-from sv_data import *
-from sv_function import *
-from sv_maze import *
-from sv_partie import *
+from server_pckg.sv_clientsIn import *
+from server_pckg.sv_data import *
+from server_pckg.sv_function import *
+from server_pckg.sv_maze import *
+from server_pckg.sv_partie import *
 
 # Début du programme
 def main():

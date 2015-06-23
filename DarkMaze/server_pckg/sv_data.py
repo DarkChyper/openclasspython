@@ -8,8 +8,8 @@ import select
 from threading import Thread, RLock
 
 # Imports internes
-from sv_function import *
-from sv_maze import *
+from .sv_function import *
+from .sv_maze import *
 
 class Data():
 	"""
@@ -58,3 +58,20 @@ class Data():
 		if Data.DEBUG:
 			print(message)
 			
+
+class Connexion(Data):
+	"""
+		ensemble des méthodes concernant les connexion TCP
+	"""
+	def __init__(self):
+		Data.connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		while 1:
+			try :
+				Data.connexion.bind((Data.hote, Data.port))
+			except OSError: # si on relance trop vite le serveur et que la connexion est deja utilisée, on boucle
+				pass
+			else:
+				break
+		Data.connexion.listen(5)
+		print("Le serveur écoute à présent sur le port {}".format(Data.port))
+		

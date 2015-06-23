@@ -11,24 +11,8 @@ from time import *
 import re
 
 # Imports internes
-from sv_data import *
-from sv_maze import *
-
-class Connexion(Data):
-	"""
-		ensemble des méthodes concernant les connexion TCP
-	"""
-	def __init__(self):
-		Data.connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		while 1:
-			try :
-				Data.connexion.bind((Data.hote, Data.port))
-			except OSError: # si on relance trop vite le serveur et que la connexion est deja utilisée, on boucle
-				pass
-			else:
-				break
-		Data.connexion.listen(5)
-		print("Le serveur écoute à présent sur le port {}".format(Data.port))
+from .sv_data import *
+from .sv_maze import *
 
 def askPseudo():
 	""" Fonction qui oucle tant que tous les joueurs n'ont pas envoyer leur pseudo"""

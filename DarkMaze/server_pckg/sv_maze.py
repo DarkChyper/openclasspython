@@ -11,11 +11,11 @@ from time import *
 import re
 
 # Imports internes
-from sv_data import *
-from sv_function import *
+from .sv_data import *
+from .sv_function import *
 
 
-class Maze(Data):
+class Maze():
 	"""Classe définissant une carte de labyrinthe avec toutes ses caractéristiques"""
 
 	def __init__(self, nom_carte, grille):

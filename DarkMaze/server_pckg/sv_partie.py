@@ -11,9 +11,9 @@ from time import *
 import re
 
 # Imports internes
-from sv_data import *
-from sv_function import *
-from sv_maze import *
+from .sv_data import *
+from .sv_function import *
+from .sv_maze import *
 
 class Partie(Thread, Data):
 
