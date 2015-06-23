@@ -14,7 +14,7 @@ from .client_affichage import *
 
 def Pseudo():
 	"""
-		On va demander u joueur de s'identifier
+		On va demander au joueur de s'identifier
 	"""
 	while 1:
 		pseudo = input("Quel est votre pseudonyme ? : ")
@@ -35,12 +35,15 @@ def Connexion():
 	message = message.encode()
 	Data.connexion.send(message)
 
-def Deconnexion():
-	with Data.verrou_send:
+def Deconnexion(turn=False):
+	if turn:
+		with Data.verrou_send:
 			Data.message_send = "EXI" + Data.pseudo
-	sleep(1)
-	Data.connexion.close()
+			sleep(1)
 	Data.nonEnd = False
+	sleep(2)
+	Data.connexion.close()
+	
 
 
 def printd(donnees):

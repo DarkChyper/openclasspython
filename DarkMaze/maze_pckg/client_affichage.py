@@ -22,6 +22,7 @@ class Affichage(Thread):
 	def run(self, **kwargs):
 		
 		fenetre = Tk()
+
 		self.interface = Interface(fenetre)
 		self.interface.mainloop()
 		self.interface.destroy()
@@ -29,6 +30,7 @@ class Affichage(Thread):
 class Interface(Frame):
 	""" Classe instanciée qui crée notre fenêtre d'affichage et les fonctions des boutons """
 	def __init__(self, fenetre, **kwargs):
+		fenetre.protocol("WM_DELETE_WINDOW", self.quitter)
 		# des variables pour les méthodes #########################################################
 		###########################################################################################
 		with Data.verrou_msg:
@@ -175,7 +177,10 @@ class Interface(Frame):
 
 	def quitter(self):
 		""" Fermeture propre des connexions, du jeu et des fenetres """
-		Deconnexion() 
+		if Data.init == False and Data.start and Data.isutu:
+			Deconnexion() 
+		else :
+			Deconnexion(True) 
 		
 
 	def evaluerType(self):

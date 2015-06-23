@@ -358,6 +358,11 @@ class Partie(Thread, Data):
 		# on lance la boucle du jeu
 		while Data.nonEnd : 	# On boucle tant que le jeu n'est pas terminé
 			for self.IndiceClientQuiJoue in self.liste_indices: # On boucle sur les indices de la liste Data.connectés sans se soucié que le joueur soit connecté ou non
+				# on test si le joueur est encore connecté
+				try:
+					Data.connectes[self.IndiceClientQuiJoue][0].send("PING".encode())
+				except socket.error:
+					print("Joueur déconnecté")
 
 				if Data.connectes[self.IndiceClientQuiJoue][2]: # On ne gère le joueur que si il est encore connecté
 
