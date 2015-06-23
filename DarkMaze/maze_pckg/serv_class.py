@@ -28,6 +28,7 @@ class Maze(Data):
 		self.nom = nom_carte
 		self.grille = self.strToList(grille)
 		self.dim = self.defDimensions(grille) # tupple (x,y)
+		self.sortie = self.defSortie(self.grille) # tupple (x,y)
 
 	def strToList(self, grille):
 		"""
@@ -55,15 +56,17 @@ class Maze(Data):
 		x = len(self.grille[0])
 		return (x,y)
 
-		"""y = 0
-		x = 1
-		for car in grille:
-			if car == "\n":
-				y += 1
-				defX = x-1
-				x = 1
-			x += 1
-		return (defX,y)"""
+	def defSortie(self, grille):
+		""" Méthode qui retourne un tupple des coordonnees de la sortie du labyrinthe"""
+		x = 0
+		y = 0
+		for ligne in grille:
+			for case in ligne:
+				if case == "S":
+					return (x,y)
+				x += 1
+			x = 0
+			y += 1
 
 	def genGrille(self, donneesdeconnexion):
 		"""
@@ -452,7 +455,7 @@ class Partie(Thread, Data):
 			
 			sleep(1)
 
-			if (Data.connectes[self.IndiceClientQuiJoue][3],Data.connectes[self.IndiceClientQuiJoue][4]) == Data.maze.dim:
+			if (Data.connectes[self.IndiceClientQuiJoue][3],Data.connectes[self.IndiceClientQuiJoue][4]) == Data.maze.sortie:
 				message = "WIN" + Data.connectes[self.IndiceClientQuiJoue][1]
 				self.MessageATous(message)
 				Data.nonEnd = False
