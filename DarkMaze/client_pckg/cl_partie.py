@@ -4,13 +4,14 @@
 """ Interface client"""
 
 # Imports externes
+import socket
 from threading import Thread, RLock
-from tkinter import *
 from time import *
+from tkinter import *
 
-# Imports interne
-from .client_class import *
-from .client_function import *
+# Imports internes
+from .cl_function import *
+from .cl_data import *
 
 
 class Affichage(Thread):
@@ -230,4 +231,3 @@ class Interface(Frame):
 			with Data.verrou_send :
 				Data.message_send = message
 				Data.isutu = False
-

@@ -5,12 +5,14 @@
 """
 
 # Imports externes
+import socket
 from threading import Thread, RLock
 from time import *
+from tkinter import *
 
-# Imports interne
-
-
+# Imports internes
+from .cl_partie import *
+from .cl_function import *
 
 class Data():
 	"""
@@ -162,53 +164,3 @@ class Data():
 	def exi():
 		""" Affiche qui a quitté la partie """
 		message = "{} a quitté la partie".format(Data.donnees)
-
-
-class ConnexionRead(Thread, Data):
-	"""
-		Class qui va lire les données en provenance du serveur
-	"""
-	def __init__(self):
-		Thread.__init__(self)
-
-	def run(self):
-		while Data.nonEnd:
-			with Data.verrou_receiv:
-				# On commence par vérifier si il y a des messages en arrivée
-				Data.msg_recu = Data.connexion.recv(1024)
-
-				# On traite le message si il n'est pas vide
-				if Data.msg_recu != "":
-					msgBrut = Data.msg_recu.decode()
-					
-					if msgBrut[:3] in Data.typesOK:
-						printd(msgBrut) ##AFFICHAGE DE DEBUG
-						leType = msgBrut[:3]
-						donnees = msgBrut[3:]
-						Data.Messages(leType, donnees)
-
-			# On attend 50 ms
-			sleep(0.05)
-
-class ConnexionWrite(Thread, Data):
-	"""
-		Class qui va envoyer des messages au serveur
-	"""
-	def __init__(self):
-		Thread.__init__(self)
-
-	def run(self):
-		while Data.nonEnd:
-			with Data.verrou_send:
-				if Data.message_send != "":
-					print("SEND => {}".format(Data.message_send))
-					message = Data.message_send.encode()
-					Data.connexion.send(message)
-					Data.message_send = ""
-
-			sleep(0.08)
-
-def printd(donnees):
-	"""Affichage de débogage """
-	if Data.debug:
-		print(donnees)

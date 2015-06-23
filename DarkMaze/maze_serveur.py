@@ -11,8 +11,11 @@ from socket import *
 from time import *
 
 # Imports internes
-from maze_pckg.serv_function import *
-from maze_pckg.serv_class import *
+from sv_clientsIn import *
+from sv_data import *
+from sv_function import *
+from sv_maze import *
+from sv_partie import *
 
 # Début du programme
 def main():

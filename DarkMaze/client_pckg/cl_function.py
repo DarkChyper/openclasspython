@@ -6,11 +6,14 @@
 
 # Imports externes
 import socket
+from threading import Thread, RLock
 from time import *
+from tkinter import *
 
 # Imports internes
-from .client_class import *
-from .client_affichage import *
+from .cl_partie import *
+from .cl_data import *
+
 
 def Pseudo():
 	"""

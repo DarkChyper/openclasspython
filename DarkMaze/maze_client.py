@@ -9,9 +9,11 @@ import socket
 from threading import Thread, RLock
 
 # Imports internes
-from maze_pckg.client_affichage import *
-from maze_pckg.client_class import *
-from maze_pckg.client_function import *
+from client_pckg.cl_data import *
+from client_pckg.cl_function import *
+from client_pckg.cl_read import *
+from client_pckg.cl_partie import *
+from client_pckg.cl_write import *
 
 # Début du programme
 def main():
