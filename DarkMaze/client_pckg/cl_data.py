@@ -11,8 +11,7 @@ from time import *
 from tkinter import *
 
 # Imports internes
-from .cl_partie import *
-from .cl_function import *
+
 
 class Data():
 	"""

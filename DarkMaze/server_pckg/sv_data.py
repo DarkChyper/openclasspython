@@ -8,8 +8,6 @@ import select
 from threading import Thread, RLock
 
 # Imports internes
-from .sv_function import *
-from .sv_maze import *
 
 class Data():
 	"""
