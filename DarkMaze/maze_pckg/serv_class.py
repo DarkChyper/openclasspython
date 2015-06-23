@@ -473,7 +473,7 @@ class Partie(Thread, Data):
 	def mur(self):
 		self.jouer = True
 		if Data.maze.murer(self.IndiceClientQuiJoue, Data.connectes[self.IndiceClientQuiJoue][3], Data.connectes[self.IndiceClientQuiJoue][4], self.message[0]):
-			self.EnvoieGrille
+			self.EnvoieGrille()
 
 			sleep(1)
 
@@ -498,7 +498,7 @@ class Partie(Thread, Data):
 	def cre(self):
 		self.jouer = True
 		if Data.maze.creuser(self.IndiceClientQuiJoue, Data.connectes[self.IndiceClientQuiJoue][3], Data.connectes[self.IndiceClientQuiJoue][4], self.message[0]):
-			self.EnvoieGrille
+			self.EnvoieGrille()
 
 			sleep(1)
 
