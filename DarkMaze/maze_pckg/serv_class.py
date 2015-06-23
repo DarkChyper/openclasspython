@@ -393,6 +393,7 @@ class Partie(Thread, Data):
 	def EnvoieGrille(self):
 		""" Méthode qui envoie à tous les joueurs encore connectés la grille avec la position de tous les joueurs
 			le joueur à qui l'on envoie la grille est différencié par un X à la place d'un x """
+		Data.printd("On env")
 		for iclient in self.liste_indices:
 			if Data.connectes[iclient][2]:
 				grille = Data.maze.genGrille(Data.clients_connectes[iclient])
