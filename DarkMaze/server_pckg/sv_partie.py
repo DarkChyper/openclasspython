@@ -32,29 +32,35 @@ class Partie(Thread, Data):
 
 	def run(self):
 		""" Thread qui gère toute la partie en cours """
-		sleep(2)
+		sleep(1)
 		# on commence par envoyer à tous les joueurs la grille de jeu
 		print("On envoie la grille à tout le monde")
 		self.EnvoieGrille()
 
-		sleep(2)
+		sleep(1)
 
 		#Ensuite on envoi le STR a tous avec la liste des joueurs
 		msgListe = Data.listePseudo()
 		self.MessageATous(msgListe)
 
-		sleep(2)
+		sleep(1)
 
 		# on lance la boucle du jeu
 		while Data.nonEnd : 	# On boucle tant que le jeu n'est pas terminé
 			for self.IndiceClientQuiJoue in self.liste_indices: # On boucle sur les indices de la liste Data.connectés sans se soucié que le joueur soit connecté ou non
-				# on test si le joueur est encore connecté
-				try:
-					Data.connectes[self.IndiceClientQuiJoue][0].send("PING".encode())
-				except socket.error:
-					print("Joueur déconnecté")
 
 				if Data.connectes[self.IndiceClientQuiJoue][2]: # On ne gère le joueur que si il est encore connecté
+
+					# on test si le joueur est encore connecté
+					try:
+						Data.connectes[self.IndiceClientQuiJoue][0].send("PING".encode())
+					except IOError, e:
+						if e.errno == errno.EPIPE:
+							Data.printd("Joueur {} déconnecté.".format(Data.connectes[self.IndiceClientQuiJoue][1]))
+							self.deconnect(self.IndiceClientQuiJoue)
+							continue
+
+					sleep(0.5)
 
 					# On indique à tous les joueur lequel est en train de jouer
 					self.MessageATous("WTU{}".format(Data.connectes[self.IndiceClientQuiJoue][1]))
@@ -88,6 +94,10 @@ class Partie(Thread, Data):
 		sleep(2)
 		Data.connextion.close()# on coupe la connexion proprement
 
+	def deconnect(self, indice):
+		""" A partir de l'indice du joueur, on passe le booléen Data.connectes[indice][2] à False """
+		Data.connectes[indice][2] = False
+
 	def EnvoieGrille(self):
 		""" Méthode qui envoie à tous les joueurs encore connectés la grille avec la position de tous les joueurs
 			le joueur à qui l'on envoie la grille est différencié par un X à la place d'un x """
@@ -100,8 +110,15 @@ class Partie(Thread, Data):
 	def MessageATous(self, message):
 		""" méthode qui envoi à tous les clients encores conectés le message fournnint en entrée"""
 		for client in self.liste_indices:
-			if Data.connectes[client][1]: # on vérifie que le joueur l'on envoie qu'aux joueurs encore connectés
-				Data.clients_connectes[client].send(message.encode())
+			if Data.connectes[client][2]: # on vérifie que le joueur l'on envoie qu'aux joueurs encore connectés
+				try:
+					Data.clients_connectes[client].send(message.encode())
+				except IOError, e:
+						if e.errno == errno.EPIPE:
+							Data.printd("Joueur {} déconnecté.".format(Data.connectes[client][1]))
+							self.deconnect(client)
+							continue
+				sleep(0.5)
 
 
 	def MessagesIn(self, tipe, message):
@@ -137,6 +154,7 @@ class Partie(Thread, Data):
 		self.MessageATous(message)
 		if self.joueur :
 			self.jouer = True
+
 
 	def mvt(self):
 		""" Méthode qui gère le type Mouvement

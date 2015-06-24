@@ -137,7 +137,7 @@ class Interface(Frame):
 			if Data.txtGrille != "":
 				self.texte_grille = self.canvas_grille.create_text(280,180,fill="green",font="LiberationMono", text=Data.txtGrille) 
 			else :
-				self.texte_grille = self.canvas_grille.create_text(280,180,fill="green", text="Please wait") 
+				self.texte_grille = self.canvas_grille.create_text(280,180,fill="green", text="En attente de joueur") 
 
 		# texte de la console
 		with Data.verrou_msg :
@@ -179,7 +179,7 @@ class Interface(Frame):
 	def quitter(self):
 		""" Fermeture propre des connexions, du jeu et des fenetres """
 		if Data.init == False and Data.start and Data.isutu:
-			Deconnexion() 
+			Deconnexion(False) 
 		else :
 			Deconnexion(True) 
 		

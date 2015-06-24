@@ -43,7 +43,7 @@ class Data():
 	# donnees des messages
 	##################################################################################
 	typesOK = ["INI","STR","WTU","ETU","MSG","GRI","WIN"]
-	longMSG = 3      # définit combien de messages sont gardés en mémoire pour l'affichage
+	longMSG = 5      # définit combien de messages sont gardés en mémoire pour l'affichage
 	txtGrille = ""   # affichge de la grille
 	txtMSG = ""      # affichage des messages du serveur
 	txtListe = ""    # affichage de la liste des joueurs
@@ -114,6 +114,8 @@ class Data():
 	def ini():
 		""" Permet au joueur de lancer la partie """
 		Data.init = True
+		with Data.verrou_msg :
+			Data.gestionMSG("MSGPartie initialisée, veuillez attendre la réponse du serveur.")
 
 	def str():
 		"""Initialise la partie, récupère la liste des pseudos des joueurs dans l'ordre du tour par tour"""

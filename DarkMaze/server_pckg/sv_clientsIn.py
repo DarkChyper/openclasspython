@@ -75,3 +75,4 @@ class NewClient(Data):
 								Data.connectes[Data.clients_connectes.index(client)][1] = msg_recu[3:]
 		# on attend l'arrivée des pseudosnymes de tous les joueurs connectés
 		null = askPseudo()
+		sleep(5)

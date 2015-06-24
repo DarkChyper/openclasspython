@@ -96,7 +96,9 @@ class Maze():
 		for cl in rnbre:
 			if Data.connectes[cl][0] == client:
 				clPos = (Data.connectes[cl][3],Data.connectes[cl][4])
-			liste.append((Data.connectes[cl][3],Data.connectes[cl][4]))
+			if Data.connectes[cl][2]:
+				# on n'affiche le robot que si le joueur est encore connecté
+				liste.append((Data.connectes[cl][3],Data.connectes[cl][4]))
 
 		return liste, clPos
 
@@ -130,7 +132,7 @@ class Maze():
 		if u >= 0 and u <= self.dim[0] and v >= 0 and v <= self.dim[1]:
 			# le mouvement reste dans la grille, on continue
 
-			if self.grille[v][u] == " " or self.grille[v][u] == "." or self.grille[v][u] == "U":
+			if self.grille[v][u] == " " or self.grille[v][u] == "." or self.grille[v][u] == "U" or self.NonPris((u,v)) == True:
 				# le mouvement n'arrive pas sur un obstacle, on continue
 
 				if Data.connectes[client][5]: 
@@ -201,3 +203,16 @@ class Maze():
 				return False
 		else:
 			return False
+
+	def nonPris(self, positionATester):
+		""" Prend un tupple de position à tester (x, y
+			Parcourt les clients encore connectés et compare les positions des robots
+			Si la positionATester == la position d'un autre robot, renvoie False
+			Sinon renvoi True"""
+
+		for donneesCLient in Data.connectes:
+			if Data.connectes[donneesClient][2]:
+				if (Data.connectes[donneesClient][3],Data.connectes[donneesClient][4]) == positionATester:
+					return False
+		return True
+
