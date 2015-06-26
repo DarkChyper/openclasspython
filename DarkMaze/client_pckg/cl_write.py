@@ -35,3 +35,5 @@ class ConnexionWrite(Thread, Data):
 					Data.message_send = ""
 
 			sleep(0.08)
+			if not Data.nonEnd:
+				printd("WRITE => {}".format(Data.nonEnd))

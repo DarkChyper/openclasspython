@@ -114,12 +114,14 @@ class Data():
 	def ini():
 		""" Permet au joueur de lancer la partie """
 		Data.init = True
-		with Data.verrou_msg :
-			Data.gestionMSG("MSGPartie initialisée, veuillez attendre la réponse du serveur.")
 
 	def str():
 		"""Initialise la partie, récupère la liste des pseudos des joueurs dans l'ordre du tour par tour"""
 		Data.init = False
+		with Data.verrou_msg :
+			Data.gestionMSG("******************")
+			Data.gestionMSG("DEBUT DE LA PARTIE")
+			Data.gestionMSG("******************")
 		split = str.split(Data.donnees, ";")
 		for word in split:
 			Data.players.append(word)

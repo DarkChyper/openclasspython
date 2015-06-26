@@ -173,15 +173,17 @@ class Interface(Frame):
 		""" Méthode qui lance la partie lorsque le joueur appuie sur le bouton"""
 		if Data.init == True and Data.start == False :
 			Data.init = False
+			with Data.verrou_msg:
+				Data.gestionMSG("Initialisation envoyée au serveur, merci de patienter.")
 			with Data.verrou_send:
 				Data.message_send = "INI" + Data.pseudo
 
 	def quitter(self):
 		""" Fermeture propre des connexions, du jeu et des fenetres """
 		if Data.init == False and Data.start and Data.isutu:
-			Deconnexion(False) 
-		else :
 			Deconnexion(True) 
+		else :
+			Deconnexion(False) 
 		
 
 	def evaluerType(self):

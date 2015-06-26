@@ -31,12 +31,13 @@ class ConnexionRead(Thread, Data):
 				# On traite le message si il n'est pas vide
 				if Data.msg_recu != "":
 					msgBrut = Data.msg_recu.decode()
-					printd(msgBrut)
-					if msgBrut[:3] in Data.typesOK:
+					if msgBrut[:3] in Data.typesOK: # on vérifie que le trigrmme au début de la chaine est valide
 						printd(msgBrut) ##AFFICHAGE DE DEBUG
 						leType = msgBrut[:3]
 						donnees = msgBrut[3:]
 						Data.Messages(leType, donnees)
 
 			# On attend 50 ms
-			sleep(0.05)
+			sleep(0.5)
+			if not Data.nonEnd:
+				printd("READ => {}".format(Data.nonEnd))

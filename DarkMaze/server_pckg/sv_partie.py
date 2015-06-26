@@ -44,7 +44,7 @@ class Partie(Thread, Data):
 		self.MessageATous(msgListe)
 
 		sleep(1)
-
+		Data.printd(self.liste_indices)
 		# on lance la boucle du jeu
 		while Data.nonEnd : 	# On boucle tant que le jeu n'est pas terminé
 			for self.IndiceClientQuiJoue in self.liste_indices: # On boucle sur les indices de la liste Data.connectés sans se soucié que le joueur soit connecté ou non
@@ -54,11 +54,12 @@ class Partie(Thread, Data):
 					# on test si le joueur est encore connecté
 					try:
 						Data.connectes[self.IndiceClientQuiJoue][0].send("PING".encode())
-					except IOError, e:
-						if e.errno == errno.EPIPE:
-							Data.printd("Joueur {} déconnecté.".format(Data.connectes[self.IndiceClientQuiJoue][1]))
-							self.deconnect(self.IndiceClientQuiJoue)
-							continue
+					except IOError:
+						
+						Data.printd("Joueur {} déconnecté.".format(Data.connectes[self.IndiceClientQuiJoue][1]))
+						self.deconnect(self.IndiceClientQuiJoue)
+						continue
+
 
 					sleep(0.5)
 
@@ -92,7 +93,7 @@ class Partie(Thread, Data):
 			sleep(1)
 
 		sleep(2)
-		Data.connextion.close()# on coupe la connexion proprement
+		Data.connexion.close()# on coupe la connexion proprement
 
 	def deconnect(self, indice):
 		""" A partir de l'indice du joueur, on passe le booléen Data.connectes[indice][2] à False """
@@ -113,11 +114,11 @@ class Partie(Thread, Data):
 			if Data.connectes[client][2]: # on vérifie que le joueur l'on envoie qu'aux joueurs encore connectés
 				try:
 					Data.clients_connectes[client].send(message.encode())
-				except IOError, e:
-						if e.errno == errno.EPIPE:
-							Data.printd("Joueur {} déconnecté.".format(Data.connectes[client][1]))
-							self.deconnect(client)
-							continue
+				except IOError:
+						
+						Data.printd("Joueur {} déconnecté.".format(Data.connectes[self.IndiceClientQuiJoue][1]))
+						self.deconnect(self.IndiceClientQuiJoue)
+						continue
 				sleep(0.5)
 
 

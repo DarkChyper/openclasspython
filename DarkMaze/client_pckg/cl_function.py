@@ -43,6 +43,10 @@ def Deconnexion(turn=False):
 			Data.message_send = "EXI" + Data.pseudo
 			sleep(1)
 	Data.nonEnd = False
+	with Data.verrou_msg:
+		Data.gestionMSG("***************************")
+		Data.gestionMSG("VOUS AVEZ QUITTER LA PARTIE")
+		Data.gestionMSG("***************************")
 	sleep(2)
 	Data.connexion.close()
 	
