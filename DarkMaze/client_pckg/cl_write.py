@@ -29,7 +29,7 @@ class ConnexionWrite(Thread, Data):
 		while Data.nonEnd:
 			with Data.verrou_send:
 				if Data.message_send != "":
-					print("SEND => {}".format(Data.message_send))
+					printd("SEND => {}".format(Data.message_send))
 					message = Data.message_send.encode()
 					Data.connexion.send(message)
 					Data.message_send = ""

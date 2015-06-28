@@ -33,9 +33,10 @@ def Connexion():
 	Data.connexion.connect((Data.hote, Data.port))
 	print("Connexion établie avec le serveur sur le port {}".format(Data.port))
 	sleep(1)
-	message = "PSD" + Data.pseudo
-	message = message.encode()
-	Data.connexion.send(message)
+	with Data.verrou_send:
+		message = "PSD" + Data.pseudo
+		message = message.encode()
+		Data.connexion.send(message)
 
 def Deconnexion(turn=False):
 	if turn:

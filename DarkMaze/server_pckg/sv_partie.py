@@ -58,6 +58,7 @@ class Partie(Thread, Data):
 						
 						Data.printd("Joueur {} déconnecté.".format(Data.connectes[self.IndiceClientQuiJoue][1]))
 						self.deconnect(self.IndiceClientQuiJoue)
+						self.MessageATous("{} s'est déconnecté".format(Data.connectes[self.IndiceClientQuiJoue][1]))
 						continue
 
 

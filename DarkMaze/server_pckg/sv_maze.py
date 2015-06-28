@@ -58,7 +58,7 @@ class Maze():
 		y = 0
 		for ligne in grille:
 			for case in ligne:
-				if case == "S":
+				if case == "U":
 					return (x,y)
 				x += 1
 			x = 0
@@ -209,9 +209,11 @@ class Maze():
 			Parcourt les clients encore connectés et compare les positions des robots
 			Si la positionATester == la position d'un autre robot, renvoie False
 			Sinon renvoi True"""
-
+		Data.printd("On vérifie que la case cible n'est pas prise par un autre joueur")
+		Data.printd(positionATester)
 		for donneesCLient in Data.connectes:
 			if Data.connectes[donneesClient][2]:
+				Data.printd("x={} y={}".format(Data.connectes[donneesClient][3],Data.connectes[donneesClient][4]))
 				if (Data.connectes[donneesClient][3],Data.connectes[donneesClient][4]) == positionATester:
 					return False
 		return True

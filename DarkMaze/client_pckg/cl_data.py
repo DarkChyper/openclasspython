@@ -160,9 +160,13 @@ class Data():
 		""" Affiche qui à gagner et enclenche la fin de la partie """
 		if Data.donnees == Data.pseudo:
 			Data.donnees = "Félicitation, vous avez gagné !!"
+			Data.isutu = False
 		else:
-			message = "Désolé, vous avez perdu.\n{} est sorti du labyrinthe avant vous.".format(Data.donnees)
-		Data.gestionMSG(message)
+			Data.donnees = "Désolé, vous avez perdu.\n{} est sorti du labyrinthe avant vous.".format(Data.donnees)
+		Data.gestionMSG(Data.donnees)
+		Data.gestionMSG("****************")
+		Data.gestionMSG("FIN DE LA PARTIE")
+		Data.gestionMSG("****************")
 
 	def exi():
 		""" Affiche qui a quitté la partie """
