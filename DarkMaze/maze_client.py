@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 """
+programme principal, côté client, du jeu de labyrinthe DarkMaze
 """
 
 # Imports externes

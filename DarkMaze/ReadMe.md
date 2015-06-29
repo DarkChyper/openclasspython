@@ -2,28 +2,34 @@ ReadMe.md du jeu de labyrinthe DarkMaze (ou Roboc) pour OpenClassRooms
 
 # Avant propos :
 
-La gestion de l'affichage graphine n'est pa correcte et provoque un runtimerror lors de la fermeture de la fenêtre, même avec la fonction quit().
-La solution serait de travailler avec une file d'attente, ce qui sera fait plus tard.
+La règle étant sujette à discussion, j'ai choisi de ne pas accepter des déplacements sur plusieures case d'un coup, déplacements gérés au tour par tour.
+Cette fonction pourrait être ajoutée facilement.
 
-La règle étant sujette à discussion, j'ai choisi de ne pas accepter des déplacement sur plusieures case d'un coup, déplacements gérés au tour par tour.
-Cette fonction pourrait être ajoutée facielement.
+L'utilisation d'une interface graphique étant demandée, j'ai fais le choix d'enlever au joueur la possbilité d'enter les commandes au clavier, tout se fait avec des boutons et des case à cocher.
+
+Il faut lancer le serveur (maze_serveur.py) avant de lancer les client (maze_client.py)
+
+Les données relatives au port de connection se trouvnt dans les fichiers clietns et serveur "data".
+
+On peut activer l'affichage debug en passant à True les variables "DEBUG" dans les fichiers sv_data.py et cl_data.py.
+Les fonction Data.printd() pour le serveur et printd() pour le client sont des fonctions filles de print() et utilisent la variable DEBUG. 
+
+
+*** Le script a été développé sous linux, comme indiqué dans le cours openclassroom, les échanges de caractères accentués peuvent posés des soucis sous un terminal windows non configuré en utf-8. ***
 
 # Les fonctions écrites :
 	* Affichage utilisateur
 	* Echanges entre client et serveur
 	* gestion du jeu par le serveur
+	* mouvement avec controle anti collision des murs et des robots
+	* Murer une porte
+	* Creuser un mur
 
 # Ce qui n'a pas été fait :
-	* Murer une porte
-	* Creuser une porte
 	* les tests unitaires
 
 # Evolutions possibles :
-## Chat : 
-Les bases d'un chat sont posées dans le programme. Il existe déjà un préfixe (MSG) que le serveur peut recevoir pour renvoyer à tout le monde le message.
-Un booleen est aussi définit sur le serveur (Partie.joueur) pour déterminer le pseudo a utiliser entre Partie.clientAutre et Partie.clientQuiJoue.
-	ie : Si c'est au tour de ClientQuijoue mais que c'est clientAutre qui envoie un message de type MSG contenant "Je suis le meilleurs", 
-		 tous les joueurs connectés recevront "pseudo_de_clientAutre : Je suis le meilleurs"
+L'utilisation de trigramme lors d'envoi de messages entre lient t serveur permet d'ajouter simplement de nouvelles fonctionnalités.
 
 # Le serveur :
 
@@ -41,10 +47,10 @@ Un booleen est aussi définit sur le serveur (Partie.joueur) pour déterminer le
 		3 la coordonnée x du joueur int()
 		4 la coordonnee y du joueur int()
 		5 un booleen pour savoir si le joueur est sur une porte
-	La liste peut s'agrandir au besoin. (exemple gestion d'un déplacement sur )
+	La liste peut s'agrandir au besoin. (gestion de clef pour l'ouverture d'une porte)
 
 ## Caractéristiques de clients_connectes :
-
+Il s'agit d'une liste ne contenant que les infos de connexion des joueurs, dans l'ordre de leur 1 ere connexion.
 				
 
 # Le client :

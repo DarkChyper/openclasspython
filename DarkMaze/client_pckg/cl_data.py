@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 """
+Contient les données de connexion, les verrous Rlock, les boolées et variables d'une partie côté client
 """
 
 # Imports externes

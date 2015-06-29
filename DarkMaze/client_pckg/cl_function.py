@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 """
+Contient les fonction non récurrentes et la fonction d'affichage de debug
 """
 
 # Imports externes

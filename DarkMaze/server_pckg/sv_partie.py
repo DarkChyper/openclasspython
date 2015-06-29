@@ -44,7 +44,7 @@ class Partie(Thread, Data):
 		self.MessageATous(msgListe)
 
 		sleep(1)
-		Data.printd(self.liste_indices)
+
 		# on lance la boucle du jeu
 		while Data.nonEnd : 	# On boucle tant que le jeu n'est pas terminé
 			for self.IndiceClientQuiJoue in self.liste_indices: # On boucle sur les indices de la liste Data.connectés sans se soucié que le joueur soit connecté ou non
@@ -86,6 +86,7 @@ class Partie(Thread, Data):
 							for self.clientAutre in nouveaux_a_lire:
 								msg_recu = self.clientAutre.recv(1024).decode()
 								if msg_recu[:3] in Data.listeMsgOk:
+										Data.printd(msg_recu)
 										self.MessagesIn(msg_recu[:3],msg_recu[3:])
 					sleep(1)
 
@@ -189,6 +190,7 @@ class Partie(Thread, Data):
 
 
 	def mur(self):
+		""" gère la demande de murage d'une porte à la demande d'un client """
 		self.jouer = True
 		if Data.maze.murer(self.IndiceClientQuiJoue, Data.connectes[self.IndiceClientQuiJoue][3], Data.connectes[self.IndiceClientQuiJoue][4], self.message[0]):
 			self.EnvoieGrille()
@@ -214,6 +216,8 @@ class Partie(Thread, Data):
 		
 
 	def cre(self):
+		""" gère la demande de creusage d'une porte à la demande d'un client """
+		
 		self.jouer = True
 		if Data.maze.creuser(self.IndiceClientQuiJoue, Data.connectes[self.IndiceClientQuiJoue][3], Data.connectes[self.IndiceClientQuiJoue][4], self.message[0]):
 			self.EnvoieGrille()

@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 """
+Définition du Thread de lecture des données en provenance du serveur.
 """
 
 # Imports externes

@@ -132,8 +132,12 @@ class Maze():
 		if u >= 0 and u <= self.dim[0] and v >= 0 and v <= self.dim[1]:
 			# le mouvement reste dans la grille, on continue
 
-			if self.grille[v][u] == " " or self.grille[v][u] == "." or self.grille[v][u] == "U" or self.NonPris((u,v)) == True:
+			if self.grille[v][u] == " " or self.grille[v][u] == "." or self.grille[v][u] == "U" :
 				# le mouvement n'arrive pas sur un obstacle, on continue
+				test = self.nonPris((u,v))
+				if not test:
+					return False
+
 
 				if Data.connectes[client][5]: 
 					# si le joueur était sur une porte, on la réaffiche
@@ -159,7 +163,7 @@ class Maze():
 			return False
 
 	def murer(self, client, x, y , direction):
-
+		""" réalise le murage d'une porte si la ccase visées est bine une porte """
 
 		if direction == "N":
 			y -= 1
@@ -182,7 +186,7 @@ class Maze():
 			return False
 
 	def creuser(self, client, x, y , direction):
-
+		""" réalise le creusage d'une porte dans un mur si la case visée est bien un mur """
 
 		if direction == "N":
 			y -= 1
@@ -209,12 +213,16 @@ class Maze():
 			Parcourt les clients encore connectés et compare les positions des robots
 			Si la positionATester == la position d'un autre robot, renvoie False
 			Sinon renvoi True"""
+
 		Data.printd("On vérifie que la case cible n'est pas prise par un autre joueur")
 		Data.printd(positionATester)
-		for donneesCLient in Data.connectes:
-			if Data.connectes[donneesClient][2]:
-				Data.printd("x={} y={}".format(Data.connectes[donneesClient][3],Data.connectes[donneesClient][4]))
-				if (Data.connectes[donneesClient][3],Data.connectes[donneesClient][4]) == positionATester:
+
+		nbreJoueurs = len(Data.connectes)
+		liste_indices = range(nbreJoueurs)
+		for client in liste_indices:
+			if Data.connectes[client][2]:
+				Data.printd("x={} y={}".format(Data.connectes[client][3],Data.connectes[client][4]))
+				if (Data.connectes[client][3],Data.connectes[client][4]) == positionATester:
 					return False
 		return True
 
