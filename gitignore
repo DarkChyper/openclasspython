@@ -9,4 +9,5 @@ maze/sylvain/roboc_class.py
 maze/sylvain/roboc_class.pyc
 maze/sylvain/roboc_fonc.py
 tests/
-
+.idea/
+.idea/*
